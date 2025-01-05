@@ -958,7 +958,7 @@ GameObject:
   m_Layer: 0
   m_Name: HexGrid
   m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: 8418204508859773708, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -974,10 +974,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 077fad22d23a78749a04a98da081ecfd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  width: 6
-  height: 6
+  chunkCountX: 4
+  chunkCountZ: 3
   cellPrefab: {fileID: 7634578376399795291, guid: c72ae964b967a4043bcbf6d09293b9c8, type: 3}
   cellLabelPrefab: {fileID: 1313679035159804760, guid: 324a165422f99324390b2528b218a48f, type: 3}
+  chunkPrefab: {fileID: 635381878753421045, guid: 48bd031dd2cf5d84b953b5a11750e2d1, type: 3}
   defaultColor: {r: 1, g: 1, b: 1, a: 1}
   noiseSource: {fileID: 2800000, guid: 69eca4f5e0c479a4b88573bb245854d3, type: 3}
 --- !u!4 &493061483

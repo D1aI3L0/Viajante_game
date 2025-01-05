@@ -8,7 +8,6 @@ public enum HexEdgeType
 
 public static class HexMetrics 
 {
-
 	public const float outerRadius = 10f;
 	public const float innerRadius = outerRadius * 0.866025404f;
 
@@ -26,6 +25,8 @@ public static class HexMetrics
 	public const float noiseScale = 0.003f;
 	public const float cellPerturbStrength = 3.5f;
 	public const float elevationPerturbStrength = 1.5f;
+
+	public const int chunkSizeX = 5, chunkSizeZ = 4;
 
 	public static Vector3[] corners = 
 	{

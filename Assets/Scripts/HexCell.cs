@@ -242,4 +242,12 @@ public class HexCell : MonoBehaviour
 		neighbor.incomingRiver = direction.Opposite();
 		neighbor.RefreshSelfOnly();
 	}
+
+	public float RiverSurfaceY 
+	{
+		get 
+		{
+			return (elevation + HexMetrics.riverSurfaceElevationOffset) * HexMetrics.elevationStep;
+		}
+	}
 }

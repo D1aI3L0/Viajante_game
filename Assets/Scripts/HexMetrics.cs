@@ -32,6 +32,7 @@ public static class HexMetrics
 	public const float elevationPerturbStrength = 1.5f;
 
 	public const float streamBedElevationOffset = -1f;
+	public const float riverSurfaceElevationOffset = -0.5f;
 
 	public static Vector3[] corners = 
 	{

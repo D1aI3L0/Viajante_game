@@ -3,6 +3,10 @@ using UnityEngine.EventSystems;
 
 public class HexMapEditor : MonoBehaviour 
 {
+	enum OptionalToggle 
+	{
+		Ignore, Yes, No
+	}
 
 	public Color[] colors;
 
@@ -16,6 +20,12 @@ public class HexMapEditor : MonoBehaviour
 
 	private int brushSize;
 
+	OptionalToggle riverMode;
+
+	bool isDrag;
+	HexDirection dragDirection;
+	HexCell previousCell;
+
 	void Awake() 
     {
 		SelectColor(0);
@@ -27,6 +37,10 @@ public class HexMapEditor : MonoBehaviour
         {
 			HandleInput();
 		}
+		else 
+		{
+			previousCell = null;
+		}
 	}
 
 	void HandleInput() 
@@ -35,32 +49,46 @@ public class HexMapEditor : MonoBehaviour
 		RaycastHit hit;
 		if (Physics.Raycast(inputRay, out hit)) 
         {
-			EditCells(hexGrid.GetCell(hit.point));
+			HexCell currentCell = hexGrid.GetCell(hit.point);
+			if (previousCell && previousCell != currentCell) 
+			{
+				ValidateDrag(currentCell);
+			}
+			else 
+			{
+				isDrag = false;
+			}
+			EditCells(currentCell);
+			previousCell = currentCell;
+			isDrag = true;
+		}
+		else 
+		{
+			previousCell = null;
 		}
 	}
 
 	void EditCells (HexCell center) 
-		{
-			int centerX = center.coordinates.X;
-			int centerZ = center.coordinates.Z;
+	{
+		int centerX = center.coordinates.X;
+		int centerZ = center.coordinates.Z;
 
-			for (int r = 0, z = centerZ - brushSize; z <= centerZ; z++, r++) 
+		for (int r = 0, z = centerZ - brushSize; z <= centerZ; z++, r++) 
+		{
+			for (int x = centerX - r; x <= centerX + brushSize; x++) 
 			{
-				for (int x = centerX - r; x <= centerX + brushSize; x++) 
-				{
-					EditCell(hexGrid.GetCell(new HexCoordinates(x, z)));
-				}
+				EditCell(hexGrid.GetCell(new HexCoordinates(x, z)));
 			}
+		}
 			
-			for (int r = 0, z = centerZ + brushSize; z > centerZ; z--, r++) 
+		for (int r = 0, z = centerZ + brushSize; z > centerZ; z--, r++) 
+		{
+			for (int x = centerX - brushSize; x <= centerX + r; x++) 
 			{
-				for (int x = centerX - brushSize; x <= centerX + r; x++) 
-				{
 					EditCell(hexGrid.GetCell(new HexCoordinates(x, z)));
-				}
+			}
 		}
-		
-		}
+	}
 
 	void EditCell (HexCell cell) 
 	{
@@ -74,7 +102,32 @@ public class HexMapEditor : MonoBehaviour
 			{
 				cell.Elevation = activeElevation;
 			}
+			if (riverMode == OptionalToggle.No) 
+			{
+				cell.RemoveRiver();
+			}
+			else if (isDrag && riverMode == OptionalToggle.Yes) 
+			{
+				HexCell otherCell = cell.GetNeighbor(dragDirection.Opposite());
+				if (otherCell) 
+				{
+					otherCell.SetOutgoingRiver(dragDirection);
+				}
+			}
 		}
+	}
+
+	void ValidateDrag (HexCell currentCell) 
+	{
+		for (dragDirection = HexDirection.NE; dragDirection <= HexDirection.NW; dragDirection++) 
+		{
+			if (previousCell.GetNeighbor(dragDirection) == currentCell) 
+			{
+				isDrag = true;
+				return;
+			}
+		}
+		isDrag = false;
 	}
 
 	public void SelectColor(int index) 
@@ -105,6 +158,9 @@ public class HexMapEditor : MonoBehaviour
 		hexGrid.ShowUI(visible);
 	}
 
-
+	public void SetRiverMode (int mode) 
+	{
+		riverMode = (OptionalToggle)mode;
+	}
 
 }

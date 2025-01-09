@@ -270,16 +270,20 @@ public class HexGridChunk : MonoBehaviour
 		{
 			e2.v3.y = neighbor.StreamBedY;
 
-			if (!cell.IsUnderwater)
+			if (!cell.IsUnderwater) 
 			{
-				if (!neighbor.IsUnderwater)	
+				if (!neighbor.IsUnderwater) 
 				{
 					TriangulateRiverQuad(e1.v2, e1.v4, e2.v2, e2.v4,cell.RiverSurfaceY, neighbor.RiverSurfaceY, 0.8f,cell.HasIncomingRiver && cell.IncomingRiver == direction);
 				}
-				else if (!neighbor.IsUnderwater && cell.Elevation > neighbor.WaterLevel) 
-				{	
-					TriangulateWaterfallInWater(e1.v2, e1.v4, e2.v2, e2.v4, cell.RiverSurfaceY, neighbor.RiverSurfaceY, neighbor.WaterSurfaceY);
+				else if (cell.Elevation > neighbor.WaterLevel) 
+				{
+					TriangulateWaterfallInWater(e1.v2, e1.v4, e2.v2, e2.v4,cell.RiverSurfaceY, neighbor.RiverSurfaceY,neighbor.WaterSurfaceY);
 				}
+			}
+			else if (!neighbor.IsUnderwater && neighbor.Elevation > cell.WaterLevel) 
+			{
+				TriangulateWaterfallInWater(e2.v4, e2.v2, e1.v4, e1.v2,neighbor.RiverSurfaceY, cell.RiverSurfaceY,cell.WaterSurfaceY);
 			}
 		}
 

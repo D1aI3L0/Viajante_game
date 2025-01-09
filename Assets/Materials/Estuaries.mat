@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: River
-  m_Shader: {fileID: 4800000, guid: 392f0374e489cbd4a8b59545823624e5, type: 3}
+  m_Name: Estuaries
+  m_Shader: {fileID: 4800000, guid: a41c4198b11296440b508daab61a7c6b, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -78,7 +78,7 @@ Material:
     - _UVSec: 0
     - _ZWrite: 1
     m_Colors:
-    - _Color: {r: 0.11173906, g: 0.2760867, b: 0.8773585, a: 0.3529412}
+    - _Color: {r: 0.10980392, g: 0.27450982, b: 0.8784314, a: 0.3529412}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

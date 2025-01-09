@@ -1,4 +1,4 @@
-Shader "Custom/River"
+Shader "Custom/Water"
 {
     Properties
     {
@@ -9,12 +9,14 @@ Shader "Custom/River"
     }
     SubShader
     {
-        Tags { "RenderType"="Transparent" "Queue"="Transparent+1" }
+        Tags { "RenderType"="Transparent" "Queue"="Transparent" }
         LOD 200
 
         CGPROGRAM
         #pragma surface surf Standard alpha 
 		#pragma target 3.0
+
+        #pragma target 3.0
 
         #include "Water.cginc"
 
@@ -23,6 +25,7 @@ Shader "Custom/River"
         struct Input
         {
             float2 uv_MainTex;
+            float3 worldPos;
         };
 
         half _Glossiness;
@@ -32,16 +35,18 @@ Shader "Custom/River"
         UNITY_INSTANCING_BUFFER_START(Props)
         UNITY_INSTANCING_BUFFER_END(Props)
 
-		void surf (Input IN, inout SurfaceOutputStandard o) 
+        void surf (Input IN, inout SurfaceOutputStandard o) 
         {
-            float river = River(IN.uv_MainTex, _MainTex);
-			
-			fixed4 c = saturate(_Color + river);
+			float waves = Waves(IN.worldPos.xz, _MainTex);
+
+			fixed4 c = saturate(_Color + waves);
 			o.Albedo = c.rgb;
 			o.Metallic = _Metallic;
 			o.Smoothness = _Glossiness;
 			o.Alpha = c.a;
 		}
+        
+
         ENDCG
     }
     FallBack "Diffuse"

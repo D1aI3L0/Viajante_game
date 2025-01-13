@@ -14,6 +14,8 @@ public class HexCell : MonoBehaviour
 	bool hasIncomingRiver, hasOutgoingRiver;
 	HexDirection incomingRiver, outgoingRiver;
 
+	int urbanLevel, farmLevel, plantLevel;
+
     public int Elevation 
     {
 		get 
@@ -32,15 +34,6 @@ public class HexCell : MonoBehaviour
             Vector3 uiPosition = uiRect.localPosition;
 			uiPosition.z = -position.y;
 			uiRect.localPosition = uiPosition;
-
-			// if (hasOutgoingRiver && elevation < GetNeighbor(outgoingRiver).elevation) 
-			// {
-			// 	RemoveOutgoingRiver();
-			// }
-			// if (hasIncomingRiver && elevation > GetNeighbor(incomingRiver).elevation)
-			// {
-			// 	RemoveIncomingRiver();
-			// }
 
 			ValidateRivers();
 
@@ -180,8 +173,6 @@ public class HexCell : MonoBehaviour
 		}
 	}
 
-
-
 	public bool HasRoads 
 	{
 		get 
@@ -194,6 +185,54 @@ public class HexCell : MonoBehaviour
 				}
 			}
 			return false;
+		}
+	}
+
+	public int UrbanLevel 
+	{
+		get 
+		{
+			return urbanLevel;
+		}
+		set 
+		{
+			if (urbanLevel != value) 
+			{
+				urbanLevel = value;
+				RefreshSelfOnly();
+			}
+		}
+	}
+
+	public int FarmLevel 
+	{
+		get 
+		{
+			return farmLevel;
+		}
+		set 
+		{
+			if (farmLevel != value) 
+			{
+				farmLevel = value;
+				RefreshSelfOnly();
+			}
+		}
+	}
+
+	public int PlantLevel 
+	{
+		get 
+		{
+			return plantLevel;
+		}
+		set 
+		{
+			if (plantLevel != value) 
+			{
+				plantLevel = value;
+				RefreshSelfOnly();
+			}
 		}
 	}
 

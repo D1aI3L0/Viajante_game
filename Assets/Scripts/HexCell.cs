@@ -12,6 +12,8 @@ public class HexCell : MonoBehaviour
 	private int waterLevel;
 
 	bool hasIncomingRiver, hasOutgoingRiver;
+	bool walled;
+
 	HexDirection incomingRiver, outgoingRiver;
 
 	int urbanLevel, farmLevel, plantLevel;
@@ -75,6 +77,17 @@ public class HexCell : MonoBehaviour
 		}
 	}
 
+	public bool Walled {
+		get {
+			return walled;
+		}
+		set {
+			if (walled != value) {
+				walled = value;
+				Refresh();
+			}
+		}
+	}
 
 	public Color Color 
 	{

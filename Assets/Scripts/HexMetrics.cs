@@ -39,9 +39,12 @@ public static class HexMetrics
 
 	public const int hashGridSize = 256;
 
-	public const float wallHeight = 3f; //высота стены
+	public const float wallHeight = 4f; //высота стены
 	public const float wallThickness = 0.75f; //толщина стены
+	public const float wallYOffset = -1f; //смещение стены по Y
 	public const float wallElevationOffset = verticalTerraceStepSize;
+	public const float wallTowerThreshold = 0.5f; //вероятность размещения башен
+	public const float bridgeDesignLength = 7f; //Исходная длинна прифаба моста
 	static HexHash[] hashGrid;
 	public const float hashGridScale = 0.25f;
 	static float[][] featureThresholds = 
@@ -196,7 +199,7 @@ public static class HexMetrics
 		near.x += (far.x - near.x) * 0.5f;
 		near.z += (far.z - near.z) * 0.5f;
 		float v = near.y < far.y ? wallElevationOffset : (1f - wallElevationOffset);
-		near.y += (far.y - near.y) * v;
+		near.y += (far.y - near.y) * v + wallYOffset;
 		return near;
 	}
 }

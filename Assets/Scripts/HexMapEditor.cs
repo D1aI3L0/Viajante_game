@@ -15,12 +15,12 @@ public class HexMapEditor : MonoBehaviour
 	private Color activeColor;
 	private int activeElevation;
 	private int activeWaterLevel;
-	int activeUrbanLevel, activeFarmLevel, activePlantLevel;
+	int activeUrbanLevel, activeFarmLevel, activePlantLevel, activeSpecialIndex;
 
 	private bool applyColor;
 	private bool applyElevation = false;
 	private bool applyWaterLevel = false;
-	bool applyUrbanLevel, applyFarmLevel, applyPlantLevel;
+	bool applyUrbanLevel, applyFarmLevel, applyPlantLevel, applySpecialIndex;
 
 	private int brushSize;
 
@@ -109,6 +109,10 @@ public class HexMapEditor : MonoBehaviour
 			if (applyWaterLevel) 
 			{
 				cell.WaterLevel = activeWaterLevel;
+			}
+			if (applySpecialIndex) 
+			{
+				cell.SpecialIndex = activeSpecialIndex;
 			}
 			if (applyUrbanLevel) 
 			{
@@ -246,5 +250,15 @@ public class HexMapEditor : MonoBehaviour
 	public void SetWalledMode (int mode) 
 	{
 		walledMode = (OptionalToggle)mode;
+	}
+
+	public void SetApplySpecialIndex (bool toggle) 
+	{
+		applySpecialIndex = toggle;
+	}
+
+	public void SetSpecialIndex (float index) 
+	{
+		activeSpecialIndex = (int)index;
 	}
 }

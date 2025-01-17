@@ -32,19 +32,19 @@ public static class HexMetrics
 	public const float elevationPerturbStrength = 1.5f;
 
 	public const float streamBedElevationOffset = -1.75f;
-
 	public const float waterElevationOffset = -0.5f;
 	public const float waterFactor = 0.6f;
 	public const float waterBlendFactor = 1f - waterFactor;
-
-	public const int hashGridSize = 256;
 
 	public const float wallHeight = 4f; //высота стены
 	public const float wallThickness = 0.75f; //толщина стены
 	public const float wallYOffset = -1f; //смещение стены по Y
 	public const float wallElevationOffset = verticalTerraceStepSize;
 	public const float wallTowerThreshold = 0.5f; //вероятность размещения башен
+	
 	public const float bridgeDesignLength = 7f; //Исходная длинна прифаба моста
+	
+	public const int hashGridSize = 256;
 	static HexHash[] hashGrid;
 	public const float hashGridScale = 0.25f;
 	static float[][] featureThresholds = 
@@ -64,6 +64,8 @@ public static class HexMetrics
 		new Vector3(-innerRadius, 0f, 0.5f * outerRadius),
 		new Vector3(0f, 0f, outerRadius)
 	};
+
+	public static Color[] colors;
 
 	public static Vector3 GetFirstCorner (HexDirection direction) 
 	{

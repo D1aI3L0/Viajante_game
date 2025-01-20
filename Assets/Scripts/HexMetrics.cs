@@ -14,7 +14,7 @@ public static class HexMetrics
 	public const float outerRadius = 10f;
 	public const float innerRadius = outerRadius * outerToInner;
 
-	public const int chunkSizeX = 5, chunkSizeZ = 4;
+	public const int chunkSizeX = 5, chunkSizeZ = 5;
 
 	public const float solidFactor = 0.78f;
 	public const float blendFactor = 1f - solidFactor;

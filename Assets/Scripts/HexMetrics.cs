@@ -65,8 +65,6 @@ public static class HexMetrics
 		new Vector3(0f, 0f, outerRadius)
 	};
 
-	public static Color[] colors;
-
 	public static Vector3 GetFirstCorner (HexDirection direction) 
 	{
 		return corners[(int)direction];

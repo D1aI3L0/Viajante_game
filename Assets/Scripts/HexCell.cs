@@ -110,13 +110,6 @@ public class HexCell : MonoBehaviour
 			return specialIndex > 0;
 		}
 	}
-	public Color Color 
-	{
-		get 
-		{
-			return HexMetrics.colors[terrainTypeIndex];
-		}
-	}
 
 	public int TerrainTypeIndex 
 	{

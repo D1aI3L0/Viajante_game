@@ -1,5 +1,7 @@
 using UnityEngine;
 using System.IO;
+using UnityEngine.UI;
+using TMPro;
 
 public class HexCell : MonoBehaviour 
 {
@@ -14,6 +16,7 @@ public class HexCell : MonoBehaviour
 
 	bool hasIncomingRiver, hasOutgoingRiver;
 	bool walled;
+	int distance; //расстояние между этой ячейкой и выбранной
 
 	HexDirection incomingRiver, outgoingRiver;
 
@@ -275,6 +278,19 @@ public class HexCell : MonoBehaviour
 		get 
 		{
 			return transform.localPosition;
+		}
+	}
+
+	public int Distance 
+	{
+		get 
+		{
+			return distance;
+		}
+		set 
+		{
+			distance = value;
+			UpdateDistanceLabel();
 		}
 	}
 
@@ -545,4 +561,12 @@ public class HexCell : MonoBehaviour
 		uiPosition.z = -position.y;
 		uiRect.localPosition = uiPosition;
 	}
+
+	void UpdateDistanceLabel () 
+	{
+		TMP_Text label = uiRect.GetComponent<TMP_Text>();
+		label.text = distance == int.MaxValue ? "" : distance.ToString();
+	}
+
+
 }

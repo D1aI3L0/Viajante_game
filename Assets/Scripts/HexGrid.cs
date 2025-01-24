@@ -1,6 +1,8 @@
 using TMPro;
 using UnityEngine;
 using System.IO;
+using System.Collections;
+using System.Collections.Generic;
 
 public class HexGrid : MonoBehaviour 
 {
@@ -91,7 +93,7 @@ public class HexGrid : MonoBehaviour
 		}
 	}
 	
-	void CreateCell(int x, int z, int i) 
+	void CreateCell (int x, int z, int i) 
     {
 		Vector3 position;
 		position.x = (x + z * 0.5f - z / 2) * (HexMetrics.innerRadius * 2f);
@@ -129,7 +131,7 @@ public class HexGrid : MonoBehaviour
 		TMP_Text label = Instantiate<TMP_Text>(cellLabelPrefab);
 		label.rectTransform.anchoredPosition =
 			new Vector2(position.x, position.z);
-		label.text = cell.coordinates.ToStringOnSeparateLines();
+		//label.text = cell.coordinates.ToStringOnSeparateLines();
 		cell.uiRect = label.rectTransform;
 
 		cell.Elevation = 0;
@@ -192,6 +194,8 @@ public class HexGrid : MonoBehaviour
 
 	public void Load (BinaryReader reader, int header) 
 	{
+		StopAllCoroutines();
+
 		int x = 20, z = 15;
 		if (header >= 1) 
 		{
@@ -217,9 +221,79 @@ public class HexGrid : MonoBehaviour
 		}
 	}
 
+	public void FindDistancesTo (HexCell cell) 
+	{
+		StopAllCoroutines();
+		StartCoroutine(Search(cell));
+	}
 
+	IEnumerator Search (HexCell cell) 
+	{
+		for (int i = 0; i < cells.Length; i++) 
+		{
+			cells[i].Distance = int.MaxValue;
+		}
 
+		WaitForSeconds delay = new WaitForSeconds(1 / 60f); //замедление выполнения кода для наглядности
 
+		List<HexCell> frontier = new List<HexCell>();
+		cell.Distance = 0;
+		frontier.Add(cell);
+
+		while (frontier.Count > 0) 
+		{
+			yield return delay;
+			HexCell current = frontier[0];
+			frontier.RemoveAt(0);
+
+			for (HexDirection d = HexDirection.NE; d <= HexDirection.NW; d++)
+			{
+				HexCell neighbor = current.GetNeighbor(d); //избегание при поиске расстояния
+				if (neighbor == null) 
+				{
+					continue;
+				}
+				if (neighbor.IsUnderwater) 
+				{
+					continue;
+				}
+				if (current.GetEdgeType(neighbor) == HexEdgeType.Cliff) 
+				{
+					continue;
+				}
+				HexEdgeType edgeType = current.GetEdgeType(neighbor);
+				if (edgeType == HexEdgeType.Cliff) 
+				{
+					continue;
+				}
+
+				int distance = current.Distance; // дистанция в стоимости перемещения
+				if (current.HasRoadThroughEdge(d))
+				{
+					distance += 1; // перемещение по дороге стоит 1 (остальные объекты не влияют)
+				}
+				else if (current.Walled != neighbor.Walled) // стена не позволяет поремещаться как и обрывы
+				{
+					continue;
+				}
+				else 
+				{
+					distance += edgeType == HexEdgeType.Flat ? 5 : 10; // обычное перемещение 5 по склонам 10
+					distance += neighbor.UrbanLevel + neighbor.FarmLevel + neighbor.PlantLevel; // прибавление уровня зданий,ферм,лесов к стоимости передвижения
+				}
+				if (neighbor.Distance == int.MaxValue) 
+				{
+					neighbor.Distance = distance;
+					frontier.Add(neighbor);
+				}
+				else if (distance < neighbor.Distance) 
+				{
+					neighbor.Distance = distance;
+				}
+				frontier.Sort((x, y) => x.Distance.CompareTo(y.Distance));
+			}
+		}
+	}
 
 
 

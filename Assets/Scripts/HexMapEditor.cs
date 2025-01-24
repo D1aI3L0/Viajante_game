@@ -27,6 +27,14 @@ public class HexMapEditor : MonoBehaviour
 	bool isDrag;
 	HexDirection dragDirection;
 	HexCell previousCell;
+	public Material terrainMaterial;
+	bool editMode;
+
+
+	void Awake () 
+	{
+		terrainMaterial.DisableKeyword("GRID_ON");
+	}
 
 	void Update() 
     {
@@ -55,9 +63,16 @@ public class HexMapEditor : MonoBehaviour
 			{
 				isDrag = false;
 			}
-			EditCells(currentCell);
+			if (editMode)
+			{
+				EditCells(currentCell);
+			}			
+			else 
+			{
+				hexGrid.FindDistancesTo(currentCell);
+			}
 			previousCell = currentCell;
-			isDrag = true;
+			//isDrag = true;
 		}
 		else 
 		{
@@ -181,10 +196,10 @@ public class HexMapEditor : MonoBehaviour
 		brushSize = (int)size;
 	}
 
-	public void ShowUI (bool visible) 
-	{
-		hexGrid.ShowUI(visible);
-	}
+	// public void ShowUI (bool visible) 
+	// {
+	// 	hexGrid.ShowUI(visible);
+	// }
 
 	public void SetRiverMode (int mode) 
 	{
@@ -251,31 +266,22 @@ public class HexMapEditor : MonoBehaviour
 		activeSpecialIndex = (int)index;
 	}
 
-	// public void Save () 
-	// {
-	// 	string path = Path.Combine(Application.persistentDataPath, "test.map");
-	// 	using (BinaryWriter writer = new BinaryWriter(File.Open(path, FileMode.Create))) 
-	// 	{
-	// 		writer.Write(1);
-	// 		hexGrid.Save(writer);
-	// 	}
-	// }
+	public void ShowGrid (bool visible) 
+	{
+		if (visible) 
+		{
+			terrainMaterial.EnableKeyword("GRID_ON");
+		}
+		else 
+		{
+			terrainMaterial.DisableKeyword("GRID_ON");
+		}
+	}
 
-	// public void Load () 
-	// {
-	// 	string path = Path.Combine(Application.persistentDataPath, "test.map");
-	// 	using (BinaryReader reader = new BinaryReader(File.OpenRead(path))) 
-	// 	{
-	// 		int header = reader.ReadInt32();
-	// 		if (header <= 1) 
-	// 		{
-	// 			hexGrid.Load(reader, header);
-	// 			HexMapCamera.ValidatePosition();
-	// 		}
-	// 		else 
-	// 		{
-	// 			Debug.LogWarning("Unknown map format " + header);
-	// 		}
-	// 	}
-	// }
+	public void SetEditMode (bool toggle) 
+	{
+		editMode = toggle;
+		hexGrid.ShowUI(!toggle);
+	}
+
 }

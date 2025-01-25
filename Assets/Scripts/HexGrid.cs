@@ -6,10 +6,8 @@ using System.Collections.Generic;
 
 public class HexGrid : MonoBehaviour 
 {
-	//public int chunkCountX = 4, chunkCountZ = 3;
 	public int cellCountX = 20, cellCountZ = 15;
 
-	//int cellCountX, cellCountZ;
 	int chunkCountX, chunkCountZ;
 
 	public HexCell cellPrefab;
@@ -22,6 +20,7 @@ public class HexGrid : MonoBehaviour
 
 	public Texture2D noiseSource;
 	public int seed;
+	HexCellPriorityQueue searchFrontier;
 
 	void Awake () 
 	{
@@ -221,30 +220,55 @@ public class HexGrid : MonoBehaviour
 		}
 	}
 
-	public void FindDistancesTo (HexCell cell) 
+	public void FindPath (HexCell fromCell, HexCell toCell) 
 	{
 		StopAllCoroutines();
-		StartCoroutine(Search(cell));
+		StartCoroutine(Search(fromCell, toCell));
 	}
 
-	IEnumerator Search (HexCell cell) 
+	IEnumerator Search (HexCell fromCell, HexCell toCell)
 	{
+		if (searchFrontier == null) 
+		{
+			searchFrontier = new HexCellPriorityQueue();
+		}
+		else 
+		{
+			searchFrontier.Clear();
+		}
+
+
 		for (int i = 0; i < cells.Length; i++) 
 		{
 			cells[i].Distance = int.MaxValue;
+			cells[i].DisableHighlight();
 		}
+		fromCell.EnableHighlight(Color.blue);
+		toCell.EnableHighlight(Color.red);
 
 		WaitForSeconds delay = new WaitForSeconds(1 / 60f); //замедление выполнения кода для наглядности
 
-		List<HexCell> frontier = new List<HexCell>();
-		cell.Distance = 0;
-		frontier.Add(cell);
+		//List<HexCell> frontier = new List<HexCell>();
+		fromCell.Distance = 0;
+		//frontier.Add(fromCell);
+		searchFrontier.Enqueue(fromCell);
 
-		while (frontier.Count > 0) 
+		while (searchFrontier.Count > 0) 
 		{
 			yield return delay;
-			HexCell current = frontier[0];
-			frontier.RemoveAt(0);
+			HexCell current = searchFrontier.Dequeue();
+			//frontier.RemoveAt(0);
+
+			if (current == toCell) // когда текущая ячейка является конечной поиск прекращается
+			{
+				current = current.PathFrom;
+				while (current != fromCell) // отрисовка пути (от конечнай точки к стартовой по ссылкам оставшимся во время поиска пути)
+				{
+					current.EnableHighlight(Color.white);
+					current = current.PathFrom;
+				}
+				break;
+			}
 
 			for (HexDirection d = HexDirection.NE; d <= HexDirection.NW; d++)
 			{
@@ -281,16 +305,22 @@ public class HexGrid : MonoBehaviour
 					distance += edgeType == HexEdgeType.Flat ? 5 : 10; // обычное перемещение 5 по склонам 10
 					distance += neighbor.UrbanLevel + neighbor.FarmLevel + neighbor.PlantLevel; // прибавление уровня зданий,ферм,лесов к стоимости передвижения
 				}
-				if (neighbor.Distance == int.MaxValue) 
+				if (neighbor.Distance == int.MaxValue)
 				{
 					neighbor.Distance = distance;
-					frontier.Add(neighbor);
+					neighbor.PathFrom = current;
+					neighbor.SearchHeuristic = neighbor.coordinates.DistanceTo(toCell.coordinates); //вычисление значения эвристики (при добавление ячейки к границк)*
+					//frontier.Add(neighbor);
+					searchFrontier.Enqueue(neighbor);
 				}
 				else if (distance < neighbor.Distance) 
 				{
+					int oldPriority = neighbor.SearchPriority;
 					neighbor.Distance = distance;
+					neighbor.PathFrom = current;
+					searchFrontier.Change(neighbor, oldPriority);
 				}
-				frontier.Sort((x, y) => x.Distance.CompareTo(y.Distance));
+				//frontier.Sort((x, y) => x.SearchPriority.CompareTo(y.SearchPriority)); // сортировка ячеек границ
 			}
 		}
 	}

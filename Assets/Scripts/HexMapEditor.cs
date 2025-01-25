@@ -26,7 +26,7 @@ public class HexMapEditor : MonoBehaviour
 
 	bool isDrag;
 	HexDirection dragDirection;
-	HexCell previousCell;
+	HexCell previousCell, searchFromCell, searchToCell;
 	public Material terrainMaterial;
 	bool editMode;
 
@@ -63,14 +63,30 @@ public class HexMapEditor : MonoBehaviour
 			{
 				isDrag = false;
 			}
-			if (editMode)
+			if (editMode) 
 			{
 				EditCells(currentCell);
-			}			
-			else 
-			{
-				hexGrid.FindDistancesTo(currentCell);
 			}
+			else if (Input.GetKey(KeyCode.LeftShift) && searchToCell != currentCell) // указывание начальной точки поиска пути (шифт+лкм) (начало не может юыть концом)
+			{
+				if (searchFromCell) 
+				{
+					searchFromCell.DisableHighlight();
+				}
+				searchFromCell = currentCell;
+				searchFromCell.EnableHighlight(Color.blue);
+
+				if (searchToCell) 
+				{
+					hexGrid.FindPath(searchFromCell, searchToCell);
+				}
+			}
+			else if (searchFromCell && searchFromCell != currentCell) // поиск пути если начальная и конечная точка отличаются
+			{
+				searchToCell = currentCell;
+				hexGrid.FindPath(searchFromCell, currentCell);
+			}
+
 			previousCell = currentCell;
 			//isDrag = true;
 		}

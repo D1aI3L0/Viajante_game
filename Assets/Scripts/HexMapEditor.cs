@@ -2,9 +2,9 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using System.IO;
 
-public class HexMapEditor : MonoBehaviour 
+public class HexMapEditor : MonoBehaviour
 {
-	enum OptionalToggle 
+	enum OptionalToggle
 	{
 		Ignore, Yes, No
 	}
@@ -31,147 +31,152 @@ public class HexMapEditor : MonoBehaviour
 	bool editMode;
 
 
-	void Awake () 
+	void Awake()
 	{
 		terrainMaterial.DisableKeyword("GRID_ON");
 	}
 
-	void Update() 
-    {
-		if (Input.GetMouseButton(0) && !EventSystem.current.IsPointerOverGameObject()) 
-        {
+	void Update()
+	{
+		if (Input.GetMouseButton(0) && !EventSystem.current.IsPointerOverGameObject())
+		{
 			HandleInput();
 		}
-		else 
+		else
 		{
 			previousCell = null;
 		}
 	}
 
-	void HandleInput() 
-    {
+	void HandleInput()
+	{
 		Ray inputRay = Camera.main.ScreenPointToRay(Input.mousePosition);
 		RaycastHit hit;
-		if (Physics.Raycast(inputRay, out hit)) 
-        {
+		if (Physics.Raycast(inputRay, out hit))
+		{
 			HexCell currentCell = hexGrid.GetCell(hit.point);
-			if (previousCell && previousCell != currentCell) 
+			if (previousCell && previousCell != currentCell)
 			{
 				ValidateDrag(currentCell);
 			}
-			else 
+			else
 			{
 				isDrag = false;
 			}
-			if (editMode) 
+			if (editMode)
 			{
 				EditCells(currentCell);
 			}
 			else if (Input.GetKey(KeyCode.LeftShift) && searchToCell != currentCell) // указывание начальной точки поиска пути (шифт+лкм) (начало не может юыть концом)
 			{
-				if (searchFromCell) 
+				if (searchFromCell != currentCell)
 				{
-					searchFromCell.DisableHighlight();
-				}
-				searchFromCell = currentCell;
-				searchFromCell.EnableHighlight(Color.blue);
+					if (searchFromCell)
+					{
+						searchFromCell.DisableHighlight();
+					}
+					searchFromCell = currentCell;
+					searchFromCell.EnableHighlight(Color.blue);
 
-				if (searchToCell) 
-				{
-					hexGrid.FindPath(searchFromCell, searchToCell);
+					if (searchToCell)
+					{
+						hexGrid.FindPath(searchFromCell, searchToCell, 24);
+					}
 				}
 			}
 			else if (searchFromCell && searchFromCell != currentCell) // поиск пути если начальная и конечная точка отличаются
 			{
-				searchToCell = currentCell;
-				hexGrid.FindPath(searchFromCell, currentCell);
+				if (searchFromCell != currentCell)
+				{
+					searchToCell = currentCell;
+					hexGrid.FindPath(searchFromCell, currentCell, 24);
+				}
 			}
 
 			previousCell = currentCell;
-			//isDrag = true;
 		}
-		else 
+		else
 		{
 			previousCell = null;
 		}
 	}
 
-	void EditCells (HexCell center) 
+	void EditCells(HexCell center)
 	{
 		int centerX = center.coordinates.X;
 		int centerZ = center.coordinates.Z;
 
-		for (int r = 0, z = centerZ - brushSize; z <= centerZ; z++, r++) 
+		for (int r = 0, z = centerZ - brushSize; z <= centerZ; z++, r++)
 		{
-			for (int x = centerX - r; x <= centerX + brushSize; x++) 
+			for (int x = centerX - r; x <= centerX + brushSize; x++)
 			{
 				EditCell(hexGrid.GetCell(new HexCoordinates(x, z)));
 			}
 		}
-			
-		for (int r = 0, z = centerZ + brushSize; z > centerZ; z--, r++) 
+
+		for (int r = 0, z = centerZ + brushSize; z > centerZ; z--, r++)
 		{
-			for (int x = centerX - brushSize; x <= centerX + r; x++) 
+			for (int x = centerX - brushSize; x <= centerX + r; x++)
 			{
-					EditCell(hexGrid.GetCell(new HexCoordinates(x, z)));
+				EditCell(hexGrid.GetCell(new HexCoordinates(x, z)));
 			}
 		}
 	}
 
-	void EditCell (HexCell cell) 
+	void EditCell(HexCell cell)
 	{
 		if (cell)
 		{
-			if (activeTerrainTypeIndex >= 0) 
+			if (activeTerrainTypeIndex >= 0)
 			{
 				cell.TerrainTypeIndex = activeTerrainTypeIndex;
 			}
-			if (applyElevation) 
+			if (applyElevation)
 			{
 				cell.Elevation = activeElevation;
 			}
-			if (applyWaterLevel) 
+			if (applyWaterLevel)
 			{
 				cell.WaterLevel = activeWaterLevel;
 			}
-			if (applySpecialIndex) 
+			if (applySpecialIndex)
 			{
 				cell.SpecialIndex = activeSpecialIndex;
 			}
-			if (applyUrbanLevel) 
+			if (applyUrbanLevel)
 			{
 				cell.UrbanLevel = activeUrbanLevel;
 			}
-			if (applyFarmLevel) 
+			if (applyFarmLevel)
 			{
 				cell.FarmLevel = activeFarmLevel;
 			}
-			if (applyPlantLevel) 
+			if (applyPlantLevel)
 			{
 				cell.PlantLevel = activePlantLevel;
 			}
-			if (riverMode == OptionalToggle.No) 
+			if (riverMode == OptionalToggle.No)
 			{
 				cell.RemoveRiver();
 			}
-			if (roadMode == OptionalToggle.No) 
+			if (roadMode == OptionalToggle.No)
 			{
 				cell.RemoveRoads();
 			}
-			if (walledMode != OptionalToggle.Ignore) 
+			if (walledMode != OptionalToggle.Ignore)
 			{
 				cell.Walled = walledMode == OptionalToggle.Yes;
 			}
-			if (isDrag) 
+			if (isDrag)
 			{
 				HexCell otherCell = cell.GetNeighbor(dragDirection.Opposite());
-				if (otherCell) 
+				if (otherCell)
 				{
-					if (riverMode == OptionalToggle.Yes) 
+					if (riverMode == OptionalToggle.Yes)
 					{
 						otherCell.SetOutgoingRiver(dragDirection);
 					}
-					if (roadMode == OptionalToggle.Yes) 
+					if (roadMode == OptionalToggle.Yes)
 					{
 						otherCell.AddRoad(dragDirection);
 					}
@@ -180,11 +185,11 @@ public class HexMapEditor : MonoBehaviour
 		}
 	}
 
-	void ValidateDrag (HexCell currentCell) 
+	void ValidateDrag(HexCell currentCell)
 	{
-		for (dragDirection = HexDirection.NE; dragDirection <= HexDirection.NW; dragDirection++) 
+		for (dragDirection = HexDirection.NE; dragDirection <= HexDirection.NW; dragDirection++)
 		{
-			if (previousCell.GetNeighbor(dragDirection) == currentCell) 
+			if (previousCell.GetNeighbor(dragDirection) == currentCell)
 			{
 				isDrag = true;
 				return;
@@ -193,22 +198,23 @@ public class HexMapEditor : MonoBehaviour
 		isDrag = false;
 	}
 
-	public void SetTerrainTypeIndex (int index) 
+	public void SetTerrainTypeIndex(int index)
 	{
 		activeTerrainTypeIndex = index;
 	}
 
-	public void SetElevation (float elevation) 
+	public void SetElevation(float elevation)
 	{
 		activeElevation = (int)elevation;
 	}
 
-	public void SetApplyElevation (bool toggle) 
+	public void SetApplyElevation(bool toggle)
 	{
 		applyElevation = toggle;
 	}
 
-	public void SetBrushSize (float size) {
+	public void SetBrushSize(float size)
+	{
 		brushSize = (int)size;
 	}
 
@@ -217,84 +223,84 @@ public class HexMapEditor : MonoBehaviour
 	// 	hexGrid.ShowUI(visible);
 	// }
 
-	public void SetRiverMode (int mode) 
+	public void SetRiverMode(int mode)
 	{
 		riverMode = (OptionalToggle)mode;
 	}
 
-	public void SetRoadMode (int mode) 
+	public void SetRoadMode(int mode)
 	{
 		roadMode = (OptionalToggle)mode;
 	}
 
-	public void SetApplyWaterLevel (bool toggle) 
+	public void SetApplyWaterLevel(bool toggle)
 	{
 		applyWaterLevel = toggle;
 	}
-	
-	public void SetWaterLevel (float level) 
+
+	public void SetWaterLevel(float level)
 	{
 		activeWaterLevel = (int)level;
 	}
 
-	public void SetApplyUrbanLevel (bool toggle) 
+	public void SetApplyUrbanLevel(bool toggle)
 	{
 		applyUrbanLevel = toggle;
 	}
-	
-	public void SetUrbanLevel (float level) 
+
+	public void SetUrbanLevel(float level)
 	{
 		activeUrbanLevel = (int)level;
 	}
 
-	public void SetApplyFarmLevel (bool toggle) 
+	public void SetApplyFarmLevel(bool toggle)
 	{
 		applyFarmLevel = toggle;
 	}
 
-	public void SetFarmLevel (float level) 
+	public void SetFarmLevel(float level)
 	{
 		activeFarmLevel = (int)level;
 	}
 
-	public void SetApplyPlantLevel (bool toggle) 
+	public void SetApplyPlantLevel(bool toggle)
 	{
 		applyPlantLevel = toggle;
 	}
 
-	public void SetPlantLevel (float level) 
+	public void SetPlantLevel(float level)
 	{
 		activePlantLevel = (int)level;
 	}
 
-	public void SetWalledMode (int mode) 
+	public void SetWalledMode(int mode)
 	{
 		walledMode = (OptionalToggle)mode;
 	}
 
-	public void SetApplySpecialIndex (bool toggle) 
+	public void SetApplySpecialIndex(bool toggle)
 	{
 		applySpecialIndex = toggle;
 	}
 
-	public void SetSpecialIndex (float index) 
+	public void SetSpecialIndex(float index)
 	{
 		activeSpecialIndex = (int)index;
 	}
 
-	public void ShowGrid (bool visible) 
+	public void ShowGrid(bool visible)
 	{
-		if (visible) 
+		if (visible)
 		{
 			terrainMaterial.EnableKeyword("GRID_ON");
 		}
-		else 
+		else
 		{
 			terrainMaterial.DisableKeyword("GRID_ON");
 		}
 	}
 
-	public void SetEditMode (bool toggle) 
+	public void SetEditMode(bool toggle)
 	{
 		editMode = toggle;
 		hexGrid.ShowUI(!toggle);

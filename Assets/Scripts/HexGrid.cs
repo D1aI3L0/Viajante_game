@@ -175,6 +175,16 @@ public class HexGrid : MonoBehaviour
 		return cells[x + z * cellCountX];
 	}
 
+	public HexCell GetCell (Ray ray) 
+	{
+		RaycastHit hit;
+		if (Physics.Raycast(ray, out hit)) 
+		{
+			return GetCell(hit.point);
+		}
+		return null;
+	}
+
 	public void ShowUI(bool visible)
 	{
 		for (int i = 0; i < chunks.Length; i++)
@@ -295,7 +305,7 @@ public class HexGrid : MonoBehaviour
 				{
 					continue;
 				}
-				if (neighbor.IsUnderwater)
+				if (neighbor.IsUnderwater || neighbor.Unit)
 				{
 					continue;
 				}
@@ -372,7 +382,7 @@ public class HexGrid : MonoBehaviour
 		currentPathTo.EnableHighlight(Color.red);
 	}
 
-	void ClearPath()
+	public void ClearPath()
 	{
 		if (currentPathExists)
 		{
@@ -393,6 +403,14 @@ public class HexGrid : MonoBehaviour
 	//-------------------------------- Юниты -------------------------------------
 	public HexUnit unitPrefab;
 	List<HexUnit> units = new List<HexUnit>();
+
+	public bool HasPath 
+	{
+		get 
+		{
+			return currentPathExists;
+		}
+	}
 
 	void ClearUnits () 
 	{
@@ -416,7 +434,6 @@ public class HexGrid : MonoBehaviour
 		units.Remove(unit);
 		unit.Die();
 	}
-
 
 	//----------------------------------------------------------------------------
 }

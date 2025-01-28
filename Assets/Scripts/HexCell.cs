@@ -335,13 +335,22 @@ public class HexCell : MonoBehaviour
 					neighbor.chunk.Refresh();
 				}
 			}
+			if (Unit) 
+			{
+				Unit.ValidateLocation();
+			}
 		}
 	}
 
 	void RefreshSelfOnly()
 	{
 		chunk.Refresh();
+		if (Unit) 
+			{
+				Unit.ValidateLocation();
+			}
 	}
+	
 
 	public bool HasRiverThroughEdge(HexDirection direction)
 	{
@@ -598,6 +607,12 @@ public class HexCell : MonoBehaviour
 		highlight.color = color;
 		highlight.enabled = true;
 	}
+
+	//----------------------------------------------------------------------------
+
+	//-------------------------------- Юниты -------------------------------------
+	public HexUnit Unit { get; set; }
+
 
 	//----------------------------------------------------------------------------
 }

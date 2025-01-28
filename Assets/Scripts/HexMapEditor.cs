@@ -29,6 +29,7 @@ public class HexMapEditor : MonoBehaviour
 	HexCell previousCell, searchFromCell, searchToCell;
 	public Material terrainMaterial;
 	bool editMode;
+	
 
 
 	void Awake()
@@ -38,23 +39,34 @@ public class HexMapEditor : MonoBehaviour
 
 	void Update()
 	{
-		if (Input.GetMouseButton(0) && !EventSystem.current.IsPointerOverGameObject())
+		if (!EventSystem.current.IsPointerOverGameObject()) 
 		{
-			HandleInput();
+			if (Input.GetMouseButton(0)) 
+			{
+				HandleInput();
+				return;
+			}
+			if (Input.GetKeyDown(KeyCode.U)) 
+			{
+			if (Input.GetKey(KeyCode.LeftShift)) 
+			{
+				DestroyUnit();
+			}
+			else 
+			{
+				CreateUnit();
+			}
+				return;
+			}
 		}
-		else
-		{
-			previousCell = null;
-		}
+		previousCell = null;
 	}
 
 	void HandleInput()
 	{
-		Ray inputRay = Camera.main.ScreenPointToRay(Input.mousePosition);
-		RaycastHit hit;
-		if (Physics.Raycast(inputRay, out hit))
+		HexCell currentCell = GetCellUnderCursor();
+		if (currentCell) 
 		{
-			HexCell currentCell = hexGrid.GetCell(hit.point);
 			if (previousCell && previousCell != currentCell)
 			{
 				ValidateDrag(currentCell);
@@ -92,7 +104,6 @@ public class HexMapEditor : MonoBehaviour
 					hexGrid.FindPath(searchFromCell, currentCell, 24);
 				}
 			}
-
 			previousCell = currentCell;
 		}
 		else
@@ -306,4 +317,38 @@ public class HexMapEditor : MonoBehaviour
 		hexGrid.ShowUI(!toggle);
 	}
 
+	HexCell GetCellUnderCursor () 
+	{
+		Ray inputRay = Camera.main.ScreenPointToRay(Input.mousePosition);
+		RaycastHit hit;
+		if (Physics.Raycast(inputRay, out hit)) 
+		{
+			return hexGrid.GetCell(hit.point);
+		}
+		return null;
+	}
+
+
+	//-------------------------------- Юниты -------------------------------------
+	
+	//public HexUnit unitPrefab;
+
+	void CreateUnit () 
+	{
+		HexCell cell = GetCellUnderCursor();
+		if (cell && !cell.Unit) 
+		{
+			hexGrid.AddUnit(Instantiate(HexUnit.unitPrefab), cell, Random.Range(0f, 360f));
+		}
+	}
+
+	void DestroyUnit () 
+	{
+		HexCell cell = GetCellUnderCursor();
+		if (cell && cell.Unit) 
+		{
+			hexGrid.RemoveUnit(cell.Unit);
+		}
+	}
+	//----------------------------------------------------------------------------
 }

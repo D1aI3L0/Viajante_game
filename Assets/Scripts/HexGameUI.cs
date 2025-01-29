@@ -1,86 +1,83 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class HexGameUI : MonoBehaviour 
+public class HexGameUI : MonoBehaviour
 {
 	public HexGrid grid;
-    HexCell currentCell;
-    HexUnit selectedUnit;
+	HexCell currentCell;
+	HexUnit selectedUnit;
 
-	void Update () 
-    {
-		if (!EventSystem.current.IsPointerOverGameObject()) 
-        {
-			if (Input.GetMouseButtonDown(0)) 
-            {
+	void Update()
+	{
+		if (!EventSystem.current.IsPointerOverGameObject())
+		{
+			if (Input.GetMouseButtonDown(0))
+			{
 				DoSelection();
 			}
-			else if (selectedUnit) 
-            {
-				if (Input.GetMouseButtonDown(1)) 
-                {
+			else if (selectedUnit)
+			{
+				if (Input.GetMouseButtonDown(1))
+				{
 					DoMove();
 				}
-				else 
-                {
+				else
+				{
 					DoPathfinding();
 				}
 			}
 		}
 	}
 
-
-
-
-    public void SetEditMode (bool toggle) 
-    {
+	public void SetEditMode(bool toggle)
+	{
 		enabled = !toggle;
 		grid.ShowUI(!toggle);
-        grid.ClearPath();
+		grid.ClearPath();
 	}
 
-    bool UpdateCurrentCell () 
-    {
+	bool UpdateCurrentCell()
+	{
 		HexCell cell = grid.GetCell(Camera.main.ScreenPointToRay(Input.mousePosition));
-		if (cell != currentCell) 
-        {
+		if (cell != currentCell)
+		{
 			currentCell = cell;
 			return true;
 		}
 		return false;
 	}
 
-    void DoSelection () 
-    {
-        grid.ClearPath();
+	void DoSelection()
+	{
+		grid.ClearPath();
 		UpdateCurrentCell();
-		if (currentCell) 
-        {
+		if (currentCell)
+		{
 			selectedUnit = currentCell.Unit;
 		}
 	}
 
-    void DoPathfinding () 
-    {
-		if (UpdateCurrentCell()) 
-        {
-			if (currentCell && selectedUnit.IsValidDestination(currentCell)) 
-            {
+	void DoPathfinding()
+	{
+		if (UpdateCurrentCell())
+		{
+			if (currentCell && selectedUnit.IsValidDestination(currentCell))
+			{
 				grid.FindPath(selectedUnit.Location, currentCell, 24);
 			}
-			else 
-            {
+			else
+			{
 				grid.ClearPath();
 			}
 		}
 	}
 
-    	void DoMove () 
-        {
-		if (grid.HasPath) 
-            {
-			    selectedUnit.Location = currentCell;
-			    grid.ClearPath();
-		    }
-    	}
+	void DoMove()
+	{
+		if (grid.HasPath)
+		{
+			selectedUnit.Travel(grid.GetPath());
+			grid.ClearPath();
+		}
+	}
 }

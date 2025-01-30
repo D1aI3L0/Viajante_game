@@ -12815,10 +12815,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useCollider: 0
-  useColors: 0
+  useCellData: 0
   useUVCoordinates: 0
   useUV2Coordinates: 0
-  useTerrainTypes: 0
 --- !u!23 &1510072076
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -16059,7 +16058,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hexGrid: {fileID: 493061482}
   terrainMaterial: {fileID: 2100000, guid: 5036702345b8c48488b009f9d80210ae, type: 2}
-  unitPrefab: {fileID: 8454914924492444950, guid: c2a4ac769b41bcc48a0706c586447e7c, type: 3}
 --- !u!114 &1970156158
 MonoBehaviour:
   m_ObjectHideFlags: 0

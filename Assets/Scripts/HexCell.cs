@@ -23,6 +23,9 @@ public class HexCell : MonoBehaviour
 	private int urbanLevel, farmLevel, plantLevel;
 	public int specialIndex;
 
+	public HexCellShaderData ShaderData { get; set; }
+	public int Index { get; set; }
+
 	public int Elevation
 	{
 		get
@@ -86,7 +89,7 @@ public class HexCell : MonoBehaviour
 			if (terrainTypeIndex != value)
 			{
 				terrainTypeIndex = value;
-				Refresh();
+				ShaderData.RefreshTerrain(this);
 			}
 		}
 	}
@@ -335,7 +338,7 @@ public class HexCell : MonoBehaviour
 					neighbor.chunk.Refresh();
 				}
 			}
-			if (Unit) 
+			if (Unit)
 			{
 				Unit.ValidateLocation();
 			}
@@ -345,12 +348,12 @@ public class HexCell : MonoBehaviour
 	void RefreshSelfOnly()
 	{
 		chunk.Refresh();
-		if (Unit) 
-			{
-				Unit.ValidateLocation();
-			}
+		if (Unit)
+		{
+			Unit.ValidateLocation();
+		}
 	}
-	
+
 
 	public bool HasRiverThroughEdge(HexDirection direction)
 	{
@@ -524,6 +527,7 @@ public class HexCell : MonoBehaviour
 	public void Load(BinaryReader reader)
 	{
 		terrainTypeIndex = reader.ReadByte();
+		ShaderData.RefreshTerrain(this);
 		elevation = reader.ReadByte();
 		RefreshPosition();
 		waterLevel = reader.ReadByte();
@@ -607,12 +611,45 @@ public class HexCell : MonoBehaviour
 		highlight.color = color;
 		highlight.enabled = true;
 	}
-
 	//----------------------------------------------------------------------------
+
+
 
 	//-------------------------------- Юниты -------------------------------------
 	public HexUnit Unit { get; set; }
+	//----------------------------------------------------------------------------
 
+
+
+	//-------------------------------- Тукамн войны -------------------------------------
+	int visibility;
+
+	public bool IsVisible
+	{
+		get
+		{
+			return visibility > 0;
+		}
+	}
+
+	public void IncreaseVisibility()
+	{
+		visibility += 1;
+		if (visibility == 1)
+		{
+			ShaderData.RefreshVisibility(this);
+		}
+	}
+
+	public void DecreaseVisibility()
+	{
+		visibility -= 1;
+		if (visibility == 0)
+		{
+			ShaderData.RefreshVisibility(this);
+		}
+	}
 
 	//----------------------------------------------------------------------------
+
 }

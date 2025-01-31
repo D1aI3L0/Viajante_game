@@ -237,7 +237,7 @@ public class HexGrid : MonoBehaviour
 
 		for (int i = 0; i < cells.Length; i++)
 		{
-			cells[i].Load(reader);
+			cells[i].Load(reader, header);
 		}
 		for (int i = 0; i < chunks.Length; i++)
 		{
@@ -262,20 +262,24 @@ public class HexGrid : MonoBehaviour
 	HexCell currentPathFrom, currentPathTo;
 	bool currentPathExists;
 
-	public void FindPath(HexCell fromCell, HexCell toCell, int speed)
+	public void FindPath(HexCell fromCell, HexCell toCell, HexUnit unit)
 	{
 		ClearPath();
 		currentPathFrom = fromCell;
 		currentPathTo = toCell;
-		currentPathExists = Search(fromCell, toCell, speed);
+		currentPathExists = Search(fromCell, toCell, unit);
+		//ShowPath(unit.Speed);
+
 		if (currentPathExists)
 		{
-			ShowPath(speed);
+			ShowPath(unit.Speed);
 		}
 	}
 
-	bool Search(HexCell fromCell, HexCell toCell, int speed)
+	bool Search(HexCell fromCell, HexCell toCell, HexUnit unit)
 	{
+		int speed = unit.Speed;
+
 		searchFrontierPhase += 2;
 
 		if (searchFrontier == null)
@@ -310,37 +314,39 @@ public class HexGrid : MonoBehaviour
 				{
 					continue;
 				}
-				if (neighbor.IsUnderwater || neighbor.Unit)
-				{
-					continue;
-				}
-				if (current.GetEdgeType(neighbor) == HexEdgeType.Cliff)
-				{
-					continue;
-				}
-				HexEdgeType edgeType = current.GetEdgeType(neighbor);
-				if (edgeType == HexEdgeType.Cliff)
-				{
-					continue;
-				}
+				// if (neighbor.IsUnderwater || neighbor.Unit)
+				// {
+				// 	continue;
+				// }
+				// HexEdgeType edgeType = current.GetEdgeType(neighbor);
+				// if (edgeType == HexEdgeType.Cliff)
+				// {
+				// 	continue;
+				// }
 
-				//int distance = current.Distance; // дистанция в стоимости перемещения
-				int moveCost;
-				if (current.HasRoadThroughEdge(d))
-				{
-					//distance += 1; // перемещение по дороге стоит 1 (остальные объекты не влияют)
-					moveCost = 1;
-				}
-				else if (current.Walled != neighbor.Walled) // стена не позволяет поремещаться как и обрывы
+				// int moveCost;
+				// if (current.HasRoadThroughEdge(d))
+				// {
+				// 	moveCost = 1;
+				// }
+				// else if (current.Walled != neighbor.Walled)
+				// {
+				// 	continue;
+				// }
+				// else
+				// {
+				// 	moveCost = edgeType == HexEdgeType.Flat ? 5 : 10;
+				// 	moveCost += neighbor.UrbanLevel + neighbor.FarmLevel + neighbor.PlantLevel;
+				// }
+
+				if (!unit.IsValidDestination(neighbor))
 				{
 					continue;
 				}
-				else
+				int moveCost = unit.GetMoveCost(current, neighbor, d);
+				if (moveCost < 0)
 				{
-					//distance += edgeType == HexEdgeType.Flat ? 5 : 10; // обычное перемещение 5 по склонам 10
-					//distance += neighbor.UrbanLevel + neighbor.FarmLevel + neighbor.PlantLevel; // прибавление уровня зданий,ферм,лесов к стоимости передвижения
-					moveCost = edgeType == HexEdgeType.Flat ? 5 : 10;
-					moveCost += neighbor.UrbanLevel + neighbor.FarmLevel + neighbor.PlantLevel;
+					continue;
 				}
 
 				int distance = current.Distance + moveCost;
@@ -462,7 +468,7 @@ public class HexGrid : MonoBehaviour
 
 
 
-	//------------------------ Видимость юнитов ----------------------------------
+	//------------------------ Область обзора ----------------------------------
 	List<HexCell> GetVisibleCells(HexCell fromCell, int range)
 	{
 		List<HexCell> visibleCells = ListPool<HexCell>.Get();

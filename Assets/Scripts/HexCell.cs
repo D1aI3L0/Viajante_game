@@ -495,6 +495,7 @@ public class HexCell : MonoBehaviour
 		writer.Write((byte)specialIndex);
 		writer.Write(walled);
 
+
 		if (hasIncomingRiver)
 		{
 			writer.Write((byte)(incomingRiver + 128));
@@ -522,9 +523,10 @@ public class HexCell : MonoBehaviour
 			}
 		}
 		writer.Write((byte)roadFlags);
+		writer.Write(IsExplored);
 	}
 
-	public void Load(BinaryReader reader)
+	public void Load(BinaryReader reader, int header)
 	{
 		terrainTypeIndex = reader.ReadByte();
 		ShaderData.RefreshTerrain(this);
@@ -564,6 +566,9 @@ public class HexCell : MonoBehaviour
 		{
 			roads[i] = (roadFlags & (1 << i)) != 0;
 		}
+
+		IsExplored = header >= 3 ? reader.ReadBoolean() : false;
+		ShaderData.RefreshVisibility(this);
 	}
 
 	void RefreshPosition()
@@ -632,11 +637,15 @@ public class HexCell : MonoBehaviour
 		}
 	}
 
+	public bool IsExplored { get; private set; }
+
+
 	public void IncreaseVisibility()
 	{
 		visibility += 1;
 		if (visibility == 1)
 		{
+			IsExplored = true;
 			ShaderData.RefreshVisibility(this);
 		}
 	}
@@ -649,6 +658,9 @@ public class HexCell : MonoBehaviour
 			ShaderData.RefreshVisibility(this);
 		}
 	}
+
+
+
 
 	//----------------------------------------------------------------------------
 

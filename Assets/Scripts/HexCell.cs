@@ -35,7 +35,12 @@ public class HexCell : MonoBehaviour
 		set
 		{
 			if (elevation == value) return;
+			int originalViewElevation = ViewElevation;
 			elevation = value;
+			if (ViewElevation != originalViewElevation)
+			{
+				ShaderData.ViewElevationChanged();
+			}
 			RefreshPosition();
 
 			ValidateRivers();
@@ -64,7 +69,12 @@ public class HexCell : MonoBehaviour
 			{
 				return;
 			}
+			int originalViewElevation = ViewElevation;
 			waterLevel = value;
+			if (ViewElevation != originalViewElevation)
+			{
+				ShaderData.ViewElevationChanged();
+			}
 			ValidateRivers();
 			Refresh();
 		}
@@ -626,19 +636,32 @@ public class HexCell : MonoBehaviour
 
 
 
-	//-------------------------------- Тукамн войны -------------------------------------
+	//--------------------------- Область видимости -------------------------------------
 	int visibility;
+	bool explored;
+
 
 	public bool IsVisible
 	{
 		get
 		{
-			return visibility > 0;
+			return visibility > 0 && Explorable;
 		}
 	}
 
-	public bool IsExplored { get; private set; }
+	public bool IsExplored
+	{
+		get
+		{
+			return explored && Explorable;
+		}
+		private set
+		{
+			explored = value;
+		}
+	}
 
+	public bool Explorable { get; set; }
 
 	public void IncreaseVisibility()
 	{
@@ -659,9 +682,22 @@ public class HexCell : MonoBehaviour
 		}
 	}
 
+	public int ViewElevation
+	{
+		get
+		{
+			return elevation >= waterLevel ? elevation : waterLevel;
+		}
+	}
 
-
-
+	public void ResetVisibility()
+	{
+		if (visibility > 0)
+		{
+			visibility = 0;
+			ShaderData.RefreshVisibility(this);
+		}
+	}
 	//----------------------------------------------------------------------------
 
 }

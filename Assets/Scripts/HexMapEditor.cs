@@ -11,7 +11,7 @@ public class HexMapEditor : MonoBehaviour
 
 	public HexGrid hexGrid;
 
-	int activeTerrainTypeIndex;
+	int activeTerrainTypeIndex = -1;
 	private int activeElevation;
 	private int activeWaterLevel;
 	int activeUrbanLevel, activeFarmLevel, activePlantLevel, activeSpecialIndex;

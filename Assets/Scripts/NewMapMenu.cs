@@ -47,7 +47,7 @@ public class NewMapMenu : MonoBehaviour
 
 	public void CreateLargeMap()
 	{
-		CreateMap(80, 60);
+		CreateMap(160, 120);
 	}
 
 	public void ToggleMapGeneration(bool toggle)

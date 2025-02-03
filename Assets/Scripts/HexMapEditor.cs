@@ -26,17 +26,15 @@ public class HexMapEditor : MonoBehaviour
 
 	bool isDrag;
 	HexDirection dragDirection;
-	//HexCell previousCell, searchFromCell, searchToCell;
 	HexCell previousCell;
 	public Material terrainMaterial;
-	//bool editMode;
 	
-
 
 	void Awake()
 	{
 		terrainMaterial.DisableKeyword("GRID_ON");
-		SetEditMode(false);
+		Shader.EnableKeyword("HEX_MAP_EDIT_MODE");
+		SetEditMode(true);
 	}
 
 	void Update()
@@ -77,35 +75,7 @@ public class HexMapEditor : MonoBehaviour
 			{
 				isDrag = false;
 			}
-			//if (editMode)
-			//{
 			EditCells(currentCell);
-			//}
-			// else if (Input.GetKey(KeyCode.LeftShift) && searchToCell != currentCell) // указывание начальной точки поиска пути (шифт+лкм) (начало не может юыть концом)
-			// {
-			// 	if (searchFromCell != currentCell)
-			// 	{
-			// 		if (searchFromCell)
-			// 		{
-			// 			searchFromCell.DisableHighlight();
-			// 		}
-			// 		searchFromCell = currentCell;
-			// 		searchFromCell.EnableHighlight(Color.blue);
-
-			// 		if (searchToCell)
-			// 		{
-			// 			hexGrid.FindPath(searchFromCell, searchToCell, 24);
-			// 		}
-			// 	}
-			// }
-			// else if (searchFromCell && searchFromCell != currentCell) // поиск пути если начальная и конечная точка отличаются
-			// {
-			// 	if (searchFromCell != currentCell)
-			// 	{
-			// 		searchToCell = currentCell;
-			// 		hexGrid.FindPath(searchFromCell, currentCell, 24);
-			// 	}
-			// }
 			previousCell = currentCell;
 		}
 		else
@@ -230,11 +200,6 @@ public class HexMapEditor : MonoBehaviour
 	{
 		brushSize = (int)size;
 	}
-
-	// public void ShowUI (bool visible) 
-	// {
-	// 	hexGrid.ShowUI(visible);
-	// }
 
 	public void SetRiverMode(int mode)
 	{

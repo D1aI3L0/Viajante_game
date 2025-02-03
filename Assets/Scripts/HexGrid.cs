@@ -193,6 +193,16 @@ public class HexGrid : MonoBehaviour
 		return null;
 	}
 
+	public HexCell GetCell(int xOffset, int zOffset)
+	{
+		return cells[xOffset + zOffset * cellCountX];
+	}
+
+	public HexCell GetCell(int cellIndex)
+	{
+		return cells[cellIndex];
+	}
+
 	public void ShowUI(bool visible)
 	{
 		for (int i = 0; i < chunks.Length; i++)
@@ -326,30 +336,6 @@ public class HexGrid : MonoBehaviour
 				{
 					continue;
 				}
-				// if (neighbor.IsUnderwater || neighbor.Unit)
-				// {
-				// 	continue;
-				// }
-				// HexEdgeType edgeType = current.GetEdgeType(neighbor);
-				// if (edgeType == HexEdgeType.Cliff)
-				// {
-				// 	continue;
-				// }
-
-				// int moveCost;
-				// if (current.HasRoadThroughEdge(d))
-				// {
-				// 	moveCost = 1;
-				// }
-				// else if (current.Walled != neighbor.Walled)
-				// {
-				// 	continue;
-				// }
-				// else
-				// {
-				// 	moveCost = edgeType == HexEdgeType.Flat ? 5 : 10;
-				// 	moveCost += neighbor.UrbanLevel + neighbor.FarmLevel + neighbor.PlantLevel;
-				// }
 
 				if (!unit.IsValidDestination(neighbor))
 				{

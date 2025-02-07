@@ -6,7 +6,7 @@ using System;
 
 public class SaveLoadMenu : MonoBehaviour
 {
-	const int mapFileVersion = 4; //версия сохранения
+	const int mapFileVersion = 5; //версия сохранения
 	public HexGrid hexGrid;
 	public TMP_InputField nameInput;
 	bool saveMode;

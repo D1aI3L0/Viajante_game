@@ -25,8 +25,9 @@ public static class HexMetrics
 	public const float outerRadius = 10f;
 	public const float innerRadius = outerRadius * outerToInner;
 	public const float innerDiameter = innerRadius * 2f;
+	public const float outerDiametr = outerRadius * 1.5f;
 
-	public const int chunkSizeX = 5, chunkSizeZ = 5;
+	public const int chunkSizeX = 5, chunkSizeZ = 4;
 
 	public const float solidFactor = 0.78f;
 	public const float blendFactor = 1f - solidFactor;
@@ -54,7 +55,7 @@ public static class HexMetrics
 	public const float wallElevationOffset = verticalTerraceStepSize;
 	public const float wallTowerThreshold = 0.5f; //вероятность размещения башен
 
-	public const float bridgeDesignLength = 7f; //Исходная длинна прифаба моста
+	public const float bridgeDesignLength = 7f; //Исходная длинна префаба моста
 
 	public const int hashGridSize = 256;
 	static HexHash[] hashGrid;
@@ -66,12 +67,19 @@ public static class HexMetrics
 		new float[] {0.4f, 0.6f, 0.8f}
 	};
 
-	public static int wrapSize;
-	public static bool Wrapping
+	public static int wrapSizeX, wrapSizeZ;
+	public static bool WrappingX
 	{
 		get
 		{
-			return wrapSize > 0;
+			return wrapSizeX > 0;
+		}
+	}
+	public static bool WrappingZ
+	{
+		get
+		{
+			return wrapSizeZ > 0;
 		}
 	}
 
@@ -139,11 +147,27 @@ public static class HexMetrics
 	{
 		Vector4 sample = noiseSource.GetPixelBilinear(position.x * noiseScale, position.z * noiseScale);
 
-		if (Wrapping && position.x < innerDiameter * 1.5f)
+		if (WrappingX && position.x < innerDiameter * 1.5f)
+		{
+			if (WrappingZ && position.z < outerDiametr * 1.5f)
+			{
+				Vector4 sample2 = noiseSource.GetPixelBilinear
+				((position.x + wrapSizeX * innerDiameter) * noiseScale, (position.z + wrapSizeZ * outerDiametr) * noiseScale);
+				sample = Vector4.Lerp(sample2, sample, position.x * (1f / innerDiameter) + position.z * (1f / outerDiametr) - 0.5f);
+			}
+			else
+			{
+				Vector4 sample2 = noiseSource.GetPixelBilinear
+					((position.x + wrapSizeX * innerDiameter) * noiseScale, position.z * noiseScale);
+				sample = Vector4.Lerp(sample2, sample, position.x * (1f / innerDiameter) - 0.5f);
+			}
+		}
+
+		if (WrappingZ && position.z < outerDiametr)
 		{
 			Vector4 sample2 = noiseSource.GetPixelBilinear
-				((position.x + wrapSize * innerDiameter) * noiseScale, position.z * noiseScale);
-			sample = Vector4.Lerp(sample2, sample, position.x * (1f / innerDiameter) - 0.5f);
+				(position.x * noiseScale, (position.z + wrapSizeZ * outerDiametr) * noiseScale);
+			sample = Vector4.Lerp(sample2, sample, position.z * (1f / outerDiametr));
 		}
 		return sample;
 	}

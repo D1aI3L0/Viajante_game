@@ -25,16 +25,16 @@ public struct HexCoordinates
 
 	public HexCoordinates(int x, int z)
 	{
-		if (HexMetrics.Wrapping)
+		if (HexMetrics.WrappingX)
 		{
 			int oX = x + z / 2;
 			if (oX < 0)
 			{
-				x += HexMetrics.wrapSize;
+				x += HexMetrics.wrapSizeX;
 			}
-			else if (oX >= HexMetrics.wrapSize)
+			else if (oX >= HexMetrics.wrapSizeX)
 			{
-				x -= HexMetrics.wrapSize;
+				x -= HexMetrics.wrapSizeX;
 			}
 		}
 		this.x = x;
@@ -89,35 +89,147 @@ public struct HexCoordinates
 
 	public int DistanceTo(HexCoordinates other)
 	{
+		// if (HexMetrics.WrappingX)
+		// {
+		// 	if (HexMetrics.WrappingZ)
+		// 	{
+		// 		int xyz =
+		// 			(x < other.x ? other.x - x : x - other.x) +
+		// 			(z < other.z ? other.z - z : z - other.z) +
+		// 			(Y < other.Y ? other.Y - Y : Y - other.Y);
+
+		// 		other.x += HexMetrics.wrapSizeX;
+		// 		other.z += HexMetrics.wrapSizeZ;
+
+		// 		int xyzWrapped =
+		// 			(x < other.x ? other.x - x : x - other.x) +
+		// 			(z < other.z ? other.z - z : z - other.z) +
+		// 			(Y < other.Y ? other.Y - Y : Y - other.Y);
+
+		// 		if (xyzWrapped < xyz)
+		// 		{
+		// 			return xyzWrapped / 2;
+		// 		}
+
+		// 		other.x -= 2 * HexMetrics.wrapSizeX;
+
+		// 		xyzWrapped =
+		// 			(x < other.x ? other.x - x : x - other.x) +
+		// 			(z < other.z ? other.z - z : z - other.z) +
+		// 			(Y < other.Y ? other.Y - Y : Y - other.Y);
+
+		// 		if (xyzWrapped < xyz)
+		// 		{
+		// 			return xyzWrapped / 2;
+		// 		}
+
+		// 		other.x += 2 * HexMetrics.wrapSizeX;
+		// 		other.z -= 2 * HexMetrics.wrapSizeZ;
+
+		// 		xyzWrapped =
+		// 			(x < other.x ? other.x - x : x - other.x) +
+		// 			(z < other.z ? other.z - z : z - other.z) +
+		// 			(Y < other.Y ? other.Y - Y : Y - other.Y);
+
+		// 		if (xyzWrapped < xyz)
+		// 		{
+		// 			return xyzWrapped / 2;
+		// 		}
+
+		// 		return xyz / 2;
+		// 	}
+		// 	else
+		// 	{
+		// 		int xy =
+		// 			(x < other.x ? other.x - x : x - other.x) +
+		// 			(Y < other.Y ? other.Y - Y : Y - other.Y);
+
+		// 		other.x += HexMetrics.wrapSizeX;
+
+		// 		int xyWrapped =
+		// 			(x < other.x ? other.x - x : x - other.x) +
+		// 			(Y < other.Y ? other.Y - Y : Y - other.Y);
+
+		// 		if (xyWrapped < xy)
+		// 		{
+		// 			xy = xyWrapped;
+		// 		}
+		// 		else
+		// 		{
+		// 			other.x -= 2 * HexMetrics.wrapSizeX;
+
+		// 			xyWrapped =
+		// 				(x < other.x ? other.x - x : x - other.x) +
+		// 				(Y < other.Y ? other.Y - Y : Y - other.Y);
+
+		// 			if (xyWrapped < xy)
+		// 			{
+		// 				xy = xyWrapped;
+		// 			}
+		// 		}
+
+		// 		return (xy + (z < other.z ? other.z - z : z - other.z)) / 2;
+		// 	}
+		// }
+
+		// if (HexMetrics.WrappingZ)
+		// {
+		// 	int yz =
+		// 		(z < other.z ? other.z - z : z - other.z) +
+		// 		(Y < other.Y ? other.Y - Y : Y - other.Y);
+
+		// 	other.z += HexMetrics.wrapSizeZ;
+
+		// 	int yzWrapped =
+		// 		(z < other.z ? other.z - z : z - other.z) +
+		// 		(Y < other.Y ? other.Y - Y : Y - other.Y);
+
+		// 	if (yzWrapped < yz)
+		// 	{
+		// 		yz = yzWrapped;
+		// 	}
+		// 	else
+		// 	{
+		// 		other.z -= 2 * HexMetrics.wrapSizeZ;
+		// 		yzWrapped =
+		// 			(z < other.z ? other.z - z : z - other.z) +
+		// 			(Y < other.Y ? other.Y - Y : Y - other.Y);
+
+		// 		if (yzWrapped < yz)
+		// 		{
+		// 			yz = yzWrapped;
+		// 		}
+		// 	}
+
+		// 	return (yz + (x < other.x ? other.x - x : x - other.x)) / 2;
+		// }
+
 		int xy =
 			(x < other.x ? other.x - x : x - other.x) +
 			(Y < other.Y ? other.Y - Y : Y - other.Y);
 
-		if (HexMetrics.Wrapping)
+		if (HexMetrics.WrappingX)
 		{
-			other.x += HexMetrics.wrapSize;
+			other.x += HexMetrics.wrapSizeX;
 			int xyWrapped =
 				(x < other.x ? other.x - x : x - other.x) +
 				(Y < other.Y ? other.Y - Y : Y - other.Y);
-
 			if (xyWrapped < xy)
 			{
-				xy = xyWrapped;
+				return (xyWrapped + (z < other.z ? other.z - z : z - other.z)) / 2;
 			}
 			else
 			{
-				other.x -= 2 * HexMetrics.wrapSize;
+				other.x -= 2 * HexMetrics.wrapSizeX;
 				xyWrapped =
 					(x < other.x ? other.x - x : x - other.x) +
 					(Y < other.Y ? other.Y - Y : Y - other.Y);
-				
 				if (xyWrapped < xy)
 				{
-					xy = xyWrapped;
+					return (xyWrapped + (z < other.z ? other.z - z : z - other.z)) / 2;
 				}
 			}
 		}
-
 		return (xy + (z < other.z ? other.z - z : z - other.z)) / 2;
 	}
 

@@ -6,7 +6,7 @@ public class NewMapMenu : MonoBehaviour
 
 	bool generateMaps = true;
 	public HexMapGenerator mapGenerator;
-	bool wrapping = true;
+	bool xWrapping = true, zWrapping = true;
 
 	public void Open()
 	{
@@ -24,11 +24,11 @@ public class NewMapMenu : MonoBehaviour
 	{
 		if (generateMaps)
 		{
-			mapGenerator.GenerateMap(x, z, wrapping);
+			mapGenerator.GenerateMap(x, z, xWrapping, zWrapping);
 		}
 		else
 		{
-			hexGrid.CreateMap(x, z, wrapping);
+			hexGrid.CreateMap(x, z, xWrapping, zWrapping);
 		}
 		HexMapCamera.ValidatePosition();
 		Close();
@@ -37,17 +37,17 @@ public class NewMapMenu : MonoBehaviour
 
 	public void CreateSmallMap()
 	{
-		CreateMap(20, 15);
+		CreateMap(HexMetrics.chunkSizeX * 4, HexMetrics.chunkSizeZ * 3);
 	}
 
 	public void CreateMediumMap()
 	{
-		CreateMap(40, 30);
+		CreateMap(HexMetrics.chunkSizeX * 8, HexMetrics.chunkSizeZ * 6);
 	}
 
 	public void CreateLargeMap()
 	{
-		CreateMap(80, 60);
+		CreateMap(HexMetrics.chunkSizeX * 20, HexMetrics.chunkSizeZ * 12);
 	}
 
 	public void ToggleMapGeneration(bool toggle)
@@ -57,6 +57,7 @@ public class NewMapMenu : MonoBehaviour
 
 	public void ToggleWrapping(bool toggle)
 	{
-		wrapping = toggle;
+		xWrapping = toggle;
+		zWrapping = toggle;
 	}
 }

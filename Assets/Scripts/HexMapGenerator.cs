@@ -18,7 +18,7 @@ public class HexMapGenerator : MonoBehaviour
         return grid.GetCell(Random.Range(region.xMin, region.xMax), Random.Range(region.zMin, region.zMax));
     }
 
-    public void GenerateMap(int x, int z, bool wrapping)
+    public void GenerateMap(int x, int z, bool xWrapping, bool zWrapping)
     {
         Random.State originalRandomState = Random.state;
         if (!useFixedSeed)
@@ -30,7 +30,7 @@ public class HexMapGenerator : MonoBehaviour
         }
         Random.InitState(seed);
         cellCount = x * z;
-        grid.CreateMap(x, z, wrapping);
+        grid.CreateMap(x, z, xWrapping, zWrapping);
         if (searchFrontier == null)
         {
             searchFrontier = new HexCellPriorityQueue();
@@ -82,19 +82,24 @@ public class HexMapGenerator : MonoBehaviour
             regions.Clear();
         }
 
-        int borderX = grid.wrapping ? regionBorder : mapBorderX;
+        int borderX = grid.xWrapping ? regionBorder : mapBorderX;
+        int borderZ = grid.xWrapping ? regionBorder : mapBorderZ;
         MapRegion region;
         switch (regionCount)
         {
             default:
-                if (grid.wrapping)
+                if (grid.xWrapping)
                 {
                     borderX = 0;
                 }
+                if (grid.zWrapping)
+                {
+                    borderZ = 0;
+                }
                 region.xMin = borderX;
                 region.xMax = grid.cellCountX - borderX;
-                region.zMin = mapBorderZ;
-                region.zMax = grid.cellCountZ - mapBorderZ;
+                region.zMin = borderZ;
+                region.zMax = grid.cellCountZ - borderZ;
                 regions.Add(region);
                 break;
             case 2:
@@ -102,8 +107,8 @@ public class HexMapGenerator : MonoBehaviour
                 {
                     region.xMin = borderX;
                     region.xMax = grid.cellCountX / 2 - regionBorder;
-                    region.zMin = mapBorderZ;
-                    region.zMax = grid.cellCountZ - mapBorderZ;
+                    region.zMin = borderZ;
+                    region.zMax = grid.cellCountZ - borderZ;
                     regions.Add(region);
                     region.xMin = grid.cellCountX / 2 + regionBorder;
                     region.xMax = grid.cellCountX - borderX;
@@ -111,25 +116,25 @@ public class HexMapGenerator : MonoBehaviour
                 }
                 else
                 {
-                    if (grid.wrapping)
+                    if (grid.xWrapping)
                     {
                         borderX = 0;
                     }
                     region.xMin = borderX;
                     region.xMax = grid.cellCountX - borderX;
-                    region.zMin = mapBorderZ;
+                    region.zMin = borderZ;
                     region.zMax = grid.cellCountZ / 2 - regionBorder;
                     regions.Add(region);
                     region.zMin = grid.cellCountZ / 2 + regionBorder;
-                    region.zMax = grid.cellCountZ - mapBorderZ;
+                    region.zMax = grid.cellCountZ - borderZ;
                     regions.Add(region);
                 }
                 break;
             case 3:
                 region.xMin = borderX;
                 region.xMax = grid.cellCountX / 3 - regionBorder;
-                region.zMin = mapBorderZ;
-                region.zMax = grid.cellCountZ - mapBorderZ;
+                region.zMin = borderZ;
+                region.zMax = grid.cellCountZ - borderZ;
                 regions.Add(region);
                 region.xMin = grid.cellCountX / 3 + regionBorder;
                 region.xMax = grid.cellCountX * 2 / 3 - regionBorder;
@@ -141,14 +146,14 @@ public class HexMapGenerator : MonoBehaviour
             case 4:
                 region.xMin = borderX;
                 region.xMax = grid.cellCountX / 2 - regionBorder;
-                region.zMin = mapBorderZ;
+                region.zMin = borderZ;
                 region.zMax = grid.cellCountZ / 2 - regionBorder;
                 regions.Add(region);
                 region.xMin = grid.cellCountX / 2 + regionBorder;
                 region.xMax = grid.cellCountX - borderX;
                 regions.Add(region);
                 region.zMin = grid.cellCountZ / 2 + regionBorder;
-                region.zMax = grid.cellCountZ - mapBorderZ;
+                region.zMax = grid.cellCountZ - borderZ;
                 regions.Add(region);
                 region.xMin = borderX;
                 region.xMax = grid.cellCountX / 2 - regionBorder;

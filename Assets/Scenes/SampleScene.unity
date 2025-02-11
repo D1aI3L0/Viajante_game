@@ -4123,14 +4123,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 077fad22d23a78749a04a98da081ecfd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cellCountX: 20
-  cellCountZ: 15
+  cellCountX: 40
+  cellCountZ: 24
   cellPrefab: {fileID: 7634578376399795291, guid: c72ae964b967a4043bcbf6d09293b9c8, type: 3}
   cellLabelPrefab: {fileID: 1313679035159804760, guid: 324a165422f99324390b2528b218a48f, type: 3}
   chunkPrefab: {fileID: 635381878753421045, guid: 48bd031dd2cf5d84b953b5a11750e2d1, type: 3}
   noiseSource: {fileID: 2800000, guid: 69eca4f5e0c479a4b88573bb245854d3, type: 3}
   seed: 4321
-  wrapping: 1
+  xWrapping: 1
+  zWrapping: 1
   unitPrefab: {fileID: 8454914924492444950, guid: c2a4ac769b41bcc48a0706c586447e7c, type: 3}
 --- !u!4 &493061483
 Transform:
@@ -15743,7 +15744,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1813751731}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9d24405af73e84a47975d1853a0ee163, type: 3}
   m_Name: 

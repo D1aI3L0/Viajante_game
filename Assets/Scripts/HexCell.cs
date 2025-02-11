@@ -26,6 +26,7 @@ public class HexCell : MonoBehaviour
 	public HexCellShaderData ShaderData { get; set; }
 	public int Index { get; set; }
 	public int ColumnIndex { get; set; }
+	public int LineIndex { get; set; }
 
 	public int Elevation
 	{

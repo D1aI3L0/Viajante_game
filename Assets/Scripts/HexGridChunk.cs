@@ -219,11 +219,20 @@ public class HexGridChunk : MonoBehaviour
 		Vector3 center2 = neighbor.Position;
 		if (neighbor.ColumnIndex < cell.ColumnIndex - 1)
 		{
-			center2.x += HexMetrics.wrapSize * HexMetrics.innerDiameter;
+			center2.x += HexMetrics.wrapSizeX * HexMetrics.innerDiameter;
 		}
 		else if (neighbor.ColumnIndex > cell.ColumnIndex + 1)
 		{
-			center2.x -= HexMetrics.wrapSize * HexMetrics.innerDiameter;
+			center2.x -= HexMetrics.wrapSizeX * HexMetrics.innerDiameter;
+		}
+
+		if (neighbor.LineIndex < cell.LineIndex - 1)
+		{
+			center2.z += HexMetrics.wrapSizeZ * HexMetrics.outerDiametr;
+		}
+		else if (neighbor.LineIndex > cell.LineIndex + 1)
+		{
+			center2.z -= HexMetrics.wrapSizeZ * HexMetrics.outerDiametr;
 		}
 		center2.y = center.y;
 		EdgeVertices e2 = new EdgeVertices(center2 + HexMetrics.GetSecondSolidCorner(direction.Opposite()), center2 + HexMetrics.GetFirstSolidCorner(direction.Opposite()));
@@ -254,11 +263,19 @@ public class HexGridChunk : MonoBehaviour
 			Vector3 center3 = nextNeighbor.Position;
 			if (nextNeighbor.ColumnIndex < cell.ColumnIndex - 1)
 			{
-				center3.x += HexMetrics.wrapSize * HexMetrics.innerDiameter;
+				center3.x += HexMetrics.wrapSizeX * HexMetrics.innerDiameter;
 			}
 			else if (nextNeighbor.ColumnIndex > cell.ColumnIndex + 1)
 			{
-				center3.x -= HexMetrics.wrapSize * HexMetrics.innerDiameter;
+				center3.x -= HexMetrics.wrapSizeX * HexMetrics.innerDiameter;
+			}
+			if (nextNeighbor.LineIndex < cell.LineIndex - 1)
+			{
+				center3.z += HexMetrics.wrapSizeZ * HexMetrics.outerDiametr;
+			}
+			else if (nextNeighbor.LineIndex > cell.LineIndex + 1)
+			{
+				center3.z -= HexMetrics.wrapSizeZ * HexMetrics.outerDiametr;
 			}
 			Vector3 v3 = center3 + (nextNeighbor.IsUnderwater ? HexMetrics.GetFirstWaterCorner(direction.Previous()) : HexMetrics.GetFirstSolidCorner(direction.Previous()));
 			v3.y = center.y;

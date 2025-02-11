@@ -3,6 +3,8 @@ using UnityEngine;
 using System.IO;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO.Compression;
+using System;
 
 public class HexGrid : MonoBehaviour
 {
@@ -23,7 +25,7 @@ public class HexGrid : MonoBehaviour
 
 	HexCellShaderData cellShaderData;
 
-	public bool wrapping;
+	public bool xWrapping, zWrapping;
 	Transform[] columns;
 
 	void Awake()
@@ -33,7 +35,7 @@ public class HexGrid : MonoBehaviour
 		HexUnit.unitPrefab = unitPrefab;
 		cellShaderData = gameObject.AddComponent<HexCellShaderData>();
 		cellShaderData.Grid = this;
-		CreateMap(cellCountX, cellCountZ, wrapping);
+		CreateMap(cellCountX, cellCountZ, xWrapping, zWrapping);
 	}
 
 	void OnEnable()
@@ -43,14 +45,15 @@ public class HexGrid : MonoBehaviour
 			HexMetrics.noiseSource = noiseSource;
 			HexMetrics.InitializeHashGrid(seed);
 			HexUnit.unitPrefab = unitPrefab;
-			HexMetrics.wrapSize = wrapping ? cellCountX : 0;
+			HexMetrics.wrapSizeX = xWrapping ? cellCountX : 0;
+			HexMetrics.wrapSizeZ = zWrapping ? cellCountZ : 0;
 			ResetVisibility();
 		}
 	}
 
-	public bool CreateMap(int x, int z, bool wrapping)
+	public bool CreateMap(int x, int z, bool xWrapping, bool zWrapping)
 	{
-		if (x <= 0 || x % HexMetrics.chunkSizeX != 0 || z <= 0 || z % HexMetrics.chunkSizeZ != 0)
+		if (x <= 0 || x % HexMetrics.chunkSizeX != 0 || z <= 0 || z % HexMetrics.chunkSizeZ != 0 || z % 2 != 0)
 		{
 			Debug.LogError("Unsupported map size.");
 			return false;
@@ -59,19 +62,20 @@ public class HexGrid : MonoBehaviour
 		ClearPath();
 		ClearUnits();
 
-		if (columns != null)
+		if (chunks != null)
 		{
-			for (int i = 0; i < columns.Length; i++)
+			for (int i = 0; i < chunks.Length; i++)
 			{
-				Destroy(columns[i].gameObject);
+				Destroy(chunks[i].gameObject);
 			}
 		}
 
 		cellCountX = x;
 		cellCountZ = z;
-		this.wrapping = wrapping;
+		this.xWrapping = xWrapping;
 		currentCenterColumnIndex = -1;
-		HexMetrics.wrapSize = wrapping ? cellCountX : 0;
+		HexMetrics.wrapSizeX = xWrapping ? cellCountX : 0;
+		HexMetrics.wrapSizeZ = zWrapping ? cellCountZ : 0;
 		chunkCountX = cellCountX / HexMetrics.chunkSizeX;
 		chunkCountZ = cellCountZ / HexMetrics.chunkSizeZ;
 		cellShaderData.Initialize(cellCountX, cellCountZ);
@@ -83,20 +87,13 @@ public class HexGrid : MonoBehaviour
 
 	void CreateChunks()
 	{
-		columns = new Transform[chunkCountX];
-		for (int x = 0; x < chunkCountX; x++)
-		{
-			columns[x] = new GameObject("Column").transform;
-			columns[x].SetParent(transform, false);
-		}
-
 		chunks = new HexGridChunk[chunkCountX * chunkCountZ];
 		for (int z = 0, i = 0; z < chunkCountZ; z++)
 		{
 			for (int x = 0; x < chunkCountX; x++)
 			{
 				HexGridChunk chunk = chunks[i++] = Instantiate(chunkPrefab);
-				chunk.transform.SetParent(columns[x], false);
+				chunk.transform.SetParent(transform);
 			}
 		}
 	}
@@ -126,11 +123,19 @@ public class HexGrid : MonoBehaviour
 		cell.coordinates = HexCoordinates.FromOffsetCoordinates(x, z);
 		cell.Index = i;
 		cell.ColumnIndex = x / HexMetrics.chunkSizeX;
+		cell.LineIndex = z / HexMetrics.chunkSizeZ;
 		cell.ShaderData = cellShaderData;
 
-		if (wrapping)
+		if (xWrapping)
 		{
-			cell.Explorable = z > 0 && z < cellCountZ - 1;
+			if (!zWrapping)
+				cell.Explorable = z > 0 && z < cellCountZ - 1;
+			else
+				cell.Explorable = true;
+		}
+		else if (zWrapping)
+		{
+			cell.Explorable = x > 0 && x < cellCountX - 1;
 		}
 		else
 		{
@@ -141,7 +146,7 @@ public class HexGrid : MonoBehaviour
 		if (x > 0)
 		{
 			cell.SetNeighbor(HexDirection.W, cells[i - 1]);
-			if (wrapping && x == cellCountX - 1)
+			if (xWrapping && x == cellCountX - 1)
 			{
 				cell.SetNeighbor(HexDirection.E, cells[i - x]);
 			}
@@ -155,7 +160,7 @@ public class HexGrid : MonoBehaviour
 				{
 					cell.SetNeighbor(HexDirection.SW, cells[i - cellCountX - 1]);
 				}
-				else if (wrapping)
+				else if (xWrapping)
 				{
 					cell.SetNeighbor(HexDirection.SW, cells[i - 1]);
 				}
@@ -167,9 +172,22 @@ public class HexGrid : MonoBehaviour
 				{
 					cell.SetNeighbor(HexDirection.SE, cells[i - cellCountX + 1]);
 				}
-				else if (wrapping)
+				else if (xWrapping)
 				{
 					cell.SetNeighbor(HexDirection.SE, cells[i - cellCountX * 2 + 1]);
+				}
+				if (zWrapping && z == cellCountZ - 1)
+				{
+					cell.SetNeighbor(HexDirection.NW, cells[x]);
+					if (x == cellCountX - 1)
+					{
+						if(xWrapping)
+							cell.SetNeighbor(HexDirection.NE, cells[0]);
+					}
+					else
+					{
+						cell.SetNeighbor(HexDirection.NE, cells[x+1]);
+					}
 				}
 			}
 		}
@@ -197,6 +215,15 @@ public class HexGrid : MonoBehaviour
 	public HexCell GetCell(Vector3 position)
 	{
 		position = transform.InverseTransformPoint(position);
+		
+		if(HexMetrics.WrappingZ)
+		{
+			if(position.z < 0)
+				position.z += HexMetrics.outerDiametr * cellCountZ;
+			if(position.z > HexMetrics.outerDiametr * cellCountZ)
+				position.z -= HexMetrics.outerDiametr * cellCountZ;
+		}
+		//Debug.Log(position.x + " " + position.z);
 		HexCoordinates coordinates = HexCoordinates.FromPosition(position);
 		return GetCell(coordinates);
 	}
@@ -245,12 +272,13 @@ public class HexGrid : MonoBehaviour
 	}
 
 
-	//------------------------------- Сохранение и загрузка ---------------------------------
+	//=============================== Сохранение и загрузка ===============================
 	public void Save(BinaryWriter writer)
 	{
 		writer.Write(cellCountX);
 		writer.Write(cellCountZ);
-		writer.Write(wrapping);
+		writer.Write(xWrapping);
+		writer.Write(zWrapping);
 
 		for (int i = 0; i < cells.Length; i++)
 		{
@@ -276,10 +304,11 @@ public class HexGrid : MonoBehaviour
 			z = reader.ReadInt32();
 		}
 
-		bool wrapping = header >= 5 ? reader.ReadBoolean() : false;
-		if (x != cellCountX || z != cellCountZ || this.wrapping != wrapping)
+		bool xWrapping = header >= 5 ? reader.ReadBoolean() : false;
+		bool zWrapping = header >= 6 ? reader.ReadBoolean() : false;
+		if (x != cellCountX || z != cellCountZ || this.xWrapping != xWrapping)
 		{
-			if (!CreateMap(x, z, wrapping))
+			if (!CreateMap(x, z, xWrapping, zWrapping))
 			{
 				return;
 			}
@@ -308,11 +337,11 @@ public class HexGrid : MonoBehaviour
 
 		cellShaderData.ImmediateMode = originalImmediateMode;
 	}
-	//----------------------------------------------------------------------------
+	//============================================================================
 
 
 
-	//------------------------------- Поиск пути ---------------------------------
+	//=============================== Поиск пути =================================
 	HexCellPriorityQueue searchFrontier;
 	int searchFrontierPhase;
 
@@ -457,11 +486,11 @@ public class HexGrid : MonoBehaviour
 		path.Reverse();
 		return path;
 	}
-	//----------------------------------------------------------------------------
+	//============================================================================
 
 
 
-	//-------------------------------- Юниты -------------------------------------
+	//=============================== Юниты ======================================
 	public HexUnit unitPrefab;
 	List<HexUnit> units = new List<HexUnit>();
 
@@ -496,15 +525,15 @@ public class HexGrid : MonoBehaviour
 		unit.Die();
 	}
 
-	public void MakeChildOfColumn(Transform child, int columnIndex)
+	public void MakeChildOfChunk(Transform child, int columnIndex, int lineIndex)
 	{
-		child.SetParent(columns[columnIndex], false);
+		child.SetParent(chunks[lineIndex*chunkCountX+columnIndex].transform, false);
 	}
-	//----------------------------------------------------------------------------
+	//============================================================================
 
 
 
-	//------------------------ Область обзора ----------------------------------
+	//========================== Область обзора ==================================
 	List<HexCell> GetVisibleCells(HexCell fromCell, int range)
 	{
 		List<HexCell> visibleCells = ListPool<HexCell>.Get();
@@ -593,13 +622,15 @@ public class HexGrid : MonoBehaviour
 			IncreaseVisibility(unit.Location, unit.VisionRange);
 		}
 	}
-	//----------------------------------------------------------------------------
+	//============================================================================
 
 
 
+	//======================== Сворачивание карты ================================
 	int currentCenterColumnIndex = -1;
+	int currentCenterLineIndex = -1;
 
-	public void CenterMap(float xPosition)
+	public void CenterMapX(float xPosition)
 	{
 		int centerColumnIndex = (int)(xPosition / (HexMetrics.innerDiameter * HexMetrics.chunkSizeX));
 
@@ -613,8 +644,7 @@ public class HexGrid : MonoBehaviour
 		int maxColumnIndex = centerColumnIndex + chunkCountX / 2;
 
 		Vector3 position;
-		position.y = position.z = 0f;
-		for (int i = 0; i < columns.Length; i++)
+		for (int i = 0; i < chunkCountX; i++)
 		{
 			if (i < minColumnIndex)
 			{
@@ -628,7 +658,50 @@ public class HexGrid : MonoBehaviour
 			{
 				position.x = 0f;
 			}
-			columns[i].localPosition = position;
+			for (int j = 0; j < chunkCountZ; j++)
+			{
+				Vector3 chunkPosition = chunks[chunkCountX * j + i].transform.localPosition;
+				chunkPosition.x = position.x;
+				chunks[chunkCountX * j + i].transform.localPosition = chunkPosition;
+			}
 		}
 	}
+
+	public void CenterMapZ(float zPosition)
+	{
+		int centerLineIndex = (int)(zPosition / (HexMetrics.outerDiametr * HexMetrics.chunkSizeZ));
+
+		if (centerLineIndex == currentCenterLineIndex)
+		{
+			return;
+		}
+		currentCenterLineIndex = centerLineIndex;
+
+		int minLineIndex = centerLineIndex - chunkCountZ / 2;
+		int maxLinenIndex = centerLineIndex + chunkCountZ / 2;
+
+		Vector3 position;
+		for (int i = 0; i < chunkCountZ; i++)
+		{
+			if (i < minLineIndex)
+			{
+				position.z = chunkCountZ * (HexMetrics.outerDiametr * HexMetrics.chunkSizeZ);
+			}
+			else if (i > maxLinenIndex)
+			{
+				position.z = chunkCountZ * -(HexMetrics.outerDiametr * HexMetrics.chunkSizeZ);
+			}
+			else
+			{
+				position.z = 0f;
+			}
+			for (int j = 0; j < chunkCountX; j++)
+			{
+				Vector3 chunkPosition = chunks[chunkCountX * i + j].transform.localPosition;
+				chunkPosition.z = position.z;
+				chunks[chunkCountX * i + j].transform.localPosition = chunkPosition;
+			}
+		}
+	}
+	//=================================================================================
 }

@@ -34,7 +34,7 @@ public class HexUnit : MonoBehaviour
 			value.Unit = this;
 			Grid.IncreaseVisibility(value, VisionRange);
 			transform.localPosition = value.Position;
-			Grid.MakeChildOfColumn(transform, value.ColumnIndex);
+			Grid.MakeChildOfChunk(transform, value.ColumnIndex, value.LineIndex);
 		}
 	}
 
@@ -189,6 +189,7 @@ public class HexUnit : MonoBehaviour
 		}
 		Grid.DecreaseVisibility(currentTravelLocation, VisionRange);
 		int currentColumn = currentTravelLocation.ColumnIndex;
+		int currentLine = currentTravelLocation.LineIndex;
 
 		float t = Time.deltaTime * travelSpeed;
 		for (int i = 1; i < pathToTravel.Count; i++)
@@ -198,21 +199,38 @@ public class HexUnit : MonoBehaviour
 			b = pathToTravel[i - 1].Position;
 
 			int nextColumn = currentTravelLocation.ColumnIndex;
+			int nextLine = currentTravelLocation.LineIndex;
 			if (currentColumn != nextColumn)
 			{
 				if (nextColumn < currentColumn - 1)
 				{
-					a.x -= HexMetrics.innerDiameter * HexMetrics.wrapSize;
-					b.x -= HexMetrics.innerDiameter * HexMetrics.wrapSize;
+					a.x -= HexMetrics.innerDiameter * HexMetrics.wrapSizeX;
+					b.x -= HexMetrics.innerDiameter * HexMetrics.wrapSizeX;
 				}
 				else if (nextColumn > currentColumn + 1)
 				{
-					a.x += HexMetrics.innerDiameter * HexMetrics.wrapSize;
-					b.x += HexMetrics.innerDiameter * HexMetrics.wrapSize;
+					a.x += HexMetrics.innerDiameter * HexMetrics.wrapSizeX;
+					b.x += HexMetrics.innerDiameter * HexMetrics.wrapSizeX;
 				}
-				Grid.MakeChildOfColumn(transform, nextColumn);
 				currentColumn = nextColumn;
 			}
+			if (currentLine != nextLine)
+			{
+				if (nextLine < currentLine - 1)
+				{
+					a.z -= HexMetrics.outerDiametr * HexMetrics.wrapSizeZ;
+					b.z -= HexMetrics.outerDiametr * HexMetrics.wrapSizeZ;
+				}
+				else if (nextLine > currentLine + 1)
+				{
+					a.z += HexMetrics.outerDiametr * HexMetrics.wrapSizeZ;
+					b.z += HexMetrics.outerDiametr * HexMetrics.wrapSizeZ;
+				}
+				currentLine = nextLine;
+			}
+
+			if(currentColumn == nextColumn || currentLine == nextLine)
+				Grid.MakeChildOfChunk(transform, currentColumn, currentLine);
 
 			c = (b + currentTravelLocation.Position) * 0.5f;
 			Grid.IncreaseVisibility(pathToTravel[i], VisionRange);
@@ -249,19 +267,19 @@ public class HexUnit : MonoBehaviour
 
 	IEnumerator LookAt(Vector3 point)
 	{
-		if (HexMetrics.Wrapping)
+		if (HexMetrics.WrappingX)
 		{
 			float xDistance = point.x - transform.localPosition.x;
-			if (xDistance < -HexMetrics.innerRadius * HexMetrics.wrapSize)
+			if (xDistance < -HexMetrics.innerRadius * HexMetrics.wrapSizeX)
 			{
-				point.x += HexMetrics.innerDiameter * HexMetrics.wrapSize;
+				point.x += HexMetrics.innerDiameter * HexMetrics.wrapSizeX;
 			}
-			else if (xDistance > HexMetrics.innerRadius * HexMetrics.wrapSize)
+			else if (xDistance > HexMetrics.innerRadius * HexMetrics.wrapSizeX)
 			{
-				point.x -= HexMetrics.innerDiameter * HexMetrics.wrapSize;
+				point.x -= HexMetrics.innerDiameter * HexMetrics.wrapSizeX;
 			}
 		}
-		
+
 		point.y = transform.localPosition.y;
 		Quaternion fromRotation = transform.localRotation;
 		Quaternion toRotation = Quaternion.LookRotation(point - transform.localPosition);

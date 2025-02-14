@@ -16,6 +16,14 @@ public class HexUnit : MonoBehaviour
 		}
 	}
 
+	public int Speed
+	{
+		get
+		{
+			return 24;
+		}
+	}
+
 	HexCell location, currentTravelLocation;
 	public HexCell Location
 	{
@@ -49,14 +57,6 @@ public class HexUnit : MonoBehaviour
 		{
 			orientation = value;
 			transform.localRotation = Quaternion.Euler(0f, value, 0f);
-		}
-	}
-
-	public int Speed
-	{
-		get
-		{
-			return 24;
 		}
 	}
 
@@ -131,10 +131,9 @@ public class HexUnit : MonoBehaviour
 		}
 		return moveCost;
 	}
-
-
-
-	//------------------------- Движение по пути -------------------------------------
+	//============================================================================================================
+	//                                       Движение по пути и анимация
+	//============================================================================================================
 	List<HexCell> pathToTravel;
 	const float travelSpeed = 3f;
 	const float rotationSpeed = 180f;
@@ -299,5 +298,5 @@ public class HexUnit : MonoBehaviour
 		transform.LookAt(point);
 		orientation = transform.localRotation.eulerAngles.y;
 	}
-	//--------------------------------------------------------------------------------
+	//============================================================================================================
 }

@@ -44,7 +44,6 @@ public class HexGridChunk : MonoBehaviour
 		gridCanvas.gameObject.SetActive(visible);
 	}
 
-
 	public void Triangulate(HexCell[] cells)
 	{
 		terrain.Clear();
@@ -135,6 +134,61 @@ public class HexGridChunk : MonoBehaviour
 
 	}
 
+	void TriangulateWithoutRiver(HexDirection direction, HexCell cell, Vector3 center, EdgeVertices e)
+	{
+		TriangulateEdgeFan(center, e, cell.Index);
+
+		if (cell.HasRoads)
+		{
+			Vector2 interpolators = GetRoadInterpolators(direction, cell);
+			TriangulateRoad
+			(
+				center,
+				Vector3.Lerp(center, e.v1, interpolators.x),
+				Vector3.Lerp(center, e.v5, interpolators.y),
+				e, cell.HasRoadThroughEdge(direction), cell.Index
+			);
+		}
+	}
+
+	void TriangulateEdgeFan(Vector3 center, EdgeVertices edge, float index)
+	{
+		terrain.AddTriangle(center, edge.v1, edge.v2);
+		terrain.AddTriangle(center, edge.v2, edge.v3);
+		terrain.AddTriangle(center, edge.v3, edge.v4);
+		terrain.AddTriangle(center, edge.v4, edge.v5);
+
+		Vector3 indices;
+		indices.x = indices.y = indices.z = index;
+		terrain.AddTriangleCellData(indices, weights1);
+		terrain.AddTriangleCellData(indices, weights1);
+		terrain.AddTriangleCellData(indices, weights1);
+		terrain.AddTriangleCellData(indices, weights1);
+	}
+
+	void TriangulateEdgeStrip(EdgeVertices e1, Color w1, float index1, EdgeVertices e2, Color w2, float index2, bool hasRoad = false)
+	{
+		terrain.AddQuad(e1.v1, e1.v2, e2.v1, e2.v2);
+		terrain.AddQuad(e1.v2, e1.v3, e2.v2, e2.v3);
+		terrain.AddQuad(e1.v3, e1.v4, e2.v3, e2.v4);
+		terrain.AddQuad(e1.v4, e1.v5, e2.v4, e2.v5);
+
+		Vector3 indices;
+		indices.x = indices.z = index1;
+		indices.y = index2;
+		terrain.AddQuadCellData(indices, w1, w2);
+		terrain.AddQuadCellData(indices, w1, w2);
+		terrain.AddQuadCellData(indices, w1, w2);
+		terrain.AddQuadCellData(indices, w1, w2);
+
+		if (hasRoad)
+		{
+			TriangulateRoadSegment(e1.v2, e1.v3, e1.v4, e2.v2, e2.v3, e2.v4, w1, w2, indices);
+		}
+	}
+	//============================================================================================================
+	//                                               Вода 
+	//============================================================================================================
 	void TriangulateWater(HexDirection direction, HexCell cell, Vector3 center)
 	{
 		center.y = cell.WaterSurfaceY;
@@ -285,59 +339,9 @@ public class HexGridChunk : MonoBehaviour
 			waterShore.AddTriangleCellData(indices, weights1, weights2, weights3);
 		}
 	}
-
-	void TriangulateEstuary(EdgeVertices e1, EdgeVertices e2, bool incomingRiver, Vector3 indices)
-	{
-		waterShore.AddTriangle(e2.v1, e1.v2, e1.v1);
-		waterShore.AddTriangle(e2.v5, e1.v5, e1.v4);
-		waterShore.AddTriangleUV(new Vector2(0f, 1f), new Vector2(0f, 0f), new Vector2(0f, 0f));
-		waterShore.AddTriangleUV(new Vector2(0f, 1f), new Vector2(0f, 0f), new Vector2(0f, 0f));
-		waterShore.AddTriangleCellData(indices, weights2, weights1, weights1);
-		waterShore.AddTriangleCellData(indices, weights2, weights1, weights1);
-
-		estuaries.AddQuad(e2.v1, e1.v2, e2.v2, e1.v3);
-		estuaries.AddTriangle(e1.v3, e2.v2, e2.v4);
-		estuaries.AddQuad(e1.v3, e1.v4, e2.v4, e2.v5);
-
-		estuaries.AddQuadUV(new Vector2(0f, 1f), new Vector2(0f, 0f), new Vector2(1f, 1f), new Vector2(0f, 0f));
-		estuaries.AddTriangleUV(new Vector2(0f, 0f), new Vector2(1f, 1f), new Vector2(1f, 1f));
-		estuaries.AddQuadUV(new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(1f, 1f), new Vector2(0f, 1f));
-		estuaries.AddQuadCellData(indices, weights2, weights1, weights2, weights1);
-		estuaries.AddTriangleCellData(indices, weights1, weights2, weights2);
-		estuaries.AddQuadCellData(indices, weights1, weights2);
-
-		if (incomingRiver)
-		{
-			estuaries.AddQuadUV2(new Vector2(1.5f, 1f), new Vector2(0.7f, 1.15f), new Vector2(1f, 0.8f), new Vector2(0.5f, 1.1f));
-			estuaries.AddTriangleUV2(new Vector2(0.5f, 1.1f), new Vector2(1f, 0.8f), new Vector2(0f, 0.8f));
-			estuaries.AddQuadUV2(new Vector2(0.5f, 1.1f), new Vector2(0.3f, 1.15f), new Vector2(0f, 0.8f), new Vector2(-0.5f, 1f));
-		}
-		else
-		{
-			estuaries.AddQuadUV2(new Vector2(-0.5f, -0.2f), new Vector2(0.3f, -0.35f), new Vector2(0f, 0f), new Vector2(0.5f, -0.3f));
-			estuaries.AddTriangleUV2(new Vector2(0.5f, -0.3f), new Vector2(0f, 0f), new Vector2(1f, 0f));
-			estuaries.AddQuadUV2(new Vector2(0.5f, -0.3f), new Vector2(0.7f, -0.35f), new Vector2(1f, 0f), new Vector2(1.5f, -0.2f));
-		}
-	}
-
-
-	void TriangulateWithoutRiver(HexDirection direction, HexCell cell, Vector3 center, EdgeVertices e)
-	{
-		TriangulateEdgeFan(center, e, cell.Index); //cell.Color центры ячеек
-
-		if (cell.HasRoads)
-		{
-			Vector2 interpolators = GetRoadInterpolators(direction, cell);
-			TriangulateRoad
-			(
-				center,
-				Vector3.Lerp(center, e.v1, interpolators.x),
-				Vector3.Lerp(center, e.v5, interpolators.y),
-				e, cell.HasRoadThroughEdge(direction), cell.Index
-			);
-		}
-	}
-
+	//============================================================================================================
+	//                                              Соединения 
+	//============================================================================================================
 	private void TriangulateConnection(HexDirection direction, HexCell cell, EdgeVertices e1)
 	{
 		HexCell neighbor = cell.GetNeighbor(direction);
@@ -355,7 +359,7 @@ public class HexGridChunk : MonoBehaviour
 		bool hasRiver = cell.HasRiverThroughEdge(direction);
 		bool hasRoad = cell.HasRoadThroughEdge(direction);
 
-		if (hasRiver) // заменено на if (hasRiver) ранее было if (cell.HasRiverThroughEdge(direction)) 
+		if (hasRiver)
 		{
 			e2.v3.y = neighbor.StreamBedY;
 			Vector3 indices;
@@ -602,6 +606,42 @@ public class HexGridChunk : MonoBehaviour
 
 		terrain.AddTriangleUnperturbed(v2, HexMetrics.Perturb(left), boundary);
 		terrain.AddTriangleCellData(indices, w2, leftWeights, boundaryWeights);
+	}
+	//============================================================================================================
+	//                                              Реки 
+	//============================================================================================================
+	void TriangulateEstuary(EdgeVertices e1, EdgeVertices e2, bool incomingRiver, Vector3 indices)
+	{
+		waterShore.AddTriangle(e2.v1, e1.v2, e1.v1);
+		waterShore.AddTriangle(e2.v5, e1.v5, e1.v4);
+		waterShore.AddTriangleUV(new Vector2(0f, 1f), new Vector2(0f, 0f), new Vector2(0f, 0f));
+		waterShore.AddTriangleUV(new Vector2(0f, 1f), new Vector2(0f, 0f), new Vector2(0f, 0f));
+		waterShore.AddTriangleCellData(indices, weights2, weights1, weights1);
+		waterShore.AddTriangleCellData(indices, weights2, weights1, weights1);
+
+		estuaries.AddQuad(e2.v1, e1.v2, e2.v2, e1.v3);
+		estuaries.AddTriangle(e1.v3, e2.v2, e2.v4);
+		estuaries.AddQuad(e1.v3, e1.v4, e2.v4, e2.v5);
+
+		estuaries.AddQuadUV(new Vector2(0f, 1f), new Vector2(0f, 0f), new Vector2(1f, 1f), new Vector2(0f, 0f));
+		estuaries.AddTriangleUV(new Vector2(0f, 0f), new Vector2(1f, 1f), new Vector2(1f, 1f));
+		estuaries.AddQuadUV(new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(1f, 1f), new Vector2(0f, 1f));
+		estuaries.AddQuadCellData(indices, weights2, weights1, weights2, weights1);
+		estuaries.AddTriangleCellData(indices, weights1, weights2, weights2);
+		estuaries.AddQuadCellData(indices, weights1, weights2);
+
+		if (incomingRiver)
+		{
+			estuaries.AddQuadUV2(new Vector2(1.5f, 1f), new Vector2(0.7f, 1.15f), new Vector2(1f, 0.8f), new Vector2(0.5f, 1.1f));
+			estuaries.AddTriangleUV2(new Vector2(0.5f, 1.1f), new Vector2(1f, 0.8f), new Vector2(0f, 0.8f));
+			estuaries.AddQuadUV2(new Vector2(0.5f, 1.1f), new Vector2(0.3f, 1.15f), new Vector2(0f, 0.8f), new Vector2(-0.5f, 1f));
+		}
+		else
+		{
+			estuaries.AddQuadUV2(new Vector2(-0.5f, -0.2f), new Vector2(0.3f, -0.35f), new Vector2(0f, 0f), new Vector2(0.5f, -0.3f));
+			estuaries.AddTriangleUV2(new Vector2(0.5f, -0.3f), new Vector2(0f, 0f), new Vector2(1f, 0f));
+			estuaries.AddQuadUV2(new Vector2(0.5f, -0.3f), new Vector2(0.7f, -0.35f), new Vector2(1f, 0f), new Vector2(1.5f, -0.2f));
+		}
 	}
 
 	void TriangulateWithRiver(HexDirection direction, HexCell cell, Vector3 center, EdgeVertices e)
@@ -851,9 +891,9 @@ public class HexGridChunk : MonoBehaviour
 			TriangulateRoadEdge(roadCenter, mR, center, cell.Index);
 		}
 	}
-
-
-
+	//============================================================================================================
+	//                                              Дороги 
+	//============================================================================================================
 	void TriangulateRoadSegment(Vector3 v1, Vector3 v2, Vector3 v3, Vector3 v4, Vector3 v5, Vector3 v6, Color w1, Color w2, Vector3 indices)
 	{
 		roads.AddQuad(v1, v2, v4, v5);
@@ -908,49 +948,4 @@ public class HexGridChunk : MonoBehaviour
 		}
 		return interpolators;
 	}
-
-
-
-	void TriangulateEdgeFan(Vector3 center, EdgeVertices edge, float index)
-	{
-		terrain.AddTriangle(center, edge.v1, edge.v2);
-		terrain.AddTriangle(center, edge.v2, edge.v3);
-		terrain.AddTriangle(center, edge.v3, edge.v4);
-		terrain.AddTriangle(center, edge.v4, edge.v5);
-
-		Vector3 indices;
-		indices.x = indices.y = indices.z = index;
-		terrain.AddTriangleCellData(indices, weights1);
-		terrain.AddTriangleCellData(indices, weights1);
-		terrain.AddTriangleCellData(indices, weights1);
-		terrain.AddTriangleCellData(indices, weights1);
-	}
-
-	void TriangulateEdgeStrip(EdgeVertices e1, Color w1, float index1, EdgeVertices e2, Color w2, float index2, bool hasRoad = false)
-	{
-		terrain.AddQuad(e1.v1, e1.v2, e2.v1, e2.v2);
-		terrain.AddQuad(e1.v2, e1.v3, e2.v2, e2.v3);
-		terrain.AddQuad(e1.v3, e1.v4, e2.v3, e2.v4);
-		terrain.AddQuad(e1.v4, e1.v5, e2.v4, e2.v5);
-
-		Vector3 indices;
-		indices.x = indices.z = index1;
-		indices.y = index2;
-		terrain.AddQuadCellData(indices, w1, w2);
-		terrain.AddQuadCellData(indices, w1, w2);
-		terrain.AddQuadCellData(indices, w1, w2);
-		terrain.AddQuadCellData(indices, w1, w2);
-
-		if (hasRoad)
-		{
-			TriangulateRoadSegment(e1.v2, e1.v3, e1.v4, e2.v2, e2.v3, e2.v4, w1, w2, indices);
-		}
-	}
-
-
-
-
-
-
-
 }

@@ -3098,7 +3098,7 @@ MonoBehaviour:
   chunkSizeMax: 100
   landPercentage: 50
   waterLevel: 3
-  highRiseProbability: 0.5
+  highRiseProbability: 0.25
   sinkProbability: 0.2
   elevationMinimum: -2
   elevationMaximum: 8

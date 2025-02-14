@@ -12,24 +12,10 @@ public class HexMapEditor : MonoBehaviour
 
 	public HexGrid hexGrid;
 
-	int activeTerrainTypeIndex = -1;
-	private int activeElevation;
-	private int activeWaterLevel;
-	int activeUrbanLevel, activeFarmLevel, activePlantLevel, activeSpecialIndex;
-
-	private bool applyElevation = false;
-	private bool applyWaterLevel = false;
-	bool applyUrbanLevel, applyFarmLevel, applyPlantLevel, applySpecialIndex;
-
-	private int brushSize;
-
-	OptionalToggle riverMode, roadMode, walledMode;
-
 	bool isDrag;
 	HexDirection dragDirection;
-	HexCell previousCell;
-	public Material terrainMaterial;
 
+	HexCell previousCell;
 
 	void Awake()
 	{
@@ -88,6 +74,11 @@ public class HexMapEditor : MonoBehaviour
 		{
 			previousCell = null;
 		}
+	}
+
+	HexCell GetCellUnderCursor()
+	{
+		return hexGrid.GetCell(Camera.main.ScreenPointToRay(Input.mousePosition));
 	}
 
 	void EditCells(HexCell center)
@@ -186,11 +177,18 @@ public class HexMapEditor : MonoBehaviour
 		}
 		isDrag = false;
 	}
-
+	//============================================================================================================
+	//                                          Тип рельефа и высота
+	//============================================================================================================
+	
+	int activeTerrainTypeIndex = -1;
 	public void SetTerrainTypeIndex(int index)
 	{
 		activeTerrainTypeIndex = index;
 	}
+
+	private bool applyElevation = false;
+	private int activeElevation;
 
 	public void SetElevation(float elevation)
 	{
@@ -201,12 +199,19 @@ public class HexMapEditor : MonoBehaviour
 	{
 		applyElevation = toggle;
 	}
+	//============================================================================================================
+	//                                             Размер кисти 
+	//============================================================================================================
+	private int brushSize;
 
 	public void SetBrushSize(float size)
 	{
 		brushSize = (int)size;
 	}
-
+	//============================================================================================================
+	//                                           Реки и дороги 
+	//============================================================================================================
+	OptionalToggle riverMode, roadMode;
 	public void SetRiverMode(int mode)
 	{
 		riverMode = (OptionalToggle)mode;
@@ -216,6 +221,11 @@ public class HexMapEditor : MonoBehaviour
 	{
 		roadMode = (OptionalToggle)mode;
 	}
+	//============================================================================================================
+	//                                                Вода 
+	//============================================================================================================
+	private bool applyWaterLevel = false;
+	private int activeWaterLevel;
 
 	public void SetApplyWaterLevel(bool toggle)
 	{
@@ -226,7 +236,12 @@ public class HexMapEditor : MonoBehaviour
 	{
 		activeWaterLevel = (int)level;
 	}
-
+	//============================================================================================================
+	//                                            Объекты рельефа 
+	//============================================================================================================
+	bool applyUrbanLevel, applyFarmLevel, applyPlantLevel, applySpecialIndex;
+	int activeUrbanLevel, activeFarmLevel, activePlantLevel, activeSpecialIndex;
+	OptionalToggle walledMode;
 	public void SetApplyUrbanLevel(bool toggle)
 	{
 		applyUrbanLevel = toggle;
@@ -271,6 +286,10 @@ public class HexMapEditor : MonoBehaviour
 	{
 		activeSpecialIndex = (int)index;
 	}
+	//============================================================================================================
+	//                                     Сетка и режим редактирования 
+	//============================================================================================================
+	public Material terrainMaterial;
 
 	public void ShowGrid(bool visible)
 	{
@@ -284,21 +303,13 @@ public class HexMapEditor : MonoBehaviour
 		}
 	}
 
-
-
 	public void SetEditMode(bool toggle)
 	{
 		enabled = toggle;
 	}
-
-	HexCell GetCellUnderCursor()
-	{
-		return hexGrid.GetCell(Camera.main.ScreenPointToRay(Input.mousePosition));
-	}
-
-
-
-	//-------------------------------- Юниты -------------------------------------
+	//============================================================================================================
+	//                                              Юниты 
+	//============================================================================================================	
 	void CreateUnit()
 	{
 		HexCell cell = GetCellUnderCursor();
@@ -317,5 +328,5 @@ public class HexMapEditor : MonoBehaviour
 			hexGrid.RemoveUnit(cell.Unit);
 		}
 	}
-	//----------------------------------------------------------------------------
+	//============================================================================================================
 }

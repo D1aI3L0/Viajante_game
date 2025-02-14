@@ -296,5 +296,4 @@ public class HexFeatureManager : MonoBehaviour
 		instance.localRotation = Quaternion.Euler(0f, 360f * hash.e, 0f);
 		instance.SetParent(container, false);
 	}
-
 }

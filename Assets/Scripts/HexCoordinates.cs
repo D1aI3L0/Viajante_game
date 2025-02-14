@@ -89,121 +89,6 @@ public struct HexCoordinates
 
 	public int DistanceTo(HexCoordinates other)
 	{
-		// if (HexMetrics.WrappingX)
-		// {
-		// 	if (HexMetrics.WrappingZ)
-		// 	{
-		// 		int xyz =
-		// 			(x < other.x ? other.x - x : x - other.x) +
-		// 			(z < other.z ? other.z - z : z - other.z) +
-		// 			(Y < other.Y ? other.Y - Y : Y - other.Y);
-
-		// 		other.x += HexMetrics.wrapSizeX;
-		// 		other.z += HexMetrics.wrapSizeZ;
-
-		// 		int xyzWrapped =
-		// 			(x < other.x ? other.x - x : x - other.x) +
-		// 			(z < other.z ? other.z - z : z - other.z) +
-		// 			(Y < other.Y ? other.Y - Y : Y - other.Y);
-
-		// 		if (xyzWrapped < xyz)
-		// 		{
-		// 			return xyzWrapped / 2;
-		// 		}
-
-		// 		other.x -= 2 * HexMetrics.wrapSizeX;
-
-		// 		xyzWrapped =
-		// 			(x < other.x ? other.x - x : x - other.x) +
-		// 			(z < other.z ? other.z - z : z - other.z) +
-		// 			(Y < other.Y ? other.Y - Y : Y - other.Y);
-
-		// 		if (xyzWrapped < xyz)
-		// 		{
-		// 			return xyzWrapped / 2;
-		// 		}
-
-		// 		other.x += 2 * HexMetrics.wrapSizeX;
-		// 		other.z -= 2 * HexMetrics.wrapSizeZ;
-
-		// 		xyzWrapped =
-		// 			(x < other.x ? other.x - x : x - other.x) +
-		// 			(z < other.z ? other.z - z : z - other.z) +
-		// 			(Y < other.Y ? other.Y - Y : Y - other.Y);
-
-		// 		if (xyzWrapped < xyz)
-		// 		{
-		// 			return xyzWrapped / 2;
-		// 		}
-
-		// 		return xyz / 2;
-		// 	}
-		// 	else
-		// 	{
-		// 		int xy =
-		// 			(x < other.x ? other.x - x : x - other.x) +
-		// 			(Y < other.Y ? other.Y - Y : Y - other.Y);
-
-		// 		other.x += HexMetrics.wrapSizeX;
-
-		// 		int xyWrapped =
-		// 			(x < other.x ? other.x - x : x - other.x) +
-		// 			(Y < other.Y ? other.Y - Y : Y - other.Y);
-
-		// 		if (xyWrapped < xy)
-		// 		{
-		// 			xy = xyWrapped;
-		// 		}
-		// 		else
-		// 		{
-		// 			other.x -= 2 * HexMetrics.wrapSizeX;
-
-		// 			xyWrapped =
-		// 				(x < other.x ? other.x - x : x - other.x) +
-		// 				(Y < other.Y ? other.Y - Y : Y - other.Y);
-
-		// 			if (xyWrapped < xy)
-		// 			{
-		// 				xy = xyWrapped;
-		// 			}
-		// 		}
-
-		// 		return (xy + (z < other.z ? other.z - z : z - other.z)) / 2;
-		// 	}
-		// }
-
-		// if (HexMetrics.WrappingZ)
-		// {
-		// 	int yz =
-		// 		(z < other.z ? other.z - z : z - other.z) +
-		// 		(Y < other.Y ? other.Y - Y : Y - other.Y);
-
-		// 	other.z += HexMetrics.wrapSizeZ;
-
-		// 	int yzWrapped =
-		// 		(z < other.z ? other.z - z : z - other.z) +
-		// 		(Y < other.Y ? other.Y - Y : Y - other.Y);
-
-		// 	if (yzWrapped < yz)
-		// 	{
-		// 		yz = yzWrapped;
-		// 	}
-		// 	else
-		// 	{
-		// 		other.z -= 2 * HexMetrics.wrapSizeZ;
-		// 		yzWrapped =
-		// 			(z < other.z ? other.z - z : z - other.z) +
-		// 			(Y < other.Y ? other.Y - Y : Y - other.Y);
-
-		// 		if (yzWrapped < yz)
-		// 		{
-		// 			yz = yzWrapped;
-		// 		}
-		// 	}
-
-		// 	return (yz + (x < other.x ? other.x - x : x - other.x)) / 2;
-		// }
-
 		int xy =
 			(x < other.x ? other.x - x : x - other.x) +
 			(Y < other.Y ? other.Y - Y : Y - other.Y);
@@ -216,7 +101,7 @@ public struct HexCoordinates
 				(Y < other.Y ? other.Y - Y : Y - other.Y);
 			if (xyWrapped < xy)
 			{
-				return (xyWrapped + (z < other.z ? other.z - z : z - other.z)) / 2;
+				xy = xyWrapped;
 			}
 			else
 			{
@@ -226,11 +111,13 @@ public struct HexCoordinates
 					(Y < other.Y ? other.Y - Y : Y - other.Y);
 				if (xyWrapped < xy)
 				{
-					return (xyWrapped + (z < other.z ? other.z - z : z - other.z)) / 2;
+					xy = xyWrapped;
 				}
 			}
 		}
-		return (xy + (z < other.z ? other.z - z : z - other.z)) / 2;
+
+		int xyz = xy + (z < other.z ? other.z - z : z - other.z);
+		return xyz / 2;
 	}
 
 	public void Save(BinaryWriter writer)

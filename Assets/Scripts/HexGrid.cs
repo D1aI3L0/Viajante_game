@@ -50,7 +50,9 @@ public class HexGrid : MonoBehaviour
 			ResetVisibility();
 		}
 	}
-
+	//============================================================================================================
+	//                                          Создание карты 
+	//============================================================================================================
 	public bool CreateMap(int x, int z, bool xWrapping, bool zWrapping)
 	{
 		if (x <= 0 || x % HexMetrics.chunkSizeX != 0 || z <= 0 || z % HexMetrics.chunkSizeZ != 0 || z % 2 != 0)
@@ -181,12 +183,12 @@ public class HexGrid : MonoBehaviour
 					cell.SetNeighbor(HexDirection.NW, cells[x]);
 					if (x == cellCountX - 1)
 					{
-						if(xWrapping)
+						if (xWrapping)
 							cell.SetNeighbor(HexDirection.NE, cells[0]);
 					}
 					else
 					{
-						cell.SetNeighbor(HexDirection.NE, cells[x+1]);
+						cell.SetNeighbor(HexDirection.NE, cells[x + 1]);
 					}
 				}
 			}
@@ -215,15 +217,14 @@ public class HexGrid : MonoBehaviour
 	public HexCell GetCell(Vector3 position)
 	{
 		position = transform.InverseTransformPoint(position);
-		
-		if(HexMetrics.WrappingZ)
+
+		if (HexMetrics.WrappingZ)
 		{
-			if(position.z < 0)
+			if (position.z < 0)
 				position.z += HexMetrics.outerDiametr * cellCountZ;
-			if(position.z > HexMetrics.outerDiametr * cellCountZ)
+			if (position.z > HexMetrics.outerDiametr * cellCountZ)
 				position.z -= HexMetrics.outerDiametr * cellCountZ;
 		}
-		//Debug.Log(position.x + " " + position.z);
 		HexCoordinates coordinates = HexCoordinates.FromPosition(position);
 		return GetCell(coordinates);
 	}
@@ -270,9 +271,9 @@ public class HexGrid : MonoBehaviour
 			chunks[i].ShowUI(visible);
 		}
 	}
-
-
-	//=============================== Сохранение и загрузка ===============================
+	//============================================================================================================
+	//                                       Сохранение и загрузка 
+	//============================================================================================================
 	public void Save(BinaryWriter writer)
 	{
 		writer.Write(cellCountX);
@@ -337,11 +338,9 @@ public class HexGrid : MonoBehaviour
 
 		cellShaderData.ImmediateMode = originalImmediateMode;
 	}
-	//============================================================================
-
-
-
-	//=============================== Поиск пути =================================
+	//============================================================================================================
+	//                                            Поиск пути 
+	//============================================================================================================
 	HexCellPriorityQueue searchFrontier;
 	int searchFrontierPhase;
 
@@ -422,7 +421,7 @@ public class HexGrid : MonoBehaviour
 					neighbor.SearchPhase = searchFrontierPhase;
 					neighbor.Distance = distance;
 					neighbor.PathFrom = current;
-					neighbor.SearchHeuristic = neighbor.coordinates.DistanceTo(toCell.coordinates); //вычисление значения эвристики (при добавление ячейки к границк)*
+					neighbor.SearchHeuristic = neighbor.coordinates.DistanceTo(toCell.coordinates); //вычисление значения эвристики (при добавление ячейки к границе)*
 					searchFrontier.Enqueue(neighbor);
 				}
 				else if (distance < neighbor.Distance)
@@ -486,11 +485,9 @@ public class HexGrid : MonoBehaviour
 		path.Reverse();
 		return path;
 	}
-	//============================================================================
-
-
-
-	//=============================== Юниты ======================================
+	//============================================================================================================
+	//                                               Юниты 
+	//============================================================================================================
 	public HexUnit unitPrefab;
 	List<HexUnit> units = new List<HexUnit>();
 
@@ -527,13 +524,11 @@ public class HexGrid : MonoBehaviour
 
 	public void MakeChildOfChunk(Transform child, int columnIndex, int lineIndex)
 	{
-		child.SetParent(chunks[lineIndex*chunkCountX+columnIndex].transform, false);
+		child.SetParent(chunks[lineIndex * chunkCountX + columnIndex].transform, false);
 	}
-	//============================================================================
-
-
-
-	//========================== Область обзора ==================================
+	//============================================================================================================
+	//                                          Область видимости 
+	//============================================================================================================
 	List<HexCell> GetVisibleCells(HexCell fromCell, int range)
 	{
 		List<HexCell> visibleCells = ListPool<HexCell>.Get();
@@ -622,11 +617,9 @@ public class HexGrid : MonoBehaviour
 			IncreaseVisibility(unit.Location, unit.VisionRange);
 		}
 	}
-	//============================================================================
-
-
-
-	//======================== Сворачивание карты ================================
+	//============================================================================================================
+	//                                        Сворачивание карты 
+	//============================================================================================================
 	int currentCenterColumnIndex = -1;
 	int currentCenterLineIndex = -1;
 
@@ -703,5 +696,5 @@ public class HexGrid : MonoBehaviour
 			}
 		}
 	}
-	//=================================================================================
+	//============================================================================================================
 }

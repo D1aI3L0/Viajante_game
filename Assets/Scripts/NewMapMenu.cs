@@ -2,10 +2,17 @@ using UnityEngine;
 
 public class NewMapMenu : MonoBehaviour
 {
+	enum Generator
+	{
+		None,
+		GuideGen,
+		NewGen
+	}
+
 	public HexGrid hexGrid;
 
-	bool generateMaps = true;
-	public HexMapGenerator mapGenerator;
+	Generator generator = Generator.None;
+	public HexMapGenerator guideGenerator;
 	bool xWrapping = true, zWrapping = true;
 
 	public void Open()
@@ -22,9 +29,9 @@ public class NewMapMenu : MonoBehaviour
 
 	void CreateMap(int x, int z)
 	{
-		if (generateMaps)
+		if (generator == Generator.GuideGen)
 		{
-			mapGenerator.GenerateMap(x, z, xWrapping, zWrapping);
+			guideGenerator.GenerateMap(x, z, xWrapping, zWrapping);
 		}
 		else
 		{
@@ -50,14 +57,18 @@ public class NewMapMenu : MonoBehaviour
 		CreateMap(HexMetrics.chunkSizeX * 20, HexMetrics.chunkSizeZ * 12);
 	}
 
-	public void ToggleMapGeneration(bool toggle)
+	public void ToggleMapGeneration(int toggle)
 	{
-		generateMaps = toggle;
+		generator = (Generator)toggle;
 	}
 
-	public void ToggleWrapping(bool toggle)
+	public void ToggleXWrapping(bool toggle)
 	{
 		xWrapping = toggle;
+	}
+
+	public void ToggleZWrapping(bool toggle)
+	{
 		zWrapping = toggle;
 	}
 }

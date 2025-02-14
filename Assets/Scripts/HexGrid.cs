@@ -75,7 +75,9 @@ public class HexGrid : MonoBehaviour
 		cellCountX = x;
 		cellCountZ = z;
 		this.xWrapping = xWrapping;
+		this.zWrapping = zWrapping;
 		currentCenterColumnIndex = -1;
+		currentCenterLineIndex = -1;
 		HexMetrics.wrapSizeX = xWrapping ? cellCountX : 0;
 		HexMetrics.wrapSizeZ = zWrapping ? cellCountZ : 0;
 		chunkCountX = cellCountX / HexMetrics.chunkSizeX;
@@ -220,9 +222,9 @@ public class HexGrid : MonoBehaviour
 
 		if (HexMetrics.WrappingZ)
 		{
-			if (position.z < 0)
+			if (position.z < -1f * HexMetrics.outerRadius)
 				position.z += HexMetrics.outerDiametr * cellCountZ;
-			if (position.z > HexMetrics.outerDiametr * cellCountZ)
+			if (position.z > HexMetrics.outerDiametr * cellCountZ + HexMetrics.outerRadius)
 				position.z -= HexMetrics.outerDiametr * cellCountZ;
 		}
 		HexCoordinates coordinates = HexCoordinates.FromPosition(position);

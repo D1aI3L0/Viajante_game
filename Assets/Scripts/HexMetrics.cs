@@ -110,17 +110,17 @@ public static class HexMetrics
 
 	public static Vector3 TerraceLerp(Vector3 a, Vector3 b, int step)
 	{
-		float h = step * HexMetrics.horizontalTerraceStepSize;
+		float h = step * horizontalTerraceStepSize;
 		a.x += (b.x - a.x) * h;
 		a.z += (b.z - a.z) * h;
-		float v = ((step + 1) / 2) * HexMetrics.verticalTerraceStepSize;
+		float v = ((step + 1) / 2) * verticalTerraceStepSize;
 		a.y += (b.y - a.y) * v;
 		return a;
 	}
 
 	public static Color TerraceLerp(Color a, Color b, int step)
 	{
-		float h = step * HexMetrics.horizontalTerraceStepSize;
+		float h = step * horizontalTerraceStepSize;
 		return Color.Lerp(a, b, h);
 	}
 
@@ -147,13 +147,13 @@ public static class HexMetrics
 	{
 		Vector4 sample = noiseSource.GetPixelBilinear(position.x * noiseScale, position.z * noiseScale);
 
-		if (WrappingX && position.x < innerDiameter * 1.5f)
+		if (WrappingX && position.x < innerDiameter * 1.1f)
 		{
-			if (WrappingZ && position.z < outerDiametr * 1.5f)
+			if (WrappingZ && position.z < outerRadius * 1.15f)
 			{
 				Vector4 sample2 = noiseSource.GetPixelBilinear
-				((position.x + wrapSizeX * innerDiameter) * noiseScale, (position.z + wrapSizeZ * outerDiametr) * noiseScale);
-				sample = Vector4.Lerp(sample2, sample, position.x * (1f / innerDiameter) + position.z * (1f / outerDiametr) - 0.5f);
+					((position.x + wrapSizeX * innerDiameter) * noiseScale, (position.z + wrapSizeZ * outerDiametr) * noiseScale);
+				sample = Vector4.Lerp(sample2, sample, position.x * (1f / innerDiameter) + position.z * (1f / outerDiametr) - 0.1f);
 			}
 			else
 			{
@@ -162,12 +162,11 @@ public static class HexMetrics
 				sample = Vector4.Lerp(sample2, sample, position.x * (1f / innerDiameter) - 0.5f);
 			}
 		}
-
-		if (WrappingZ && position.z < outerDiametr)
+		else if (WrappingZ && position.z < outerDiametr * 1.5f)
 		{
 			Vector4 sample2 = noiseSource.GetPixelBilinear
 				(position.x * noiseScale, (position.z + wrapSizeZ * outerDiametr) * noiseScale);
-			sample = Vector4.Lerp(sample2, sample, position.z * (1f / outerDiametr));
+			sample = Vector4.Lerp(sample2, sample, position.z * (1f / outerDiametr) - 0.5f);
 		}
 		return sample;
 	}

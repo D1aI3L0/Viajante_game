@@ -117,6 +117,27 @@ public struct HexCoordinates
 		}
 
 		int xyz = xy + (z < other.z ? other.z - z : z - other.z);
+
+		if(HexMetrics.WrappingZ)
+		{
+			other.z += HexMetrics.wrapSizeZ;
+			int xyzWrapped = xy + (z < other.z ? other.z - z : z - other.z);
+			if (xyzWrapped < xyz)
+			{
+				xyz = xyzWrapped;
+			}
+			else
+			{
+				other.z -= 2 * HexMetrics.wrapSizeZ;
+				xyzWrapped = xy + (z < other.z ? other.z - z : z - other.z);
+					
+				if (xyzWrapped < xyz)
+				{
+					xyz = xyzWrapped;
+				}
+			}
+		}
+		
 		return xyz / 2;
 	}
 

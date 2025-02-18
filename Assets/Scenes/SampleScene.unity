@@ -3591,6 +3591,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hexGrid: {fileID: 493061482}
   guideGenerator: {fileID: 390140062}
+  newGenerator: {fileID: 2040898656}
 --- !u!1 &418219243
 GameObject:
   m_ObjectHideFlags: 0
@@ -4474,9 +4475,10 @@ MonoBehaviour:
   cellLabelPrefab: {fileID: 1313679035159804760, guid: 324a165422f99324390b2528b218a48f, type: 3}
   chunkPrefab: {fileID: 635381878753421045, guid: 48bd031dd2cf5d84b953b5a11750e2d1, type: 3}
   noiseSource: {fileID: 2800000, guid: 69eca4f5e0c479a4b88573bb245854d3, type: 3}
+  generatorNoiseSource: {fileID: 2800000, guid: 69eca4f5e0c479a4b88573bb245854d3, type: 3}
   seed: 4321
-  xWrapping: 1
-  zWrapping: 1
+  xWrapping: 0
+  zWrapping: 0
   unitPrefab: {fileID: 8454914924492444950, guid: c2a4ac769b41bcc48a0706c586447e7c, type: 3}
 --- !u!4 &493061483
 Transform:
@@ -12524,7 +12526,7 @@ MonoBehaviour:
   m_FillRect: {fileID: 241111377}
   m_HandleRect: {fileID: 285182867}
   m_Direction: 0
-  m_MinValue: -4
+  m_MinValue: 0
   m_MaxValue: 10
   m_WholeNumbers: 1
   m_Value: 1
@@ -13011,7 +13013,7 @@ MonoBehaviour:
   m_FillRect: {fileID: 347588555}
   m_HandleRect: {fileID: 244889605}
   m_Direction: 0
-  m_MinValue: -4
+  m_MinValue: 0
   m_MaxValue: 10
   m_WholeNumbers: 1
   m_Value: 0
@@ -18601,14 +18603,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   grid: {fileID: 493061482}
-  cellCount: 0
-  seed: 1
+  seed: 1312466619
   useFixedSeed: 1
-  elevationScaling: 0.08
+  elevationScaling: 0.03
   minElevation: 0
-  maxElevation: 7
+  maxElevation: 10
   waterLevel: 3
-  moistureScaling: 0.06
 --- !u!4 &2040898657
 Transform:
   m_ObjectHideFlags: 0

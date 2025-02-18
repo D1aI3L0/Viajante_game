@@ -20,17 +20,19 @@ public class HexGrid : MonoBehaviour
 	public HexGridChunk chunkPrefab;
 	HexGridChunk[] chunks;
 
-	public Texture2D noiseSource;
+	public Texture2D noiseSource, generatorNoiseSource;
 	public int seed;
 
 	HexCellShaderData cellShaderData;
 
 	public bool xWrapping, zWrapping;
-	Transform[] columns;
+
+	List<HexBiome> biomes;
 
 	void Awake()
 	{
 		HexMetrics.noiseSource = noiseSource;
+		HexMetrics.generatorNoiseSource = generatorNoiseSource;
 		HexMetrics.InitializeHashGrid(seed);
 		HexUnit.unitPrefab = unitPrefab;
 		cellShaderData = gameObject.AddComponent<HexCellShaderData>();
@@ -40,9 +42,10 @@ public class HexGrid : MonoBehaviour
 
 	void OnEnable()
 	{
-		if (!HexMetrics.noiseSource)
+		if (!HexMetrics.noiseSource || !HexMetrics.generatorNoiseSource)
 		{
 			HexMetrics.noiseSource = noiseSource;
+			HexMetrics.generatorNoiseSource = generatorNoiseSource;
 			HexMetrics.InitializeHashGrid(seed);
 			HexUnit.unitPrefab = unitPrefab;
 			HexMetrics.wrapSizeX = xWrapping ? cellCountX : 0;
@@ -59,6 +62,15 @@ public class HexGrid : MonoBehaviour
 		{
 			Debug.LogError("Unsupported map size.");
 			return false;
+		}
+
+		if (biomes == null)
+		{
+			biomes = ListPool<HexBiome>.Get();
+		}
+		else
+		{
+			biomes.Clear();
 		}
 
 		ClearPath();
@@ -271,6 +283,37 @@ public class HexGrid : MonoBehaviour
 		for (int i = 0; i < chunks.Length; i++)
 		{
 			chunks[i].ShowUI(visible);
+		}
+	}
+
+
+	public void AddBiome(HexCell center, List<HexCell> borders)
+	{
+		biomes.Add(new HexBiome(center, borders));
+	}
+
+	public HexBiome GetBiome(HexCell center)
+	{
+		foreach(HexBiome biome in biomes)
+		{
+			if(biome.Center == center)
+				return biome;
+		}
+		return null;
+	}
+
+	public HexBiome GetBiome(int index)
+	{
+		if(index > biomes.Count - 1)
+			return null;
+		return biomes[index];
+	}
+
+	public int GetBiomesCount
+	{
+		get
+		{
+			return biomes.Count;
 		}
 	}
 	//============================================================================================================

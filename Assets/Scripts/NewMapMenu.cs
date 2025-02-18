@@ -13,6 +13,7 @@ public class NewMapMenu : MonoBehaviour
 
 	Generator generator = Generator.None;
 	public HexMapGenerator guideGenerator;
+	public NewMapGenerator newGenerator;
 	bool xWrapping = true, zWrapping = true;
 
 	public void Open()
@@ -32,6 +33,10 @@ public class NewMapMenu : MonoBehaviour
 		if (generator == Generator.GuideGen)
 		{
 			guideGenerator.GenerateMap(x, z, xWrapping, zWrapping);
+		}
+		else if (generator == Generator.NewGen)
+		{
+			newGenerator.GenerateMap(x, z, false, false);
 		}
 		else
 		{
@@ -54,7 +59,7 @@ public class NewMapMenu : MonoBehaviour
 
 	public void CreateLargeMap()
 	{
-		CreateMap(HexMetrics.chunkSizeX * 20, HexMetrics.chunkSizeZ * 12);
+		CreateMap(HexMetrics.chunkSizeX * 20, HexMetrics.chunkSizeZ * 16);
 	}
 
 	public void ToggleMapGeneration(int toggle)

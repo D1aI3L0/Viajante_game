@@ -39,7 +39,7 @@ public static class HexMetrics
 	public const float horizontalTerraceStepSize = 1f / terraceSteps;
 	public const float verticalTerraceStepSize = 1f / (terracesPerSlope + 1);
 
-	public static Texture2D noiseSource;
+	public static Texture2D noiseSource, generatorNoiseSource;
 	public const float noiseScale = 0.003f;
 	public const float cellPerturbStrength = 3.5f;
 	public const float elevationPerturbStrength = 1.5f;
@@ -147,26 +147,23 @@ public static class HexMetrics
 	{
 		Vector4 sample = noiseSource.GetPixelBilinear(position.x * noiseScale, position.z * noiseScale);
 
-		if (WrappingX && position.x < innerDiameter * 1.1f)
+		if (WrappingX && position.x < innerDiameter && WrappingZ && position.z < outerRadius)
 		{
-			if (WrappingZ && position.z < outerRadius * 1.15f)
-			{
-				Vector4 sample2 = noiseSource.GetPixelBilinear
-					((position.x + wrapSizeX * innerDiameter) * noiseScale, (position.z + wrapSizeZ * outerDiametr) * noiseScale);
-				sample = Vector4.Lerp(sample2, sample, position.x * (1f / innerDiameter) + position.z * (1f / outerDiametr) - 0.1f);
-			}
-			else
-			{
-				Vector4 sample2 = noiseSource.GetPixelBilinear
-					((position.x + wrapSizeX * innerDiameter) * noiseScale, position.z * noiseScale);
-				sample = Vector4.Lerp(sample2, sample, position.x * (1f / innerDiameter) - 0.5f);
-			}
+			Vector4 sample2 = noiseSource.GetPixelBilinear
+				((position.x + wrapSizeX * innerDiameter) * noiseScale, (position.z + wrapSizeZ * outerDiametr) * noiseScale);
+			sample = Vector4.Lerp(sample2, sample, position.x * (1f / innerDiameter) + position.z * (1f / outerDiametr) - 1f);
 		}
-		else if (WrappingZ && position.z < outerDiametr * 1.5f)
+		else if (WrappingX && position.x < innerDiameter)
+		{
+			Vector4 sample2 = noiseSource.GetPixelBilinear
+				((position.x + wrapSizeX * innerDiameter) * noiseScale, position.z * noiseScale);
+			sample = Vector4.Lerp(sample2, sample, position.x * (1f / innerDiameter) - 1f);
+		}
+		else if (WrappingZ && position.z < outerDiametr)
 		{
 			Vector4 sample2 = noiseSource.GetPixelBilinear
 				(position.x * noiseScale, (position.z + wrapSizeZ * outerDiametr) * noiseScale);
-			sample = Vector4.Lerp(sample2, sample, position.z * (1f / outerDiametr) - 0.5f);
+			sample = Vector4.Lerp(sample2, sample, position.z * (1f / outerDiametr) - 0.6f);
 		}
 		return sample;
 	}

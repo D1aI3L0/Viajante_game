@@ -78,7 +78,7 @@ public class HexCell : MonoBehaviour
 		TMP_Text label = uiRect.GetComponent<TMP_Text>();
 		label.text = text;
 	}
-	
+
 	public HexCellShaderData ShaderData { get; set; }
 
 	public void SetMapData(float data)
@@ -720,4 +720,49 @@ public class HexCell : MonoBehaviour
 		}
 	}
 	//============================================================================================================
+
+	public float moisture;
+	public BiomeNames biomeName = BiomeNames.None;
+
+	public bool AllNeighborsAreSubBorders
+	{
+		get
+		{
+			int subBorders = 0, maxSubBorders = 6;
+			for (HexDirection d = HexDirection.NE; d <= HexDirection.NW; d++)
+			{
+				HexCell neighbor = GetNeighbor(d);
+				if(!neighbor)
+				{
+					maxSubBorders-=1;
+					continue;
+				}
+				if (GetNeighbor(d).biomeName == BiomeNames.SubBorder)
+					subBorders += 1;
+			}
+
+			return subBorders == maxSubBorders;
+		}
+	}
+
+	public bool AllNeighborsAreBiome
+	{
+		get
+		{
+			int biomes = 0, maxBiomes = 6;
+			for (HexDirection d = HexDirection.NE; d <= HexDirection.NW; d++)
+			{
+				HexCell neighbor = GetNeighbor(d);
+				if(!neighbor)
+				{
+					maxBiomes-=1;
+					continue;
+				}
+				if (neighbor.biomeName < BiomeNames.SubBorder)
+					biomes += 1;
+			}
+
+			return biomes == maxBiomes;
+		}
+	}
 }

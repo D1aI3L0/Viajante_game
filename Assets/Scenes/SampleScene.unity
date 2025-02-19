@@ -18603,12 +18603,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   grid: {fileID: 493061482}
-  seed: 1312466619
-  useFixedSeed: 1
-  elevationScaling: 0.03
+  seed: 1005261859
+  useFixedSeed: 0
+  iterationsCount: 3
+  subCornersScale: 2
+  elevationScaling: 0.003
   minElevation: 0
   maxElevation: 10
   waterLevel: 3
+  erosionPercentage: 80
 --- !u!4 &2040898657
 Transform:
   m_ObjectHideFlags: 0

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using TreeEditor;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -17,15 +18,25 @@ public class NewMapGenerator : MonoBehaviour
     HexCellPriorityQueue searchFrontier;
     int searchFrontierPhase;
 
-    Biome[] biomes =
+    BiomePattern[] biomes =
     {
-        new Biome(BiomeNames.Desert, 8, 17, 0), new Biome(BiomeNames.StoneDesert, 7, 14, 3),
-        new Biome(BiomeNames.Plain, 8, 16, 1), new Biome(BiomeNames.Mud, 6, 12, 2), new Biome(BiomeNames.Mountain, 2, 5, 4)
+        new BiomePattern(BiomeNames.Desert, 8, 17), new BiomePattern(BiomeNames.Plain, 8, 16), new BiomePattern(BiomeNames.Mud, 4, 8),
+        new BiomePattern(BiomeNames.StoneDesert, 7, 14), new BiomePattern(BiomeNames.Mountain, 2, 5)
     };
     int biomesCount = 5;
 
+    MinMaxElevation[] elevationCaps =
+    {
+        new MinMaxElevation(3, 5), new MinMaxElevation(3, 6), new MinMaxElevation(3, 4),
+        new MinMaxElevation(5, 7), new MinMaxElevation(7, 10)
+    };
+
+    [Range(1, 6)]
+    public int iterationsCount = 3;
+    [Range(2, 5)]
+    public int subCornersScale = 3;
+
     List<HexCell> cellsCopy;
-    int untouchedCells;
 
     List<HexCell> borders;
 
@@ -53,6 +64,8 @@ public class NewMapGenerator : MonoBehaviour
 
         GenerateBiomes();
         GenerateElevationMap();
+        ErodeLand();
+        SetTerrain();
 
         for (int i = 0; i < cellCount; i++)
         {
@@ -60,7 +73,7 @@ public class NewMapGenerator : MonoBehaviour
             grid.GetCell(i).SearchPhase = 0;
         }
 
-        for(int i = 0; i < grid.GetBiomesCount; i++)
+        for (int i = 0; i < grid.GetBiomesCount; i++)
         {
             grid.GetBiome(i).GetBiomeCells();
         }
@@ -68,8 +81,8 @@ public class NewMapGenerator : MonoBehaviour
         UnityEngine.Random.state = originalRandomState;
     }
 
-    [Range(1f, 0.005f)]
-    public float elevationScaling = 0.001f;
+    [Range(1f, 0.001f)]
+    public float elevationScaling = 0.003f;
     [Range(0, 5)]
     public int minElevation = 0;
     [Range(5, 10)]
@@ -84,12 +97,11 @@ public class NewMapGenerator : MonoBehaviour
         {
             cellsCopy.Add(grid.GetCell(i));
         }
-        untouchedCells = cellCount;
-        for (int c = 0; c < 3 && untouchedCells > 0; c++)
+        for (int c = 0; c < iterationsCount && cellsCopy.Count > 0; c++)
         {
-            for (int i = 0; i < biomesCount && untouchedCells > 0; i++)
+            for (int i = 0; i < biomesCount && cellsCopy.Count > 0; i++)
             {
-                GenerateBiome(i);
+                if (!GenerateBiome(i)) i--;
             }
         }
         for (int i = 0; i < cellCount; i++)
@@ -99,37 +111,34 @@ public class NewMapGenerator : MonoBehaviour
             {
                 cell.biomeName = BiomeNames.SubBorder;
             }
-            if (cell.biomeName != BiomeNames.None)
-            {
-                if (cell.biomeName == BiomeNames.SubBorder)
-                    cell.Elevation = 6;
-                else if (cell.Elevation != maxElevation)
-                    cell.Elevation = waterLevel + 1;
-            }
-
         }
         ListPool<HexCell>.Add(cellsCopy);
     }
 
-    void GenerateBiome(int biomeIndex)
+    bool GenerateBiome(int biomeIndex)
     {
         int centerIndex = UnityEngine.Random.Range(0, cellsCopy.Count - 1);
         HexCell centerCell = cellsCopy[centerIndex];
-        centerCell.Elevation = maxElevation;
         cellsCopy.Remove(centerCell);
-        untouchedCells -= 1;
 
         borders = ListPool<HexCell>.Get();
 
-        CreateBorders(borders, centerCell, biomeIndex);
+        if (!CreateBorders(borders, centerCell, biomeIndex))
+        {
+            cellsCopy.Add(centerCell);
+            ListPool<HexCell>.Add(borders);
+            return false;
+        }
+        //centerCell.Elevation = maxElevation;
         FillBiome(borders, centerCell, biomeIndex);
         CreateSubBorders(borders, centerCell.coordinates, 1);
         RefillBiome(borders, centerCell, biomeIndex);
         grid.AddBiome(centerCell, borders);
+        return true;
     }
 
 
-    void CreateBorders(List<HexCell> borders, HexCell centerCell, int biomeIndex)
+    bool CreateBorders(List<HexCell> borders, HexCell centerCell, int biomeIndex)
     {
         for (HexDirection d = HexDirection.NE; d <= HexDirection.NW; d++)
         {
@@ -150,8 +159,8 @@ public class NewMapGenerator : MonoBehaviour
             HexCell corner1 = corner;
             HexCell corner2 = corner;
 
-            int cornerDistance1 = UnityEngine.Random.Range(1, cornerDistance/3);
-            int cornerDistance2 = UnityEngine.Random.Range(1, cornerDistance/3);
+            int cornerDistance1 = UnityEngine.Random.Range(1, cornerDistance / subCornersScale);
+            int cornerDistance2 = UnityEngine.Random.Range(1, cornerDistance / subCornersScale);
 
             while (cornerDistance1-- > 0)
             {
@@ -177,16 +186,6 @@ public class NewMapGenerator : MonoBehaviour
             while (corner2.biomeName != BiomeNames.None)
             {
                 corner2 = corner2.GetNeighbor(d.Next().Opposite());
-            }
-            if (!corner1)
-            {
-                Debug.Log("!1");
-                return;
-            }
-            if (!corner2)
-            {
-                Debug.Log("!2");
-                return;
             }
 
             if (d == HexDirection.NE)
@@ -222,14 +221,17 @@ public class NewMapGenerator : MonoBehaviour
             // }
         }
 
+        if (borders.Contains(centerCell))
+            return false;
+
         for (int j = 0; j < borders.Count; j++)
         {
             HexCell cell = borders[j];
             cell.biomeName = biomes[biomeIndex].name;
-            cell.TerrainTypeIndex = biomes[biomeIndex].texture;
             cellsCopy.Remove(cell);
-            untouchedCells -= 1;
         }
+
+        return true;
     }
 
     void ConnectCorners(List<HexCell> borders, HexCell corner1, HexCell corner2)
@@ -302,7 +304,7 @@ public class NewMapGenerator : MonoBehaviour
             border.SearchPhase = searchFrontierPhase;
             searchFrontier.Enqueue(border);
 
-            while (searchFrontier.Count > 0 && untouchedCells > 0)
+            while (searchFrontier.Count > 0 && cellsCopy.Count > 0)
             {
                 HexCell current = searchFrontier.Dequeue();
                 for (HexDirection d = HexDirection.NE; d <= HexDirection.NW; d++)
@@ -318,7 +320,6 @@ public class NewMapGenerator : MonoBehaviour
                         {
                             neighbor.biomeName = BiomeNames.SubBorder;
                             cellsCopy.Remove(neighbor);
-                            untouchedCells -= 1;
                         }
                         neighbor.SearchPhase = searchFrontierPhase;
                         searchFrontier.Enqueue(neighbor);
@@ -339,7 +340,7 @@ public class NewMapGenerator : MonoBehaviour
         List<HexCell> biomeCells = ListPool<HexCell>.Get();
         biomeCells.Add(centerCell);
 
-        while (searchFrontier.Count > 0 && untouchedCells > 0)
+        while (searchFrontier.Count > 0 && cellsCopy.Count > 0)
         {
             HexCell current = searchFrontier.Dequeue();
 
@@ -365,9 +366,7 @@ public class NewMapGenerator : MonoBehaviour
         foreach (HexCell cell in biomeCells)
         {
             cell.biomeName = biomes[biomeIndex].name;
-            cell.TerrainTypeIndex = biomes[biomeIndex].texture;
             cellsCopy.Remove(cell);
-            untouchedCells -= 1;
         }
     }
 
@@ -410,11 +409,9 @@ public class NewMapGenerator : MonoBehaviour
         foreach (HexCell cell in biomeCells)
         {
             cell.biomeName = biomes[biomeIndex].name;
-            cell.TerrainTypeIndex = biomes[biomeIndex].texture;
             if (cellsCopy.Contains(cell))
             {
                 cellsCopy.Remove(cell);
-                untouchedCells -= 1;
             }
         }
     }
@@ -424,22 +421,261 @@ public class NewMapGenerator : MonoBehaviour
         for (int i = 0; i < cellCount; i++)
         {
             HexCell cell = grid.GetCell(i);
-            float fElevation = SampleNoise(cell.Position * elevationScaling, 0.005f)[0];
+            if (cell.biomeName == BiomeNames.SubBorder)
+            {
+                cell.Elevation = waterLevel;
+                continue;
+            }
+            Vector3 pos = cell.Position * elevationScaling;
+            float fElevation = Mathf.PerlinNoise(pos.x, pos.z);
 
             int iElevation = (int)(Math.Sin(fElevation) * 10);
-            if (iElevation > maxElevation)
-                iElevation = maxElevation;
-            else if (iElevation < minElevation)
-                iElevation = minElevation;
 
-            if(cell.biomeName != BiomeNames.None)
-                cell.Elevation = iElevation;
+            if (cell.biomeName == BiomeNames.None && iElevation >= waterLevel)
+            {
+                iElevation = waterLevel - 1;
+            }
+            else if (cell.biomeName != BiomeNames.None)
+            {
+                if (iElevation > elevationCaps[(int)cell.biomeName].max)
+                    iElevation = elevationCaps[(int)cell.biomeName].max;
+                else if (iElevation < elevationCaps[(int)cell.biomeName].min)
+                    iElevation = elevationCaps[(int)cell.biomeName].max;
+            }
+
+            cell.Elevation = iElevation;
         }
     }
+
+    [Range(0, 100)]
+    public int erosionPercentage = 50;
+    [Range(0f, 1f)]
+    public float mountainErosionChance = 0.6f;
+
+    void ErodeLand()
+    {
+        List<HexCell> erodibleCells = ListPool<HexCell>.Get();
+        for (int i = 0; i < cellCount; i++)
+        {
+            HexCell cell = grid.GetCell(i);
+            if (IsErodible(cell))
+            {
+                erodibleCells.Add(cell);
+            }
+        }
+
+        int targetErodibleCount = (int)(erodibleCells.Count * (100 - erosionPercentage) * 0.01f);
+
+        while (erodibleCells.Count > targetErodibleCount)
+        {
+            int index = UnityEngine.Random.Range(0, erodibleCells.Count);
+            HexCell cell = erodibleCells[index];
+            HexCell targetCell = GetErosionTarget(cell);
+
+            cell.Elevation -= 1;
+            targetCell.Elevation += 1;
+
+            if (!IsErodible(cell))
+            {
+                erodibleCells[index] = erodibleCells[erodibleCells.Count - 1];
+                erodibleCells.RemoveAt(erodibleCells.Count - 1);
+            }
+
+            for (HexDirection d = HexDirection.NE; d <= HexDirection.NW; d++)
+            {
+                HexCell neighbor = cell.GetNeighbor(d);
+                if (neighbor && neighbor && neighbor.Elevation == cell.Elevation + 2 && !erodibleCells.Contains(neighbor))
+                {
+                    erodibleCells.Add(neighbor);
+                }
+            }
+
+            if (IsErodible(targetCell) && !erodibleCells.Contains(targetCell))
+            {
+                erodibleCells.Add(targetCell);
+            }
+
+            for (HexDirection d = HexDirection.NE; d <= HexDirection.NW; d++)
+            {
+                HexCell neighbor = targetCell.GetNeighbor(d);
+                if (neighbor && neighbor != cell && !IsErodible(neighbor) && neighbor.Elevation == targetCell.Elevation + 1)
+                {
+                    erodibleCells.Remove(neighbor);
+                }
+            }
+        }
+
+        ListPool<HexCell>.Add(erodibleCells);
+    }
+
+    bool IsErodible(HexCell cell)
+    {
+        int erodibleElevation = cell.Elevation - 2;
+        for (HexDirection d = HexDirection.NE; d <= HexDirection.NW; d++)
+        {
+            HexCell neighbor = cell.GetNeighbor(d);
+            if (neighbor && neighbor.Elevation <= erodibleElevation)
+            {
+                if (neighbor.biomeName == BiomeNames.Mountain && UnityEngine.Random.value < mountainErosionChance)
+                    return false;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    HexCell GetErosionTarget(HexCell cell)
+    {
+        List<HexCell> candidates = ListPool<HexCell>.Get();
+        int erodibleElevation = cell.Elevation - 2;
+        for (HexDirection d = HexDirection.NE; d <= HexDirection.NW; d++)
+        {
+            HexCell neighbor = cell.GetNeighbor(d);
+            if (neighbor && neighbor.Elevation <= erodibleElevation)
+            {
+                candidates.Add(neighbor);
+            }
+        }
+        HexCell target = candidates[UnityEngine.Random.Range(0, candidates.Count)];
+        ListPool<HexCell>.Add(candidates);
+        return target;
+    }
+
+    void SetTerrain()
+    {
+        for (int i = 0; i < cellCount; i++)
+        {
+            HexCell cell = grid.GetCell(i);
+            if ((cell.biomeName == BiomeNames.None && !cell.IsUnderwater) || (cell.IsUnderwater && cell.AllNeighborsAreSubBorders))
+                cell.biomeName = BiomeNames.SubBorder;
+
+            if (cell.biomeName == BiomeNames.SubBorder)
+            {
+                cell.TerrainTypeIndex = 5;
+                if(cell.IsUnderwater)
+                    cell.Elevation = waterLevel;
+            }
+
+            if(cell.biomeName != BiomeNames.None)
+            cell.TerrainTypeIndex = (int)cell.biomeName;
+        }
+    }
+
+
 
     Vector4 SampleNoise(Vector3 position, float noiseScale)
     {
         Vector4 sample = HexMetrics.generatorNoiseSource.GetPixelBilinear(position.x * noiseScale, position.z * noiseScale);
         return sample;
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    List<HexCell> seeds;
+    List<List<HexCell>> voronoiCells;
+
+    void Generate()
+    {
+        cellsCopy = ListPool<HexCell>.Get();
+        seeds = ListPool<HexCell>.Get();
+        voronoiCells = ListPool<List<HexCell>>.Get();
+        for (int i = 0; i < cellCount; i++)
+        {
+            cellsCopy.Add(grid.GetCell(i));
+        }
+        GenerateSeeds();
+        GenerateVoronoiDiagram();
+        SetBiomes();
+        ListPool<HexCell>.Add(seeds);
+        ListPool<HexCell>.Add(cellsCopy);
+    }
+
+    private void GenerateSeeds()
+    {
+        for (int i = 0; i < iterationsCount * biomesCount; i++)
+        {
+            HexCell cell = grid.GetCell(UnityEngine.Random.Range(0, cellsCopy.Count - 1));
+            cell.biomeName = biomes[i % biomesCount].name;
+            cell.Elevation = maxElevation;
+            cellsCopy.Remove(cell);
+            seeds.Add(cell);
+        }
+    }
+
+    private void GenerateVoronoiDiagram()
+    {
+        for (int i = 0; i < seeds.Count; i++)
+        {
+            List<HexCell> cell = ListPool<HexCell>.Get();
+            voronoiCells.Add(cell);
+        }
+
+        for (int x = 0; x < cellCount; x++)
+        {
+            HexCell cell = grid.GetCell(x);
+            int closestSeedIndex = FindClosestSeedIndex(cell);
+            voronoiCells[closestSeedIndex].Add(cell);
+        }
+    }
+
+    private int FindClosestSeedIndex(HexCell cell)
+    {
+        int closestIndex = 0;
+        int closestDistance = cell.coordinates.DistanceTo(seeds[0].coordinates);
+
+        for (int i = 1; i < seeds.Count; i++)
+        {
+            int distance = cell.coordinates.DistanceTo(seeds[i].coordinates);
+            if (distance < closestDistance)
+            {
+                closestDistance = distance;
+                closestIndex = i;
+            }
+        }
+
+        return closestIndex;
+    }
+
+    void SetBiomes()
+    {
+        for (int i = 0; i < seeds.Count; i++)
+        {
+            HexCell centerCell = seeds[i];
+            for (int j = 0; j < voronoiCells[i].Count; j++)
+            {
+                HexCell cell = voronoiCells[i][j];
+                cell.biomeName = centerCell.biomeName;
+                cell.TerrainTypeIndex = centerCell.TerrainTypeIndex;
+                if (cell.Elevation != maxElevation)
+                {
+                    cell.Elevation = 4;
+                }
+            }
+        }
+    }
+
 }

@@ -36,7 +36,7 @@ public class NewMapMenu : MonoBehaviour
 		}
 		else if (generator == Generator.NewGen)
 		{
-			newGenerator.GenerateMap(x, z, false, false);
+			newGenerator.GenerateMap(x, z, xWrapping, false);
 		}
 		else
 		{

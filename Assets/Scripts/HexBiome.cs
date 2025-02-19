@@ -3,29 +3,37 @@ using UnityEngine;
 
 public enum BiomeNames
 {
-    Ocean,
     Desert,
-    StoneDesert,
     Plain,
     Mud,
+    StoneDesert,
     Mountain,
     SubBorder,
     None
 }
 
 
-struct Biome
+struct BiomePattern
 {
     public BiomeNames name;
     public int maxRadius, minRadius;
-    public int texture;
 
-    public Biome(BiomeNames name, int minRadius, int maxRadius, int texture)
+    public BiomePattern(BiomeNames name, int minRadius, int maxRadius)
     {
         this.name = name;
         this.minRadius = minRadius;
         this.maxRadius = maxRadius;
-        this.texture = texture;
+    }
+}
+
+struct MinMaxElevation
+{
+    public int min, max;
+
+    public MinMaxElevation(int min, int max)
+    {
+        this.min = min;
+        this.max = max;
     }
 }
 

@@ -153,17 +153,17 @@ public static class HexMetrics
 				((position.x + wrapSizeX * innerDiameter) * noiseScale, (position.z + wrapSizeZ * outerDiametr) * noiseScale);
 			sample = Vector4.Lerp(sample2, sample, position.x * (1f / innerDiameter) + position.z * (1f / outerDiametr) - 1f);
 		}
-		else if (WrappingX && position.x < innerDiameter)
+		else if (WrappingX && position.x < innerDiameter * 1.5f)
 		{
 			Vector4 sample2 = noiseSource.GetPixelBilinear
 				((position.x + wrapSizeX * innerDiameter) * noiseScale, position.z * noiseScale);
-			sample = Vector4.Lerp(sample2, sample, position.x * (1f / innerDiameter) - 1f);
+			sample = Vector4.Lerp(sample2, sample, position.x * (1f / innerDiameter) - 0.5f);
 		}
-		else if (WrappingZ && position.z < outerDiametr)
+		else if (WrappingZ && position.z < outerDiametr * 1.5f)
 		{
 			Vector4 sample2 = noiseSource.GetPixelBilinear
 				(position.x * noiseScale, (position.z + wrapSizeZ * outerDiametr) * noiseScale);
-			sample = Vector4.Lerp(sample2, sample, position.z * (1f / outerDiametr) - 0.6f);
+			sample = Vector4.Lerp(sample2, sample, position.z * (1f / outerDiametr) - 0.5f);
 		}
 		return sample;
 	}

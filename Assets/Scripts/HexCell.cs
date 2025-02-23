@@ -561,6 +561,8 @@ public class HexCell : MonoBehaviour
 		}
 		writer.Write((byte)roadFlags);
 		writer.Write(IsExplored);
+
+		writer.Write((byte)biomeName);
 	}
 
 	public void Load(BinaryReader reader, int header)
@@ -610,6 +612,7 @@ public class HexCell : MonoBehaviour
 
 		IsExplored = header >= 3 ? reader.ReadBoolean() : false;
 		ShaderData.RefreshVisibility(this);
+		biomeName = (BiomeNames)reader.ReadByte();
 	}
 	//============================================================================================================
 	//                                           Поиск пути 
@@ -720,8 +723,8 @@ public class HexCell : MonoBehaviour
 		}
 	}
 	//============================================================================================================
-
-	public float moisture;
+	//                                              Биомы
+	//============================================================================================================
 	public BiomeNames biomeName = BiomeNames.None;
 
 	public bool AllNeighborsAreSubBorders

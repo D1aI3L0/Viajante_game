@@ -4479,6 +4479,7 @@ MonoBehaviour:
   seed: 4321
   xWrapping: 0
   zWrapping: 0
+  biomePrefab: {fileID: 2738282794105337302, guid: cd2c9648b2dae184485a688a9244156c, type: 3}
   unitPrefab: {fileID: 8454914924492444950, guid: c2a4ac769b41bcc48a0706c586447e7c, type: 3}
 --- !u!4 &493061483
 Transform:
@@ -18603,15 +18604,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   grid: {fileID: 493061482}
-  seed: 1005261859
-  useFixedSeed: 0
-  iterationsCount: 3
+  seed: 100209442
+  useFixedSeed: 1
+  mapType: 5
+  landPersentage: 80
   subCornersScale: 2
-  elevationScaling: 0.003
+  elevationScaling: 0.0027
   minElevation: 0
   maxElevation: 10
   waterLevel: 3
   erosionPercentage: 80
+  mountainErosionChance: 0.5
+  checkWater: 0
 --- !u!4 &2040898657
 Transform:
   m_ObjectHideFlags: 0

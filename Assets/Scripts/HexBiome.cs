@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 public enum BiomeNames
@@ -11,7 +12,6 @@ public enum BiomeNames
     SubBorder,
     None
 }
-
 
 struct BiomePattern
 {
@@ -37,7 +37,8 @@ struct MinMaxElevation
     }
 }
 
-public class HexBiome
+
+public class HexBiome : MonoBehaviour
 {
     HexCell center;
     public HexCell Center
@@ -45,6 +46,10 @@ public class HexBiome
         get
         {
             return center;
+        }
+        set
+        {
+            center = value;
         }
     }
 
@@ -55,14 +60,16 @@ public class HexBiome
         {
             return borderCells;
         }
+        set
+        {
+            borderCells = value;
+        }
     }
-    BiomeNames name;
 
     public HexBiome(HexCell center, List<HexCell> borderCells)
     {
         this.center = center;
         this.borderCells = borderCells;
-        name = center.biomeName;
     }
 
     public List<HexCell> GetBiomeCells()
@@ -100,6 +107,17 @@ public class HexBiome
             cells[i].SearchPhase = 0;
         }
         return cells;
+    }
+
+    public void Save(BinaryWriter writer)
+    {
+        writer.Write(center.Index);
+
+        writer.Write(borderCells.Count);
+        for(int i = 0; i < borderCells.Count; i++)
+        {
+            writer.Write(borderCells[i].Index);
+        }
     }
 
     ~HexBiome()

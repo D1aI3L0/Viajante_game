@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO.Compression;
 using System;
+using Unity.VisualScripting;
 
 public class HexGrid : MonoBehaviour
 {
@@ -27,6 +28,9 @@ public class HexGrid : MonoBehaviour
 
 	public bool xWrapping, zWrapping;
 
+	Transform chunksEmpty, biomesEmpty;
+
+	public HexBiome biomePrefab;
 	List<HexBiome> biomes;
 
 	void Awake()
@@ -76,13 +80,10 @@ public class HexGrid : MonoBehaviour
 		ClearPath();
 		ClearUnits();
 
-		if (chunks != null)
-		{
-			for (int i = 0; i < chunks.Length; i++)
-			{
-				Destroy(chunks[i].gameObject);
-			}
-		}
+		if (chunksEmpty != null)
+			Destroy(chunksEmpty.gameObject);
+		if (biomesEmpty != null)
+			Destroy(biomesEmpty.gameObject);
 
 		cellCountX = x;
 		cellCountZ = z;
@@ -98,18 +99,23 @@ public class HexGrid : MonoBehaviour
 		CreateChunks();
 		CreateCells();
 
+		biomesEmpty = new GameObject("Biomes").transform;
+		biomesEmpty.SetParent(transform);
+
 		return true;
 	}
 
 	void CreateChunks()
 	{
+		chunksEmpty = new GameObject("Chunks").transform;
+		chunksEmpty.SetParent(transform);
 		chunks = new HexGridChunk[chunkCountX * chunkCountZ];
 		for (int z = 0, i = 0; z < chunkCountZ; z++)
 		{
 			for (int x = 0; x < chunkCountX; x++)
 			{
 				HexGridChunk chunk = chunks[i++] = Instantiate(chunkPrefab);
-				chunk.transform.SetParent(transform);
+				chunk.transform.SetParent(chunksEmpty);
 			}
 		}
 	}
@@ -289,14 +295,19 @@ public class HexGrid : MonoBehaviour
 
 	public void AddBiome(HexCell center, List<HexCell> borders)
 	{
-		biomes.Add(new HexBiome(center, borders));
+		HexBiome biome = Instantiate(biomePrefab);
+		biome.transform.SetParent(biomesEmpty);
+		biome.transform.localPosition = center.Position;
+		biome.Center = center;
+		biome.Border = borders;
+		biomes.Add(biome);
 	}
 
 	public HexBiome GetBiome(HexCell center)
 	{
-		foreach(HexBiome biome in biomes)
+		foreach (HexBiome biome in biomes)
 		{
-			if(biome.Center == center)
+			if (biome.Center == center)
 				return biome;
 		}
 		return null;
@@ -304,7 +315,7 @@ public class HexGrid : MonoBehaviour
 
 	public HexBiome GetBiome(int index)
 	{
-		if(index > biomes.Count - 1)
+		if (index > biomes.Count - 1)
 			return null;
 		return biomes[index];
 	}
@@ -335,6 +346,12 @@ public class HexGrid : MonoBehaviour
 		for (int i = 0; i < units.Count; i++)
 		{
 			units[i].Save(writer);
+		}
+
+		writer.Write(biomes.Count);
+		for (int i = 0; i < biomes.Count; i++)
+		{
+			biomes[i].Save(writer);
 		}
 	}
 
@@ -378,6 +395,30 @@ public class HexGrid : MonoBehaviour
 			for (int i = 0; i < unitCount; i++)
 			{
 				HexUnit.Load(reader, this);
+			}
+		}
+
+		if (header >= 7)
+		{
+			if (biomes == null)
+			{
+				biomes = ListPool<HexBiome>.Get();
+			}
+			else
+			{
+				biomes.Clear();
+			}
+			int biomesCount = reader.ReadInt32();
+			for (int i = 0; i < biomesCount; i++)
+			{
+				HexCell center = GetCell(reader.ReadInt32());
+				int borderSize = reader.ReadInt32();
+				List<HexCell> border = ListPool<HexCell>.Get();
+				for (int j = 0; j < borderSize; j++)
+				{
+					border.Add(GetCell(reader.ReadInt32()));
+				}
+				biomes.Add(new HexBiome(center, border));
 			}
 		}
 
@@ -703,6 +744,7 @@ public class HexGrid : MonoBehaviour
 				chunks[chunkCountX * j + i].transform.localPosition = chunkPosition;
 			}
 		}
+		CenterBiomes();
 	}
 
 	public void CenterMapZ(float zPosition)
@@ -739,6 +781,15 @@ public class HexGrid : MonoBehaviour
 				chunkPosition.z = position.z;
 				chunks[chunkCountX * i + j].transform.localPosition = chunkPosition;
 			}
+		}
+		CenterBiomes();
+	}
+
+	public void CenterBiomes()
+	{
+		foreach (HexBiome biome in biomes)
+		{
+			biome.transform.localPosition = biome.Center.Position;
 		}
 	}
 	//============================================================================================================

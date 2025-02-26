@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO.Compression;
 using System;
 using Unity.VisualScripting;
+using System.Data.SqlClient;
 
 public class HexGrid : MonoBehaviour
 {
@@ -21,7 +22,7 @@ public class HexGrid : MonoBehaviour
 	public HexGridChunk chunkPrefab;
 	HexGridChunk[] chunks;
 
-	public Texture2D noiseSource, generatorNoiseSource;
+	public Texture2D noiseSource;
 	public int seed;
 
 	HexCellShaderData cellShaderData;
@@ -36,7 +37,6 @@ public class HexGrid : MonoBehaviour
 	void Awake()
 	{
 		HexMetrics.noiseSource = noiseSource;
-		HexMetrics.generatorNoiseSource = generatorNoiseSource;
 		HexMetrics.InitializeHashGrid(seed);
 		HexUnit.unitPrefab = unitPrefab;
 		cellShaderData = gameObject.AddComponent<HexCellShaderData>();
@@ -46,10 +46,9 @@ public class HexGrid : MonoBehaviour
 
 	void OnEnable()
 	{
-		if (!HexMetrics.noiseSource || !HexMetrics.generatorNoiseSource)
+		if (!HexMetrics.noiseSource)
 		{
 			HexMetrics.noiseSource = noiseSource;
-			HexMetrics.generatorNoiseSource = generatorNoiseSource;
 			HexMetrics.InitializeHashGrid(seed);
 			HexUnit.unitPrefab = unitPrefab;
 			HexMetrics.wrapSizeX = xWrapping ? cellCountX : 0;
@@ -291,8 +290,9 @@ public class HexGrid : MonoBehaviour
 			chunks[i].ShowUI(visible);
 		}
 	}
-
-
+	//============================================================================================================
+	//                                                 Биомы 
+	//============================================================================================================
 	public void AddBiome(HexCell center, List<HexCell> borders)
 	{
 		HexBiome biome = Instantiate(biomePrefab);
@@ -318,6 +318,17 @@ public class HexGrid : MonoBehaviour
 		if (index > biomes.Count - 1)
 			return null;
 		return biomes[index];
+	}
+
+	public List<HexBiome> GetBiomes(BiomeNames name)
+	{
+		List<HexBiome> searchedBiomes = ListPool<HexBiome>.Get();
+		foreach(HexBiome biome in biomes)
+		{
+			if(biome.Center.biomeName == name)
+				searchedBiomes.Add(biome);
+		}
+		return searchedBiomes;
 	}
 
 	public int GetBiomesCount

@@ -17,6 +17,7 @@ public class NewMapGenerator : MonoBehaviour
 
     // Проблемные сиды
     // 100209442 - HighDesert
+    // 838092167 - Standart
 
     HexCellPriorityQueue searchFrontier;
     int searchFrontierPhase;
@@ -26,44 +27,44 @@ public class NewMapGenerator : MonoBehaviour
         new BiomePattern[]
         {
             new BiomePattern(BiomeNames.Desert, 8, 17), new BiomePattern(BiomeNames.Plain, 8, 16), new BiomePattern(BiomeNames.Mud, 4, 8),
-            new BiomePattern(BiomeNames.StoneDesert, 7, 14), new BiomePattern(BiomeNames.Mountain, 3, 6)
+            new BiomePattern(BiomeNames.StoneDesert, 7, 14), new BiomePattern(BiomeNames.Snow, 3, 6)
         },
         new BiomePattern[]
         {
             new BiomePattern(BiomeNames.Desert, 8, 17), new BiomePattern(BiomeNames.Plain, 14, 19), new BiomePattern(BiomeNames.Mud, 10, 17),
-            new BiomePattern(BiomeNames.StoneDesert, 7, 14), new BiomePattern(BiomeNames.Mountain, 6, 9)
+            new BiomePattern(BiomeNames.StoneDesert, 7, 14), new BiomePattern(BiomeNames.Snow, 6, 9)
         },
         new BiomePattern[]
         {
             new BiomePattern(BiomeNames.Desert, 8, 17), new BiomePattern(BiomeNames.Plain, 7, 12), new BiomePattern(BiomeNames.Mud, 14, 19),
-            new BiomePattern(BiomeNames.StoneDesert, 5, 11), new BiomePattern(BiomeNames.Mountain, 3, 6)
+            new BiomePattern(BiomeNames.StoneDesert, 5, 11), new BiomePattern(BiomeNames.Snow, 3, 6)
         },
         new BiomePattern[]
         {
             new BiomePattern(BiomeNames.Desert, 6, 10), new BiomePattern(BiomeNames.Plain, 8, 11), new BiomePattern(BiomeNames.Mud, 4, 8),
-            new BiomePattern(BiomeNames.StoneDesert, 7, 13), new BiomePattern(BiomeNames.Mountain, 9, 15)
+            new BiomePattern(BiomeNames.StoneDesert, 7, 13), new BiomePattern(BiomeNames.Snow, 9, 15)
         },
         new BiomePattern[]
         {
             new BiomePattern(BiomeNames.Desert, 11, 18), new BiomePattern(BiomeNames.Plain, 7, 12), new BiomePattern(BiomeNames.Mud, 4, 8),
-            new BiomePattern(BiomeNames.StoneDesert, 9, 14), new BiomePattern(BiomeNames.Mountain, 6, 9)
+            new BiomePattern(BiomeNames.StoneDesert, 9, 14), new BiomePattern(BiomeNames.Snow, 6, 9)
         },
         new BiomePattern[]
         {
             new BiomePattern(BiomeNames.Desert, 9, 14), new BiomePattern(BiomeNames.Plain, 8, 16), new BiomePattern(BiomeNames.Mud, 4, 8),
-            new BiomePattern(BiomeNames.StoneDesert, 11, 18), new BiomePattern(BiomeNames.Mountain, 6, 10)
+            new BiomePattern(BiomeNames.StoneDesert, 11, 18), new BiomePattern(BiomeNames.Snow, 6, 10)
         }
     };
     int biomesCount = 5;
     MinMaxElevation[] elevationCaps =
     {
-        new MinMaxElevation(3, 5), new MinMaxElevation(3, 6), new MinMaxElevation(3, 4),
-        new MinMaxElevation(5, 7), new MinMaxElevation(7, 13)
+        new MinMaxElevation(0, 2), new MinMaxElevation(0, 2), new MinMaxElevation(0, 1),
+        new MinMaxElevation(2, 4), new MinMaxElevation(0, 3)
     };
 
     float[][] eachBiomeWeight =
     {
-        new float[] {0.25f, 0.25f, 0.2f, 0.2f, 0.1f},
+        new float[] {0.2f, 0.2f, 0.2f, 0.2f, 0.2f},
         new float[] {0, 0.6f, 0.15f, 0.1f, 0.15f},
         new float[] {0, 0.15f, 0.65f, 0.1f, 0.1f},
         new float[] {0.1f, 0.15f, 0, 0.15f, 0.6f},
@@ -92,6 +93,9 @@ public class NewMapGenerator : MonoBehaviour
 
     List<HexCell> borders;
 
+    public bool fill = true;
+    public bool checkWater = false;
+
     public void GenerateMap(int x, int z, bool xWrapping, bool zWrapping)
     {
         UnityEngine.Random.State originalRandomState = UnityEngine.Random.state;
@@ -115,9 +119,10 @@ public class NewMapGenerator : MonoBehaviour
         }
 
         GenerateBiomes();
-        GenerateElevationMap();
-        ErodeLand();
+        if (elevation) GenerateElevationMap();
+        if (erode) ErodeLand();
         SetTerrain();
+        GenerateSettlements();
 
         for (int i = 0; i < cellCount; i++)
         {
@@ -132,16 +137,9 @@ public class NewMapGenerator : MonoBehaviour
 
         UnityEngine.Random.state = originalRandomState;
     }
-
-    [Range(1f, 0.001f)]
-    public float elevationScaling = 0.003f;
-    [Range(0, 5)]
-    public int minElevation = 0;
-    [Range(5, 10)]
-    public int maxElevation = 7;
-    [Range(0, 3)]
-    public int waterLevel = 3;
-
+    //============================================================================================================
+    //                                              Биомы 
+    //============================================================================================================
     void GenerateBiomes()
     {
         cellsCopy = ListPool<HexCell>.Get();
@@ -189,13 +187,11 @@ public class NewMapGenerator : MonoBehaviour
             ListPool<HexCell>.Add(borders);
             return false;
         }
-        FillBiome(borders, centerCell, biomeIndex);
-        CreateSubBorders(borders, centerCell.coordinates, 1);
-        RefillBiome(borders, centerCell, biomeIndex);
+        CreateSubBorders(borders, 1);
+        if (fill) FillBiome(borders, centerCell, biomeIndex);
         grid.AddBiome(centerCell, borders);
         return true;
     }
-
 
     bool CreateBorders(List<HexCell> borders, HexCell centerCell, int biomeIndex)
     {
@@ -271,6 +267,11 @@ public class NewMapGenerator : MonoBehaviour
 
         for (int j = 0; j < borders.Count; j++)
         {
+            if (borders.IndexOf(borders[j]) != borders.LastIndexOf(borders[j]))
+            {
+                if (j < borders.LastIndexOf(borders[j]))
+                    borders.RemoveAt(borders.LastIndexOf(borders[j]));
+            }
             HexCell cell = borders[j];
             cell.biomeName = biomes[(int)mapType][biomeIndex].name;
             cellsCopy.Remove(cell);
@@ -337,85 +338,28 @@ public class NewMapGenerator : MonoBehaviour
         }
     }
 
-    void CreateSubBorders(List<HexCell> borders, HexCoordinates centerCoords, int subBorderSize)
+    void CreateSubBorders(List<HexCell> borders, int subBorderSize)
     {
-        searchFrontierPhase += 1;
         foreach (HexCell border in borders)
         {
-            HexCoordinates borderCoords = border.coordinates;
-            int distance = borderCoords.DistanceTo(centerCoords);
-
-            searchFrontier.Clear();
-            border.SearchPhase = searchFrontierPhase;
-            searchFrontier.Enqueue(border);
-
-            while (searchFrontier.Count > 0 && cellsCopy.Count > 0)
+            for (HexDirection d = HexDirection.NE; d <= HexDirection.NW; d++)
             {
-                HexCell current = searchFrontier.Dequeue();
-                for (HexDirection d = HexDirection.NE; d <= HexDirection.NW; d++)
+                HexCell neighbor = border.GetNeighbor(d);
+                if (!neighbor || borders.Contains(neighbor))
                 {
-                    HexCell neighbor = current.GetNeighbor(d);
-                    if (!neighbor || neighbor.biomeName != BiomeNames.None || borders.Contains(neighbor))
-                    {
-                        continue;
-                    }
-                    if (neighbor.coordinates.DistanceTo(borderCoords) <= subBorderSize && neighbor.SearchPhase < searchFrontierPhase)
-                    {
-                        if (neighbor.biomeName != BiomeNames.SubBorder)
-                        {
-                            neighbor.biomeName = BiomeNames.SubBorder;
-                            cellsCopy.Remove(neighbor);
-                        }
-                        neighbor.SearchPhase = searchFrontierPhase;
-                        searchFrontier.Enqueue(neighbor);
-                    }
+                    continue;
+                }
+
+                if (neighbor.biomeName != BiomeNames.SubBorder)
+                {
+                    neighbor.biomeName = BiomeNames.SubBorder;
+                    cellsCopy.Remove(neighbor);
                 }
             }
         }
     }
 
     void FillBiome(List<HexCell> borders, HexCell centerCell, int biomeIndex)
-    {
-        searchFrontierPhase += 1;
-        searchFrontier.Clear();
-
-        centerCell.SearchPhase = searchFrontierPhase;
-        searchFrontier.Enqueue(centerCell);
-
-        List<HexCell> biomeCells = ListPool<HexCell>.Get();
-        biomeCells.Add(centerCell);
-
-        while (searchFrontier.Count > 0)
-        {
-            HexCell current = searchFrontier.Dequeue();
-
-            for (HexDirection d = HexDirection.NE; d <= HexDirection.NW; d++)
-            {
-                HexCell neighbor = current.GetNeighbor(d);
-                if (!neighbor || neighbor.biomeName != BiomeNames.None)
-                {
-                    continue;
-                }
-                if (neighbor.SearchPhase < searchFrontierPhase)
-                {
-                    if (!borders.Contains(neighbor))
-                    {
-                        biomeCells.Add(neighbor);
-                    }
-                    neighbor.SearchPhase = searchFrontierPhase;
-                    searchFrontier.Enqueue(neighbor);
-                }
-            }
-        }
-
-        foreach (HexCell cell in biomeCells)
-        {
-            cell.biomeName = biomes[(int)mapType][biomeIndex].name;
-            cellsCopy.Remove(cell);
-        }
-    }
-
-    void RefillBiome(List<HexCell> borders, HexCell centerCell, int biomeIndex)
     {
         searchFrontierPhase += 1;
         searchFrontier.Clear();
@@ -453,13 +397,14 @@ public class NewMapGenerator : MonoBehaviour
                                 break;
                             }
                             if (borders.Contains(neighborNeighbor))
-                                b++;
-                            if (b >= 4)
                             {
-                                biomeCells.Add(neighbor);
-                                neighbor.SearchPhase = searchFrontierPhase;
-                                searchFrontier.Enqueue(neighbor);
-                                break;
+                                if (++b >= 4)
+                                {
+                                    biomeCells.Add(neighbor);
+                                    neighbor.SearchPhase = searchFrontierPhase;
+                                    searchFrontier.Enqueue(neighbor);
+                                    break;
+                                }
                             }
                         }
                     }
@@ -474,19 +419,6 @@ public class NewMapGenerator : MonoBehaviour
                     }
                 }
             }
-
-            // if (bn >= 4)
-            // {
-            //     Debug.Log("Wrong subborder at: " + current.coordinates.X + " " + current.coordinates.Z);
-            //     current.biomeName = BiomeNames.None;
-            //     current.SearchPhase -= 1;
-            //     biomeCells.Add(current);
-            //     // for (HexDirection d = HexDirection.NE; d <= HexDirection.NW; d++)
-            //     // {
-            //     //     current.GetNeighbor(d).SearchPhase -= 1;
-            //     //     //searchFrontier.Enqueue( current.GetNeighbor(d));
-            //     // }
-            // }
         }
 
         foreach (HexCell cell in biomeCells)
@@ -500,40 +432,85 @@ public class NewMapGenerator : MonoBehaviour
 
         ListPool<HexCell>.Add(biomeCells);
     }
+    //============================================================================================================
+    //                                               Высоты
+    //============================================================================================================
+    public bool elevation = true;
+    [Range(1f, 0.001f)]
+    public float elevationScaling = 0.003f;
+    [Range(-3, 2)]
+    public int minElevation = -3;
+    [Range(5, 10)]
+    public int maxElevation = 7;
+    [Range(-3, 3)]
+    public int waterLevel = -3;
+    [Range(1, 14)]
+    public int perlinOctaves = 3;
+    [Range(-0.5f, 0.5f)]
+    public float perlinPersistence = -0.3f;
+
+    public enum PerlinChoise
+    {
+        Integrated,
+        Personal,
+        PersonalWithOctaves
+    }
+
+    public PerlinChoise perlinType = PerlinChoise.PersonalWithOctaves;
 
     void GenerateElevationMap()
     {
+        Perlin perlin = new Perlin();
+        Perlin2D perlin2D = new Perlin2D(seed);
+        perlin.SetSeed(seed);
         for (int i = 0; i < cellCount; i++)
         {
             HexCell cell = grid.GetCell(i);
-            if (cell.biomeName == BiomeNames.SubBorder)
-            {
-                cell.Elevation = waterLevel;
-                continue;
-            }
-            Vector3 pos = cell.Position * elevationScaling;
-            float fElevation = Mathf.PerlinNoise(pos.x, pos.z);
-            int iElevation = (int)(Math.Sin(fElevation) * 10);
 
-            // Vector4 vElevation = SampleNoise(pos);
-            // int noiseSource = UnityEngine.Random.Range(0,4);
-            // int iElevation = (int)(Math.Sin(vElevation[noiseSource]) * 10);
+            Vector3 pos = cell.Position * elevationScaling;
+            float fElevation;
+            switch (perlinType)
+            {
+                default:
+                    fElevation = perlin.Noise(pos.x, pos.z);
+                    break;
+                case PerlinChoise.Personal:
+                    fElevation = perlin2D.Noise(pos.x, pos.z);
+                    break;
+                case PerlinChoise.PersonalWithOctaves:
+                    fElevation = perlin2D.Noise(pos.x, pos.z, perlinOctaves, perlinPersistence);
+                    break;
+            }
+
+
+            int iElevation = (int)(Math.Sin(fElevation) * 10);
 
             if (cell.biomeName == BiomeNames.None && iElevation >= waterLevel)
             {
                 iElevation = waterLevel - 1;
+            }
+            else if (cell.biomeName == BiomeNames.SubBorder)
+            {
+                if (iElevation < minElevation)
+                    iElevation = minElevation;
+                else if (iElevation > maxElevation)
+                    iElevation = maxElevation;
             }
             else if (cell.biomeName != BiomeNames.None)
             {
                 if (iElevation > elevationCaps[(int)cell.biomeName].max)
                     iElevation = elevationCaps[(int)cell.biomeName].max;
                 else if (iElevation < elevationCaps[(int)cell.biomeName].min)
-                    iElevation = elevationCaps[(int)cell.biomeName].max;
+                    iElevation = elevationCaps[(int)cell.biomeName].min;
             }
 
             cell.Elevation = iElevation;
         }
     }
+    //============================================================================================================
+    //                                               Эрозия
+    //============================================================================================================
+    public bool erode = true;
 
     [Range(0, 100)]
     public int erosionPercentage = 50;
@@ -604,7 +581,7 @@ public class NewMapGenerator : MonoBehaviour
             HexCell neighbor = cell.GetNeighbor(d);
             if (neighbor && neighbor.Elevation <= erodibleElevation)
             {
-                if (neighbor.biomeName == BiomeNames.Mountain && 1 - UnityEngine.Random.value < mountainErosionChance)
+                if (neighbor.biomeName == BiomeNames.Snow && UnityEngine.Random.value > mountainErosionChance)
                     return false;
                 return true;
             }
@@ -628,30 +605,31 @@ public class NewMapGenerator : MonoBehaviour
         ListPool<HexCell>.Add(candidates);
         return target;
     }
-
+    //============================================================================================================
+    //                                               Рельеф
+    //============================================================================================================
     void SetTerrain()
     {
         for (int i = 0; i < cellCount; i++)
         {
             HexCell cell = grid.GetCell(i);
             if (cell.biomeName == BiomeNames.None && !cell.IsUnderwater)
-                cell.biomeName = BiomeNames.SubBorder;
-
-            if (checkWater && cell.IsUnderwater)
-                CheckWater(cell);
-
-            if (cell.biomeName == BiomeNames.SubBorder)
             {
-                if (cell.IsUnderwater)
-                    cell.Elevation = waterLevel;
+                cell.biomeName = BiomeNames.SubBorder;
+            }
+            if (checkWater && cell.IsUnderwater)
+            {
+                CheckWater(cell);
+            }
+            if (cell.biomeName == BiomeNames.SubBorder && cell.IsUnderwater)
+            {
+                cell.Elevation = waterLevel;
             }
 
             if (cell.biomeName != BiomeNames.None)
                 cell.TerrainTypeIndex = (int)cell.biomeName;
         }
     }
-
-    public bool checkWater = false;
 
     void CheckWater(HexCell cell)
     {
@@ -694,12 +672,29 @@ public class NewMapGenerator : MonoBehaviour
         {
             waterCell.biomeName = BiomeNames.SubBorder;
         }
+
+        ListPool<HexCell>.Add(waterCells);
     }
-
-
-    Vector4 SampleNoise(Vector3 position)
+    //============================================================================================================
+    //                                                 Поселения
+    //============================================================================================================
+    void GenerateSettlements()
     {
-        Vector4 sample = HexMetrics.generatorNoiseSource.GetPixelBilinear(position.x, position.z);
-        return sample;
+        for (int i = 0; i < 3; i++)
+        {
+            List<HexBiome> biomes = grid.GetBiomes(BiomeNames.Desert);
+            for (int j = 0; j < biomes.Count; j++)
+            {
+                if (biomes[j].GetBiomeCells().Count < 100)
+                {
+                    biomes.RemoveAt(j);
+                    j--;
+                }
+            }
+
+            float[] weigths = new float[biomes.Count];
+
+
+        }
     }
 }

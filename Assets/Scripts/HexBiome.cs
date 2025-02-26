@@ -8,8 +8,15 @@ public enum BiomeNames
     Plain,
     Mud,
     StoneDesert,
-    Mountain,
+    Snow,
     SubBorder,
+    None
+}
+
+public enum SubBiomeNames
+{
+    Lake,
+    Oasis,
     None
 }
 
@@ -53,7 +60,7 @@ public class HexBiome : MonoBehaviour
         }
     }
 
-    List<HexCell> borderCells;
+    public List<HexCell> borderCells;
     public List<HexCell> Border
     {
         get
@@ -73,6 +80,43 @@ public class HexBiome : MonoBehaviour
     }
 
     public List<HexCell> GetBiomeCells()
+    {
+        List<HexCell> cells = ListPool<HexCell>.Get();
+        HexCellPriorityQueue searchFrontier = new HexCellPriorityQueue();
+        int searchFrontierPhase = 1;
+
+        cells.Add(center);
+        center.SearchPhase = searchFrontierPhase;
+        searchFrontier.Enqueue(center);
+
+        while (searchFrontier.Count > 0)
+        {
+            HexCell current = searchFrontier.Dequeue();
+
+            for (HexDirection d = HexDirection.NE; d <= HexDirection.NW; d++)
+            {
+                HexCell neighbor = current.GetNeighbor(d);
+                if (!neighbor || neighbor.biomeName == BiomeNames.SubBorder)
+                {
+                    continue;
+                }
+                if (neighbor.SearchPhase < searchFrontierPhase)
+                {
+                    cells.Add(neighbor);
+                    neighbor.SearchPhase = searchFrontierPhase;
+                    searchFrontier.Enqueue(neighbor);
+                }
+            }
+        }
+
+        for (int i = 0; i < cells.Count; i++)
+        {
+            cells[i].SearchPhase = 0;
+        }
+        return cells;
+    }
+
+    public static List<HexCell> GetBiomeCells(HexCell center)
     {
         List<HexCell> cells = ListPool<HexCell>.Get();
         HexCellPriorityQueue searchFrontier = new HexCellPriorityQueue();

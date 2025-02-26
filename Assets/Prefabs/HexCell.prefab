@@ -57,3 +57,6 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   roads: 000000000000
+  specialIndex: 0
+  biomeName: 6
+  isSettlement: 0

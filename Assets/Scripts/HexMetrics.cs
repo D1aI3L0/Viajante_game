@@ -39,7 +39,7 @@ public static class HexMetrics
 	public const float horizontalTerraceStepSize = 1f / terraceSteps;
 	public const float verticalTerraceStepSize = 1f / (terracesPerSlope + 1);
 
-	public static Texture2D noiseSource, generatorNoiseSource;
+	public static Texture2D noiseSource;
 	public const float noiseScale = 0.003f;
 	public const float cellPerturbStrength = 3.5f;
 	public const float elevationPerturbStrength = 1.5f;
@@ -147,11 +147,11 @@ public static class HexMetrics
 	{
 		Vector4 sample = noiseSource.GetPixelBilinear(position.x * noiseScale, position.z * noiseScale);
 
-		if (WrappingX && position.x < innerDiameter && WrappingZ && position.z < outerRadius)
+		if (WrappingX && position.x < innerDiameter && WrappingZ && position.z < outerDiametr)
 		{
 			Vector4 sample2 = noiseSource.GetPixelBilinear
 				((position.x + wrapSizeX * innerDiameter) * noiseScale, (position.z + wrapSizeZ * outerDiametr) * noiseScale);
-			sample = Vector4.Lerp(sample2, sample, position.x * (1f / innerDiameter) + position.z * (1f / outerDiametr) - 1f);
+			sample = Vector4.Lerp(sample2, sample, position.x * (1f / innerDiameter) + position.z * (1f / outerDiametr));
 		}
 		else if (WrappingX && position.x < innerDiameter * 1.5f)
 		{

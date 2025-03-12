@@ -435,21 +435,21 @@ MonoBehaviour:
     - {fileID: 5007182638353232846, guid: 21f7dbd83c9db3444a480e971f0855a1, type: 3}
   plantCollections:
   - prefabs:
-    - {fileID: -8679921383154817045, guid: 60c3308862c93bb468742945dda7d105, type: 3}
-    - {fileID: -8679921383154817045, guid: 60c3308862c93bb468742945dda7d105, type: 3}
+    - {fileID: -8679921383154817045, guid: b8d628f139642a94093bd35acab7fca2, type: 3}
+    - {fileID: -8679921383154817045, guid: 34ce097e7e8d9404c9aba8d0110a102f, type: 3}
   - prefabs:
-    - {fileID: 5007182638353232846, guid: 3f867bf4c401a8f4e98a24ce6c1a8c08, type: 3}
-    - {fileID: 5007182638353232846, guid: 72d51f93808a27e4d9ca4d54affeba9d, type: 3}
+    - {fileID: -8679921383154817045, guid: 5a57ed3bd2bb1c4489f1f2792df082c0, type: 3}
+    - {fileID: -8679921383154817045, guid: ad2bebf056ff5564cbf27d8128d801de, type: 3}
   - prefabs:
-    - {fileID: 5007182638353232846, guid: 2f90f5d86fe658445b57b5a3390f3681, type: 3}
-    - {fileID: 5007182638353232846, guid: 7ad5138cd7a391c47bde18f5724c0d7f, type: 3}
+    - {fileID: -8679921383154817045, guid: b89db7fc9c033d84887eb7d888ff7181, type: 3}
+    - {fileID: -8679921383154817045, guid: 1f0b2ec685283454d80f9d1d7fbf0eac, type: 3}
   walls: {fileID: 6512944421923687873}
   wallTower: {fileID: 428222965715188891, guid: 32baa139a539b5346a0f6830dfae183b, type: 3}
   bridge: {fileID: 3484659051540245626, guid: 1292f4b3ca939fe44931b525e5a40a79, type: 3}
   special:
-  - {fileID: -8679921383154817045, guid: bb0439d9af2824f48b8443a71cc87701, type: 3}
   - {fileID: 3963494063345537810, guid: d8d69a9827cd5b348afa1a76d5a38fa2, type: 3}
-  - {fileID: 818175003677751440, guid: 5b94a2a4b1f08014f989c37905c87ddd, type: 3}
+  - {fileID: -8679921383154817045, guid: bb0439d9af2824f48b8443a71cc87701, type: 3}
+  - {fileID: 3443252884805125002, guid: f38d032e671b678408fdec6abb8a0366, type: 3}
 --- !u!1 &6304021210615616206
 GameObject:
   m_ObjectHideFlags: 0

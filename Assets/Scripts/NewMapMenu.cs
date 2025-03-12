@@ -14,7 +14,7 @@ public class NewMapMenu : MonoBehaviour
 	Generator generator = Generator.None;
 	public HexMapGenerator guideGenerator;
 	public NewMapGenerator newGenerator;
-	bool xWrapping = true, zWrapping = true;
+	bool xWrapping = true, zWrapping = false;
 
 	public void Open()
 	{
@@ -36,7 +36,7 @@ public class NewMapMenu : MonoBehaviour
 		}
 		else if (generator == Generator.NewGen)
 		{
-			newGenerator.GenerateMap(x, z, xWrapping, false);
+			newGenerator.GenerateMap(x, z, xWrapping, zWrapping);
 		}
 		else
 		{

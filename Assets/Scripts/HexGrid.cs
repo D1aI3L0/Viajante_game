@@ -1,12 +1,7 @@
 using TMPro;
 using UnityEngine;
 using System.IO;
-using System.Collections;
 using System.Collections.Generic;
-using System.IO.Compression;
-using System;
-using Unity.VisualScripting;
-using System.Data.SqlClient;
 
 public class HexGrid : MonoBehaviour
 {
@@ -29,10 +24,13 @@ public class HexGrid : MonoBehaviour
 
 	public bool xWrapping, zWrapping;
 
-	Transform chunksEmpty, biomesEmpty;
+	Transform chunksEmpty, biomesEmpty, settlementsEmpty;
 
 	public HexBiome biomePrefab;
 	List<HexBiome> biomes;
+
+	public HexSettlement settlementPrefab;
+	List<HexSettlement> settlements;
 
 	void Awake()
 	{
@@ -67,15 +65,6 @@ public class HexGrid : MonoBehaviour
 			return false;
 		}
 
-		if (biomes == null)
-		{
-			biomes = ListPool<HexBiome>.Get();
-		}
-		else
-		{
-			biomes.Clear();
-		}
-
 		ClearPath();
 		ClearUnits();
 
@@ -83,6 +72,8 @@ public class HexGrid : MonoBehaviour
 			Destroy(chunksEmpty.gameObject);
 		if (biomesEmpty != null)
 			Destroy(biomesEmpty.gameObject);
+		if (settlementsEmpty != null)
+			Destroy(settlementsEmpty.gameObject);
 
 		cellCountX = x;
 		cellCountZ = z;
@@ -100,6 +91,17 @@ public class HexGrid : MonoBehaviour
 
 		biomesEmpty = new GameObject("Biomes").transform;
 		biomesEmpty.SetParent(transform);
+		if (biomes == null)
+			biomes = ListPool<HexBiome>.Get();
+		else
+			biomes.Clear();
+			
+		settlementsEmpty = new GameObject("Settlements").transform;
+		settlementsEmpty.SetParent(transform);
+		if (settlements == null)
+			settlements = ListPool<HexSettlement>.Get();
+		else
+			settlements.Clear();
 
 		return true;
 	}
@@ -298,8 +300,8 @@ public class HexGrid : MonoBehaviour
 		HexBiome biome = Instantiate(biomePrefab);
 		biome.transform.SetParent(biomesEmpty);
 		biome.transform.localPosition = center.Position;
-		biome.Center = center;
-		biome.Border = borders;
+		biome.center = center;
+		biome.border = borders;
 		biomes.Add(biome);
 	}
 
@@ -307,7 +309,7 @@ public class HexGrid : MonoBehaviour
 	{
 		foreach (HexBiome biome in biomes)
 		{
-			if (biome.Center == center)
+			if (biome.center == center)
 				return biome;
 		}
 		return null;
@@ -320,23 +322,71 @@ public class HexGrid : MonoBehaviour
 		return biomes[index];
 	}
 
-	public List<HexBiome> GetBiomes(BiomeNames name)
+	public List<HexBiome> GetBiomes(BiomeName name)
 	{
 		List<HexBiome> searchedBiomes = ListPool<HexBiome>.Get();
-		foreach(HexBiome biome in biomes)
+		foreach (HexBiome biome in biomes)
 		{
-			if(biome.Center.biomeName == name)
+			if (biome.center.biomeName == name)
 				searchedBiomes.Add(biome);
 		}
 		return searchedBiomes;
 	}
 
-	public int GetBiomesCount
+	public List<HexBiome> GetBiomes(BiomeName name, BiomeSize size)
 	{
-		get
+		List<HexBiome> searchedBiomes = ListPool<HexBiome>.Get();
+		foreach (HexBiome biome in biomes)
 		{
-			return biomes.Count;
+			if (biome.BiomeName == name && biome.size == size)
+				searchedBiomes.Add(biome);
 		}
+		return searchedBiomes;
+	}
+
+	public int GetBiomesCount()
+	{
+		return biomes.Count;
+	}
+
+	public void SetBiomesCells()
+	{
+		for (int i = 0; i < biomes.Count; i++)
+		{
+			biomes[i].SetBiomeCell();
+		}
+	}
+	//============================================================================================================
+	//                                                 Биомы 
+	//============================================================================================================
+	public void AddSettlement(HexCell center, List<HexCell> borders, SettlementNation settlementNation, SettlementType settlementType, bool isCapital)
+	{
+		HexSettlement settlement = Instantiate(settlementPrefab);
+		settlement.transform.SetParent(settlementsEmpty);
+		settlement.transform.localPosition = center.Position;
+		settlement.center = center;
+		settlement.border = borders;
+		settlement.nation = settlementNation;
+		settlement.type = settlementType;
+		settlement.isCapital = isCapital;
+		settlements.Add(settlement);
+	}
+
+	public HexSettlement GetSettlement(HexCell center)
+	{
+		foreach (HexSettlement settlement in settlements)
+		{
+			if (settlement.center == center)
+				return settlement;
+		}
+		return null;
+	}
+
+	public HexSettlement GetSettlement(int index)
+	{
+		if (index > settlements.Count - 1 || index < 0)
+			return null;
+		return settlements[index];
 	}
 	//============================================================================================================
 	//                                       Сохранение и загрузка 
@@ -481,7 +531,7 @@ public class HexGrid : MonoBehaviour
 			HexCell current = searchFrontier.Dequeue();
 			current.SearchPhase += 1;
 
-			if (current == toCell) // когда текущая ячейка является конечной поиск прекращается
+			if (current == toCell)
 			{
 				return true;
 			}
@@ -490,7 +540,7 @@ public class HexGrid : MonoBehaviour
 
 			for (HexDirection d = HexDirection.NE; d <= HexDirection.NW; d++)
 			{
-				HexCell neighbor = current.GetNeighbor(d); //избегание при поиске расстояния
+				HexCell neighbor = current.GetNeighbor(d);
 				if (neighbor == null || neighbor.SearchPhase > searchFrontierPhase)
 				{
 					continue;
@@ -518,7 +568,7 @@ public class HexGrid : MonoBehaviour
 					neighbor.SearchPhase = searchFrontierPhase;
 					neighbor.Distance = distance;
 					neighbor.PathFrom = current;
-					neighbor.SearchHeuristic = neighbor.coordinates.DistanceTo(toCell.coordinates); //вычисление значения эвристики (при добавление ячейки к границе)*
+					neighbor.SearchHeuristic = neighbor.coordinates.DistanceTo(toCell.coordinates);
 					searchFrontier.Enqueue(neighbor);
 				}
 				else if (distance < neighbor.Distance)
@@ -755,7 +805,7 @@ public class HexGrid : MonoBehaviour
 				chunks[chunkCountX * j + i].transform.localPosition = chunkPosition;
 			}
 		}
-		CenterBiomes();
+		CenterAll();
 	}
 
 	public void CenterMapZ(float zPosition)
@@ -793,14 +843,18 @@ public class HexGrid : MonoBehaviour
 				chunks[chunkCountX * i + j].transform.localPosition = chunkPosition;
 			}
 		}
-		CenterBiomes();
+		CenterAll();
 	}
 
-	public void CenterBiomes()
+	public void CenterAll()
 	{
 		foreach (HexBiome biome in biomes)
 		{
-			biome.transform.localPosition = biome.Center.Position;
+			biome.transform.localPosition = biome.center.Position;
+		}
+		foreach (HexSettlement settlement in settlements)
+		{
+			settlement.transform.localPosition = settlement.center.Position;
 		}
 	}
 	//============================================================================================================

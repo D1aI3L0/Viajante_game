@@ -612,7 +612,7 @@ public class HexCell : MonoBehaviour
 
 		IsExplored = header >= 3 ? reader.ReadBoolean() : false;
 		ShaderData.RefreshVisibility(this);
-		biomeName = (BiomeNames)reader.ReadByte();
+		biomeName = (BiomeName)reader.ReadByte();
 	}
 	//============================================================================================================
 	//                                           Поиск пути 
@@ -725,7 +725,7 @@ public class HexCell : MonoBehaviour
 	//============================================================================================================
 	//                                              Биомы
 	//============================================================================================================
-	public BiomeNames biomeName = BiomeNames.None;
+	public BiomeName biomeName = BiomeName.None;
 
 	public bool AllNeighborsAreSubBorders
 	{
@@ -740,7 +740,7 @@ public class HexCell : MonoBehaviour
 					maxSubBorders-=1;
 					continue;
 				}
-				if (GetNeighbor(d).biomeName == BiomeNames.SubBorder)
+				if (GetNeighbor(d).biomeName == BiomeName.SubBorder)
 					subBorders += 1;
 			}
 
@@ -761,7 +761,7 @@ public class HexCell : MonoBehaviour
 					maxBiomes-=1;
 					continue;
 				}
-				if (neighbor.biomeName < BiomeNames.SubBorder)
+				if (neighbor.biomeName < BiomeName.SubBorder)
 					biomes += 1;
 			}
 

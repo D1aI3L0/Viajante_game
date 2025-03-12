@@ -380,7 +380,7 @@ GameObject:
   - component: {fileID: 9092177}
   - component: {fileID: 9092178}
   m_Layer: 5
-  m_Name: Toggle Green
+  m_Name: Toggle Grass
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4475,11 +4475,11 @@ MonoBehaviour:
   cellLabelPrefab: {fileID: 1313679035159804760, guid: 324a165422f99324390b2528b218a48f, type: 3}
   chunkPrefab: {fileID: 635381878753421045, guid: 48bd031dd2cf5d84b953b5a11750e2d1, type: 3}
   noiseSource: {fileID: 2800000, guid: 69eca4f5e0c479a4b88573bb245854d3, type: 3}
-  generatorNoiseSource: {fileID: 2800000, guid: 69eca4f5e0c479a4b88573bb245854d3, type: 3}
   seed: 4321
   xWrapping: 1
   zWrapping: 0
   biomePrefab: {fileID: 2738282794105337302, guid: cd2c9648b2dae184485a688a9244156c, type: 3}
+  settlementPrefab: {fileID: 2707815116899783049, guid: c7b8e7dab2b510d4fa902b012d5ee3f7, type: 3}
   unitPrefab: {fileID: 8454914924492444950, guid: c2a4ac769b41bcc48a0706c586447e7c, type: 3}
 --- !u!4 &493061483
 Transform:
@@ -4867,7 +4867,7 @@ GameObject:
   - component: {fileID: 514313601}
   - component: {fileID: 514313602}
   m_Layer: 5
-  m_Name: Toggle Blue
+  m_Name: Toggle Snow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4914,11 +4914,11 @@ MonoBehaviour:
     m_SelectOnRight: {fileID: 0}
   m_Transition: 1
   m_Colors:
-    m_NormalColor: {r: 0.6901961, g: 0.6313726, b: 0.5019608, a: 1}
-    m_HighlightedColor: {r: 0.6901961, g: 0.6313726, b: 0.5019608, a: 1}
-    m_PressedColor: {r: 0.6901961, g: 0.6313726, b: 0.5019608, a: 1}
-    m_SelectedColor: {r: 0.6901961, g: 0.6313726, b: 0.5019608, a: 1}
-    m_DisabledColor: {r: 0.6901961, g: 0.6313726, b: 0.5019608, a: 0.5019608}
+    m_NormalColor: {r: 0.8980393, g: 0.882353, b: 0.8313726, a: 1}
+    m_HighlightedColor: {r: 0.8980392, g: 0.88235295, b: 0.83137256, a: 1}
+    m_PressedColor: {r: 0.8980392, g: 0.88235295, b: 0.83137256, a: 1}
+    m_SelectedColor: {r: 0.8980392, g: 0.88235295, b: 0.83137256, a: 1}
+    m_DisabledColor: {r: 0.8980392, g: 0.88235295, b: 0.83137256, a: 1}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
@@ -5817,7 +5817,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  m_IsOn: 1
+  m_IsOn: 0
 --- !u!1 &623522310
 GameObject:
   m_ObjectHideFlags: 0
@@ -5829,7 +5829,7 @@ GameObject:
   - component: {fileID: 623522311}
   - component: {fileID: 623522312}
   m_Layer: 5
-  m_Name: Toggle Yellow
+  m_Name: Toggle Sand
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7135,7 +7135,7 @@ GameObject:
   - component: {fileID: 739284461}
   - component: {fileID: 739284462}
   m_Layer: 5
-  m_Name: Toggle Orange
+  m_Name: Toggle Mud
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7182,11 +7182,11 @@ MonoBehaviour:
     m_SelectOnRight: {fileID: 0}
   m_Transition: 1
   m_Colors:
-    m_NormalColor: {r: 0.5803922, g: 0.4039216, b: 0.22352943, a: 1}
-    m_HighlightedColor: {r: 0.5803922, g: 0.4039216, b: 0.22352943, a: 1}
-    m_PressedColor: {r: 0.5803922, g: 0.4039216, b: 0.22352943, a: 1}
-    m_SelectedColor: {r: 0.5803922, g: 0.4039216, b: 0.22352943, a: 1}
-    m_DisabledColor: {r: 0.5803922, g: 0.4039216, b: 0.22352943, a: 0.5019608}
+    m_NormalColor: {r: 0.6862745, g: 0.6117647, b: 0.4901961, a: 1}
+    m_HighlightedColor: {r: 0.6862745, g: 0.6117647, b: 0.49019608, a: 1}
+    m_PressedColor: {r: 0.6862745, g: 0.6117647, b: 0.49019608, a: 1}
+    m_SelectedColor: {r: 0.6862745, g: 0.6117647, b: 0.49019608, a: 1}
+    m_DisabledColor: {r: 0.6862745, g: 0.6117647, b: 0.49019608, a: 1}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
@@ -9790,9 +9790,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c19651e2c440c6e438b6da98f253c5c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  stickMinZoom: -900
+  stickMinZoom: -350
   stickMaxZoom: -45
-  swivelMinZoom: 90
+  swivelMinZoom: 75
   swivelMaxZoom: 45
   moveSpeedMinZoom: 400
   moveSpeedMaxZoom: 100
@@ -15804,7 +15804,7 @@ GameObject:
   - component: {fileID: 1655055990}
   - component: {fileID: 1655055991}
   m_Layer: 5
-  m_Name: Toggle White
+  m_Name: Toggle Stone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -15851,11 +15851,11 @@ MonoBehaviour:
     m_SelectOnRight: {fileID: 0}
   m_Transition: 1
   m_Colors:
-    m_NormalColor: {r: 0.8862746, g: 0.882353, b: 0.854902, a: 1}
-    m_HighlightedColor: {r: 0.8862746, g: 0.882353, b: 0.854902, a: 1}
-    m_PressedColor: {r: 0.8862746, g: 0.882353, b: 0.854902, a: 1}
-    m_SelectedColor: {r: 0.8862746, g: 0.882353, b: 0.854902, a: 1}
-    m_DisabledColor: {r: 0.8862746, g: 0.882353, b: 0.854902, a: 0.5019608}
+    m_NormalColor: {r: 0.5803922, g: 0.39607847, b: 0.22352943, a: 1}
+    m_HighlightedColor: {r: 0.5803922, g: 0.39607844, b: 0.22352941, a: 1}
+    m_PressedColor: {r: 0.5803922, g: 0.39607844, b: 0.22352941, a: 1}
+    m_SelectedColor: {r: 0.5803922, g: 0.39607844, b: 0.22352941, a: 1}
+    m_DisabledColor: {r: 0.5803922, g: 0.39607844, b: 0.22352941, a: 1}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
@@ -18604,24 +18604,27 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   grid: {fileID: 493061482}
-  seed: 838092167
+  seed: 1783861624
   useFixedSeed: 0
   mapType: 0
-  landPersentage: 80
-  subCornersScale: 2
   fill: 1
-  checkWater: 1
+  biomeWeights: []
+  biomesMaxCount: 0500000005000000050000000000000000000000
+  landPersentage: 80
+  maxSubCornersScale: 5
   elevation: 1
-  elevationScaling: 0.0062
+  elevationScaling: 0.0067
   minElevation: -3
   maxElevation: 10
   waterLevel: 0
-  perlinOctaves: 11
+  perlinOctaves: 7
   perlinPersistence: -0.42
   perlinType: 2
   erode: 1
-  erosionPercentage: 80
-  mountainErosionChance: 0.5
+  erosionPercentage: 85
+  checkWater: 1
+  minWaterCount: 20
+  minSettlementsDistanceScale: 2.5
 --- !u!4 &2040898657
 Transform:
   m_ObjectHideFlags: 0

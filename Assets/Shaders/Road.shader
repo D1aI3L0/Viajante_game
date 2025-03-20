@@ -5,7 +5,7 @@ Shader "Custom/Road"
 		_Color ("Color", Color) = (1,1,1,1)
 		_MainTex ("Albedo (RGB)", 2D) = "white" {}
 		_Glossiness ("Smoothness", Range(0,1)) = 0.5
-		_Specular ("Specular", Color) = (0.2, 0.2, 0.2)
+		_Metallic ("Metallic", Range(0,1)) = 0.0
 	}
 	SubShader 
     {
@@ -18,12 +18,8 @@ Shader "Custom/Road"
 		Offset -1, -1
 		
 		CGPROGRAM
-		#pragma surface surf StandardSpecular fullforwardshadows decal:blend vertex:vert
+		#pragma surface surf Standard fullforwardshadows decal:blend
 		#pragma target 3.0
-		#pragma multi_compile _ HEX_MAP_EDIT_MODE
-
-		#include "HexCellData.cginc"
-		#include "HexMetrics.cginc"
 
 		sampler2D _MainTex;
 
@@ -31,42 +27,27 @@ Shader "Custom/Road"
         {
 			float2 uv_MainTex;
 			float3 worldPos;
-			float2 visibility;
 		};
 
 		half _Glossiness;
-		fixed3 _Specular;
+		half _Metallic;
 		fixed4 _Color;
 
         UNITY_INSTANCING_BUFFER_START(Props)
         UNITY_INSTANCING_BUFFER_END(Props)
 
-		void vert (inout appdata_full v, out Input data)
-		{
-			UNITY_INITIALIZE_OUTPUT(Input, data);
-
-			float4 cell0 = GetCellData(v, 0);
-			float4 cell1 = GetCellData(v, 1);
-
-			data.visibility.x = cell0.x * v.color.x + cell1.x * v.color.y;
-			data.visibility.x = lerp(0.25, 1, data.visibility.x);
-			data.visibility.y = cell0.y * v.color.x + cell1.y * v.color.y;
-		}
-
-		void surf (Input IN, inout SurfaceOutputStandardSpecular  o) 
+		void surf (Input IN, inout SurfaceOutputStandard o) 
         {
-			float4 noise = tex2D(_MainTex, IN.worldPos.xz * (3 * TILING_SCALE));
-			fixed4 c = _Color * ((noise.y * 0.75 + 0.25) * IN.visibility.x);
+			float4 noise = tex2D(_MainTex, IN.worldPos.xz * 0.025);
+			fixed4 c = _Color * (noise.y * 0.75 + 0.25);
 			float blend = IN.uv_MainTex.x;
 			blend *= noise.x + 0.5;
 			blend = smoothstep(0.4, 0.7, blend);
 
-			float explored = IN.visibility.y;
 			o.Albedo = c.rgb;
-			o.Specular = _Specular * explored;
+			o.Metallic = _Metallic;
 			o.Smoothness = _Glossiness;
-			o.Occlusion = explored;
-			o.Alpha = blend * explored;
+			o.Alpha = blend;
 		}
 		ENDCG
 	}

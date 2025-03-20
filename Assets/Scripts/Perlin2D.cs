@@ -12,14 +12,14 @@ class Perlin2D
     private float[] GetPseudoRandomGradientVector(int x, int y)
     {
         int v = (int)(((x * 1836311903) ^ (y * 2971215073) + 4807526976) & 1023);
-        v = permutationTable[v]&3;
+        v = permutationTable[v] & 3;
 
         switch (v)
         {
-            case 0:  return new float[]{  1, 0 };
-            case 1:  return new float[]{ -1, 0 };
-            case 2:  return new float[]{  0, 1 };
-            default: return new float[]{  0,-1 };
+            case 0: return new float[] { 1, 0 };
+            case 1: return new float[] { -1, 0 };
+            case 2: return new float[] { 0, 1 };
+            default: return new float[] { 0, -1 };
         }
     }
 
@@ -41,23 +41,23 @@ class Perlin2D
     public float Noise(float fx, float fy)
     {
         int left = (int)System.Math.Floor(fx);
-        int top  = (int)System.Math.Floor(fy);
+        int top = (int)System.Math.Floor(fy);
         float pointInQuadX = fx - left;
         float pointInQuadY = fy - top;
 
-        float[] topLeftGradient     = GetPseudoRandomGradientVector(left,   top  );
-        float[] topRightGradient    = GetPseudoRandomGradientVector(left+1, top  );
-        float[] bottomLeftGradient  = GetPseudoRandomGradientVector(left,   top+1);
-        float[] bottomRightGradient = GetPseudoRandomGradientVector(left+1, top+1);
+        float[] topLeftGradient = GetPseudoRandomGradientVector(left, top);
+        float[] topRightGradient = GetPseudoRandomGradientVector(left + 1, top);
+        float[] bottomLeftGradient = GetPseudoRandomGradientVector(left, top + 1);
+        float[] bottomRightGradient = GetPseudoRandomGradientVector(left + 1, top + 1);
 
-        float[] distanceToTopLeft     = new float[]{ pointInQuadX,   pointInQuadY   };
-        float[] distanceToTopRight    = new float[]{ pointInQuadX-1, pointInQuadY   };
-        float[] distanceToBottomLeft  = new float[]{ pointInQuadX,   pointInQuadY-1 };
-        float[] distanceToBottomRight = new float[]{ pointInQuadX-1, pointInQuadY-1 };
+        float[] distanceToTopLeft = new float[] { pointInQuadX, pointInQuadY };
+        float[] distanceToTopRight = new float[] { pointInQuadX - 1, pointInQuadY };
+        float[] distanceToBottomLeft = new float[] { pointInQuadX, pointInQuadY - 1 };
+        float[] distanceToBottomRight = new float[] { pointInQuadX - 1, pointInQuadY - 1 };
 
-        float tx1 = Dot(distanceToTopLeft,     topLeftGradient);
-        float tx2 = Dot(distanceToTopRight,    topRightGradient);
-        float bx1 = Dot(distanceToBottomLeft,  bottomLeftGradient);
+        float tx1 = Dot(distanceToTopLeft, topLeftGradient);
+        float tx2 = Dot(distanceToTopRight, topRightGradient);
+        float bx1 = Dot(distanceToBottomLeft, bottomLeftGradient);
         float bx2 = Dot(distanceToBottomRight, bottomRightGradient);
 
         pointInQuadX = QunticCurve(pointInQuadX);
@@ -85,6 +85,6 @@ class Perlin2D
             fy *= 2;
         }
 
-        return result/max;
+        return result / max;
     }
 }

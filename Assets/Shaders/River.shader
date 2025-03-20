@@ -13,51 +13,34 @@ Shader "Custom/River"
         LOD 200
 
         CGPROGRAM
-        #pragma surface surf StandardSpecular alpha vertex:vert
+        #pragma surface surf Standard alpha 
 		#pragma target 3.0
-        #pragma multi_compile _ HEX_MAP_EDIT_MODE
 
         #include "Water.cginc"
-        #include "HexCellData.cginc"
 
         sampler2D _MainTex;
 
         struct Input
         {
             float2 uv_MainTex;
-            float2 visibility;
         };
 
         half _Glossiness;
-        fixed3 _Specular;
+        half _Metallic;
         fixed4 _Color;
 
         UNITY_INSTANCING_BUFFER_START(Props)
         UNITY_INSTANCING_BUFFER_END(Props)
 
-        void vert (inout appdata_full v, out Input data) 
-        {
-			UNITY_INITIALIZE_OUTPUT(Input, data);
-
-			float4 cell0 = GetCellData(v, 0);
-			float4 cell1 = GetCellData(v, 1);
-
-			data.visibility.x = cell0.x * v.color.x + cell1.x * v.color.y;
-			data.visibility.x = lerp(0.25, 1, data.visibility.x);
-			data.visibility.y = cell0.y * v.color.x + cell1.y * v.color.y;
-		}
-
-		void surf (Input IN, inout SurfaceOutputStandardSpecular o) 
+		void surf (Input IN, inout SurfaceOutputStandard o) 
         {
             float river = River(IN.uv_MainTex, _MainTex);
 			
 			fixed4 c = saturate(_Color + river);
-			float explored = IN.visibility.y;
-			o.Albedo = c.rgb * IN.visibility.x;
-			o.Specular = _Specular * explored;
+			o.Albedo = c.rgb;
+			o.Metallic = _Metallic;
 			o.Smoothness = _Glossiness;
-			o.Occlusion = explored;
-			o.Alpha = c.a * explored;
+			o.Alpha = c.a;
 		}
         ENDCG
     }

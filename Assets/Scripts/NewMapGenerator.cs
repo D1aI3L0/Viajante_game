@@ -28,7 +28,7 @@ public class NewMapGenerator : MonoBehaviour
     int searchFrontierPhase;
 
     List<HexCell> cellsCopy;
-    List<HexCell> borders;
+    List<HexCell> connection;
 
     public bool fill = true;
 
@@ -59,14 +59,15 @@ public class NewMapGenerator : MonoBehaviour
         GenerateElevationMap();
         grid.SetBiomesCells();
 
-        for (int i = 0; i < cellCount; i++)
-            grid.GetCell(i).SearchPhase = 0;
-
         GenerateSettlements();
-        ConnectSettlements();
 
         if (erode) ErodeLand();
         SetTerrain();
+
+        ConnectSettlements();
+
+        for (int i = 0; i < cellCount; i++)
+            grid.GetCell(i).SearchPhase = 0;
 
         UnityEngine.Random.state = originalRandomState;
     }
@@ -78,9 +79,9 @@ public class NewMapGenerator : MonoBehaviour
     {
         new BiomePattern[]
         {
-            new BiomePattern(BiomeName.Desert, 9, 12),
-            new BiomePattern(BiomeName.Plain, 9, 12),
-            new BiomePattern(BiomeName.Snow, 9, 12),
+            new BiomePattern(BiomeName.Desert, 8, 11),
+            new BiomePattern(BiomeName.Plain, 8, 11),
+            new BiomePattern(BiomeName.Snow, 8, 11),
             new BiomePattern(BiomeName.Mud, 4, 8),
             new BiomePattern(BiomeName.StoneDesert, 7, 11)
         },
@@ -195,23 +196,23 @@ public class NewMapGenerator : MonoBehaviour
 
     bool GenerateBiome(int biomeIndex)
     {
-        if (borders == null || borders.Count != 0)
-            borders = ListPool<HexCell>.Get();
+        if (connection == null || connection.Count != 0)
+            connection = ListPool<HexCell>.Get();
 
         int centerIndex = UnityEngine.Random.Range(0, cellsCopy.Count - 1);
         HexCell centerCell = cellsCopy[centerIndex];
 
-        if (!CreateBorders(centerCell, biomePatterns[(int)mapType][biomeIndex].minMaxRadius, true, 1, connectionSkipRules, new ConnectionParams(BiomeName.None), cornerBreakRules, cornerBackRules))
+        if (!CreateBorders(centerCell, biomePatterns[(int)mapType][biomeIndex].minMaxRadius, true, 1, connectionSkipRules, new ConnectionParams(BiomeName.None, ConnectionType.BiomeBorder), cornerBreakRules, cornerBackRules))
         {
-            borders.Clear();
+            connection.Clear();
             return false;
         }
         cellsCopy.Remove(centerCell);
-        for (int i = 0; i < borders.Count; i++)
-            borders[i].biomeName = biomePatterns[(int)mapType][biomeIndex].name;
-        CreateSubBorders(borders);
-        if (fill) FillBiome(borders, centerCell, biomeIndex);
-        grid.AddBiome(centerCell, borders);
+        for (int i = 0; i < connection.Count; i++)
+            connection[i].biomeName = biomePatterns[(int)mapType][biomeIndex].name;
+        CreateSubBorders(connection);
+        if (fill) FillBiome(connection, centerCell, biomeIndex);
+        grid.AddBiome(centerCell, connection);
         return true;
     }
 
@@ -321,20 +322,22 @@ public class NewMapGenerator : MonoBehaviour
     [Range(5, 10)]
     public int maxElevation = 7;
     [Range(-3, 3)]
-    public int waterLevel = -3;
+    public const int waterLevel = -3;
     [Range(1, 14)]
     public int perlinOctaves = 3;
     [Range(-0.5f, 0.5f)]
     public float perlinPersistence = -0.3f;
+    [Range(-5f, 5f)]
+    public float amplitude = 1f;
 
     readonly MinMaxInt[] elevationCaps =
     {
-        new MinMaxInt(0, 2),
-        new MinMaxInt(0, 2),
-        new MinMaxInt(0, 2),
+        new MinMaxInt(0, 3),
+        new MinMaxInt(0, 3),
+        new MinMaxInt(0, 3),
         new MinMaxInt(0, 1),
         new MinMaxInt(0, 1),
-        new MinMaxInt(0, 2)
+        new MinMaxInt(0, 3)
     };
 
     public enum PerlinChoise
@@ -372,7 +375,7 @@ public class NewMapGenerator : MonoBehaviour
                         break;
                 }
 
-                int iElevation = (int)(Math.Sin(fElevation) * 10);
+                int iElevation = (int)(Math.Sin(fElevation * amplitude) * 10);
 
                 if (cell.biomeName == BiomeName.None && iElevation >= waterLevel)
                 {
@@ -584,8 +587,8 @@ public class NewMapGenerator : MonoBehaviour
         new SettlementPattern(SettlementType.City, 2, 3),
     };
 
-    [Range(1.5f, 3f)]
-    public float minSettlementsDistanceScale = 2.5f;
+    [Range(4, 10)]
+    public int minSettlementsDistance = 7;
 
 
     void GenerateSettlements()
@@ -599,8 +602,7 @@ public class NewMapGenerator : MonoBehaviour
         {
             return cell.biomeName != connectionParams.searchedBorderBiome
             || cell.isSettlement
-            || (checkCell != null && cell.Elevation - checkCell.Elevation > connectionParams.minMaxElevationDeviation.max)
-            || (checkCell != null && cell.Elevation - checkCell.Elevation < connectionParams.minMaxElevationDeviation.min);
+            || (checkCell != null && checkCell.GetEdgeType(cell) == HexEdgeType.Cliff);
         };
         cornerBreakRules = (cell) => { return cell.biomeName == BiomeName.SubBorder || cell.isSettlement; };
         cornerBackRules = (cell, biome) => { return cell.biomeName != biome || cell.isSettlement; };
@@ -633,7 +635,7 @@ public class NewMapGenerator : MonoBehaviour
                     cellsCopy = biomes[0].GetBiomeCells(false);
                     for (int d = 0; d < j && biomes[0].settlementsCount < j; d++)
                     {
-                        int settlementType = UnityEngine.Random.Range(Math.Max(j - d - 1, (int)SettlementType.Village), Math.Min(j - 1, (int)SettlementType.City));
+                        int settlementType = UnityEngine.Random.Range(Math.Max(j - 2, (int)SettlementType.Village), Math.Min(j - 1, (int)SettlementType.City));
                         GenerateSettlement(biomes[0], (SettlementType)settlementType);
                     }
                     biomes.RemoveAt(0);
@@ -645,9 +647,8 @@ public class NewMapGenerator : MonoBehaviour
 
     bool GenerateSettlement(HexBiome biome, SettlementType settlementType, bool isCapital = false)
     {
-        Debug.Log((int)settlementType);
-        if (borders == null || borders.Count != 0)
-            borders = ListPool<HexCell>.Get();
+        if (connection == null || connection.Count != 0)
+            connection = ListPool<HexCell>.Get();
 
         int index;
         HexCell center = null;
@@ -656,16 +657,16 @@ public class NewMapGenerator : MonoBehaviour
         {
             index = UnityEngine.Random.Range(0, cellsCopy.Count - 1);
             center = cellsCopy[index];
-            if (CheckArea(center, (int)settlementType + 2 + (isCapital ? 1 : 0), checkAreaRules, null, biome.border) && !FindClosestSettlement(center, (int)(((int)settlementType + 1 + (isCapital ? 1 : 0)) * minSettlementsDistanceScale)))
+            if (CheckArea(center, (int)settlementType + 2 + (isCapital ? 1 : 0), checkAreaRules, null, biome.border) && !IsSettlementNearby(center, minSettlementsDistance))
                 break;
             center = null;
         }
 
         if (center != null)
         {
-            if (!CreateBorders(center, settlementPatterns[(int)settlementType + (isCapital ? 1 : 0)].minMaxRadius, false, 0, connectionSkipRules, new ConnectionParams(center.biomeName), cornerBreakRules, cornerBackRules))
+            if (!CreateBorders(center, settlementPatterns[(int)settlementType + (isCapital ? 1 : 0)].minMaxRadius, true, 0, connectionSkipRules, new ConnectionParams(center.biomeName, ConnectionType.SettlementBorder), cornerBreakRules, cornerBackRules))
             {
-                borders.Clear();
+                connection.Clear();
                 return false;
             }
 
@@ -676,17 +677,17 @@ public class NewMapGenerator : MonoBehaviour
             center.UrbanLevel = (int)settlementType + 1;
             cellsCopy.Remove(center);
 
-            for (int i = 0; i < borders.Count; i++)
+            for (int i = 0; i < connection.Count; i++)
             {
                 if (settlementType != SettlementType.Village)
-                    borders[i].Walled = true;
-                borders[i].isSettlement = true;
-                borders[i].UrbanLevel = (int)settlementType + 1;
-                cellsCopy.Remove(borders[i]);
+                    connection[i].Walled = true;
+                connection[i].isSettlement = true;
+                connection[i].UrbanLevel = (int)settlementType + 1;
+                cellsCopy.Remove(connection[i]);
             }
             FillSettlement(center, settlementType);
             biome.settlementsCount++;
-            grid.AddSettlement(center, borders, (SettlementNation)biome.BiomeName, settlementType, isCapital);
+            grid.AddSettlement(center, connection, settlementType, (SettlementNation)biome.BiomeName, isCapital);
             return true;
         }
         else
@@ -708,7 +709,7 @@ public class NewMapGenerator : MonoBehaviour
             for (HexDirection d = HexDirection.NE; d <= HexDirection.NW; d++)
             {
                 HexCell neighbor = current.GetNeighbor(d);
-                if (!neighbor || borders.Contains(neighbor))
+                if (!neighbor || connection.Contains(neighbor))
                 {
                     continue;
                 }
@@ -726,7 +727,7 @@ public class NewMapGenerator : MonoBehaviour
         }
     }
 
-    bool FindClosestSettlement(HexCell center, int minDistance)
+    bool IsSettlementNearby(HexCell center, int minDistance)
     {
         searchFrontierPhase += 1;
         searchFrontier.Clear();
@@ -761,8 +762,78 @@ public class NewMapGenerator : MonoBehaviour
 
     void ConnectSettlements()
     {
+        if (connection == null || connection.Count != 0)
+            connection = ListPool<HexCell>.Get();
 
+        connectionSkipRules = (cell, connectionParams, checkCell) =>
+        {
+            return (checkCell != null && checkCell.GetEdgeType(cell) == HexEdgeType.Cliff)
+            || cell.IsUnderwater;
+        };
+
+        List<HexSettlement> settlements = grid.GetSettlements();
+
+        for (int i = 0; i < settlements.Count; i++)
+        {
+            while (settlements[i].connectedWith.Count < 2)
+            {
+                HexSettlement closSett = FindClosestSettlement(settlements[i], settlements);
+                if (closSett == null)
+                    continue;
+
+                ConnectCells(closSett.center, settlements[i].center, connectionSkipRules, new ConnectionParams(true, ConnectionType.Roads), true);
+
+                for (int j = 0; j < connection.Count - 1; j++)
+                {
+                    HexCell cell = connection[j];
+                    for (HexDirection d = HexDirection.NE; d <= HexDirection.NW; d++)
+                    {
+                        HexCell neighbor = cell.GetNeighbor(d);
+                        if (neighbor == null)
+                            continue;
+
+                        if (neighbor == connection[j + 1])
+                        {
+                            cell.AddRoad(d);
+                            neighbor.AddRoad(d.Opposite());
+                            break;
+                        }
+                    }
+                }
+                connection.Clear();
+                settlements[i].connectedWith.Add(closSett);
+                closSett.connectedWith.Add(settlements[i]);
+            }
+        }
     }
+
+
+    HexSettlement FindClosestSettlement(HexSettlement settlement, List<HexSettlement> allSettlements)
+    {
+        HexCoordinates settCoords = settlement.center.coordinates;
+
+        int minDistance = int.MaxValue;
+        int closIndex = -1;
+
+        for (int i = 0; i < allSettlements.Count; i++)
+        {
+            if (allSettlements[i] == settlement || settlement.connectedWith.Contains(allSettlements[i]))
+                continue;
+
+            int distance = settCoords.DistanceTo(allSettlements[i].center.coordinates);
+
+            if (minDistance > distance)
+            {
+                minDistance = distance;
+                closIndex = i;
+            }
+        }
+
+        if (closIndex >= 0)
+            return allSettlements[closIndex];
+        return null;
+    }
+
     //============================================================================================================
     //                                                 Универсальные функции
     //============================================================================================================
@@ -810,17 +881,21 @@ public class NewMapGenerator : MonoBehaviour
     struct ConnectionParams
     {
         public BiomeName searchedBorderBiome;
-        public MinMaxInt minMaxElevationDeviation;
-        public bool useElevationCheck;
+        public bool useCliffCheck;
+        public ConnectionType connectionType;
 
-        public ConnectionParams(BiomeName biome, int minElevationDeviation = 0, int maxElevationDeviation = 0)
+        public ConnectionParams(BiomeName biome, ConnectionType connectionType, bool useCliffCheck = false)
         {
             searchedBorderBiome = biome;
-            minMaxElevationDeviation = new(minElevationDeviation, maxElevationDeviation);
-            if (minElevationDeviation != 0 || maxElevationDeviation != 0)
-                useElevationCheck = true;
-            else
-                useElevationCheck = false;
+            this.useCliffCheck = useCliffCheck;
+            this.connectionType = connectionType;
+        }
+
+        public ConnectionParams(bool useCliffCheck, ConnectionType connectionType, BiomeName biome = BiomeName.None)
+        {
+            searchedBorderBiome = biome;
+            this.useCliffCheck = useCliffCheck;
+            this.connectionType = connectionType;
         }
     }
 
@@ -828,6 +903,15 @@ public class NewMapGenerator : MonoBehaviour
     CornerBreakRules cornerBreakRules;
     delegate bool CornerBackRules(HexCell cell, BiomeName biomeName);
     CornerBackRules cornerBackRules;
+
+    enum ConnectionType
+    {
+        None,
+        BiomeBorder,
+        SettlementBorder,
+        Roads
+
+    }
 
     bool CreateBorders(HexCell centerCell, MinMaxInt minMaxRadius, bool useSubCorners, int subCornersScale, ConnectionSkipRules connectionSkipRules, ConnectionParams connectionParams, CornerBreakRules cornerBreakRules, CornerBackRules cornerBackRules)
     {
@@ -861,8 +945,8 @@ public class NewMapGenerator : MonoBehaviour
                 }
                 else
                 {
-                    cornerDistance1 = UnityEngine.Random.Range(1, minMaxRadius.max);
-                    cornerDistance2 = UnityEngine.Random.Range(1, minMaxRadius.max);
+                    cornerDistance1 = UnityEngine.Random.Range(0, UnityEngine.Random.Range(minMaxRadius.min, minMaxRadius.max));
+                    cornerDistance2 = UnityEngine.Random.Range(0, UnityEngine.Random.Range(minMaxRadius.min, minMaxRadius.max));
                 }
 
                 for (int j = 0; j < cornerDistance1; j++)
@@ -893,58 +977,58 @@ public class NewMapGenerator : MonoBehaviour
 
                 if (d == HexDirection.NE)
                 {
-                    borders.Add(corner1);
+                    connection.Add(corner1);
                     ConnectCells(corner2, corner1, connectionSkipRules, connectionParams);
-                    borders.Add(corner2);
+                    connection.Add(corner2);
                 }
                 else
                 {
-                    ConnectCells(corner1, borders[^1], connectionSkipRules, connectionParams);
-                    borders.Add(corner1);
+                    ConnectCells(corner1, connection[^1], connectionSkipRules, connectionParams);
+                    connection.Add(corner1);
                     ConnectCells(corner2, corner1, connectionSkipRules, connectionParams);
-                    borders.Add(corner2);
+                    connection.Add(corner2);
                 }
                 if (d == HexDirection.NW)
                 {
-                    ConnectCells(borders[0], corner2, connectionSkipRules, connectionParams);
+                    ConnectCells(connection[0], corner2, connectionSkipRules, connectionParams);
                 }
             }
             else
             {
                 if (d == HexDirection.NE)
                 {
-                    borders.Add(corner);
+                    connection.Add(corner);
                 }
                 else
                 {
-                    ConnectCells(corner, borders[^1], connectionSkipRules, connectionParams);
-                    borders.Add(corner);
+                    ConnectCells(corner, connection[^1], connectionSkipRules, connectionParams);
+                    connection.Add(corner);
                 }
                 if (d == HexDirection.NW)
                 {
-                    ConnectCells(borders[0], corner, connectionSkipRules, connectionParams);
+                    ConnectCells(connection[0], corner, connectionSkipRules, connectionParams);
                 }
             }
         }
 
-        if (borders.Contains(centerCell))
+        if (connection.Contains(centerCell))
             return false;
 
-        for (int j = 0; j < borders.Count; j++)
+        for (int j = 0; j < connection.Count; j++)
         {
-            if (borders.IndexOf(borders[j]) != borders.LastIndexOf(borders[j]))
+            if (connection.IndexOf(connection[j]) != connection.LastIndexOf(connection[j]))
             {
-                if (j < borders.LastIndexOf(borders[j]))
-                    borders.RemoveAt(borders.LastIndexOf(borders[j]));
+                if (j < connection.LastIndexOf(connection[j]))
+                    connection.RemoveAt(connection.LastIndexOf(connection[j]));
             }
-            HexCell cell = borders[j];
+            HexCell cell = connection[j];
             cellsCopy.Remove(cell);
         }
 
         return true;
     }
 
-    void ConnectCells(HexCell cell1, HexCell cell2, ConnectionSkipRules connectionSkipRules, ConnectionParams connectionParams)
+    bool ConnectCells(HexCell cell1, HexCell cell2, ConnectionSkipRules connectionSkipRules, ConnectionParams connectionParams, bool includeCorners = false)
     {
         searchFrontierPhase += 2;
 
@@ -973,12 +1057,19 @@ public class NewMapGenerator : MonoBehaviour
                 {
                     continue;
                 }
-                if (connectionSkipRules(neighbor, connectionParams, connectionParams.useElevationCheck ? current : null))
+                if (connectionSkipRules(neighbor, connectionParams, connectionParams.useCliffCheck ? current : null))
                 {
                     continue;
                 }
 
                 int distance = current.Distance;
+                var extraDistance = connectionParams.connectionType switch
+                {
+                    ConnectionType.Roads => (neighbor.HasRoads ? 0 : 4) + (UnityEngine.Random.value > 0.3f ? (int)neighbor.GetEdgeType(current) * 2 : 0),
+                    _ => 0,
+                };
+
+                distance += extraDistance;
 
                 if (neighbor.SearchPhase < searchFrontierPhase)
                 {
@@ -1000,15 +1091,18 @@ public class NewMapGenerator : MonoBehaviour
 
         if (isFind)
         {
-            HexCell currentBorder = cell2;
-            while (currentBorder != cell1)
+            if (includeCorners)
+                connection.Add(cell2);
+            HexCell currentCell = cell2;
+            while (currentCell != cell1)
             {
-                currentBorder = currentBorder.PathFrom;
-                if (currentBorder == cell1)
+                currentCell = currentCell.PathFrom;
+                if (currentCell == cell1 && !includeCorners)
                     break;
-                borders.Add(currentBorder);
+                connection.Add(currentCell);
             }
-            return;
+            return true;
         }
+        return false;
     }
 }

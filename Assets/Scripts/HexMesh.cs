@@ -9,12 +9,13 @@ public class HexMesh : MonoBehaviour
 	Mesh hexMesh;
 	MeshCollider meshCollider;
 
-	[NonSerialized] List<Vector3> vertices, cellIndices;
-	[NonSerialized] List<Color> cellWeights;
+	[NonSerialized] List<Vector3> vertices, terrainTypes;
+	[NonSerialized] List<Color> colors;
 	[NonSerialized] List<int> triangles;
 	[NonSerialized] List<Vector2> uvs, uv2s;
 
-	public bool useCollider, useCellData, useUVCoordinates, useUV2Coordinates;
+	public bool useCollider, useColors, useUVCoordinates, useUV2Coordinates;
+	public bool useTerrainTypes;
 
 	void Awake()
 	{
@@ -30,10 +31,9 @@ public class HexMesh : MonoBehaviour
 	{
 		hexMesh.Clear();
 		vertices = ListPool<Vector3>.Get();
-		if (useCellData)
+		if (useColors)
 		{
-			cellWeights = ListPool<Color>.Get();
-			cellIndices = ListPool<Vector3>.Get();
+			colors = ListPool<Color>.Get();
 		}
 		if (useUVCoordinates)
 		{
@@ -43,6 +43,10 @@ public class HexMesh : MonoBehaviour
 		{
 			uv2s = ListPool<Vector2>.Get();
 		}
+		if (useTerrainTypes)
+		{
+			terrainTypes = ListPool<Vector3>.Get();
+		}
 		triangles = ListPool<int>.Get();
 	}
 
@@ -50,12 +54,10 @@ public class HexMesh : MonoBehaviour
 	{
 		hexMesh.SetVertices(vertices);
 		ListPool<Vector3>.Add(vertices);
-		if (useCellData)
+		if (useColors)
 		{
-			hexMesh.SetColors(cellWeights);
-			ListPool<Color>.Add(cellWeights);
-			hexMesh.SetUVs(2, cellIndices);
-			ListPool<Vector3>.Add(cellIndices);
+			hexMesh.SetColors(colors);
+			ListPool<Color>.Add(colors);
 		}
 		if (useUVCoordinates)
 		{
@@ -66,6 +68,11 @@ public class HexMesh : MonoBehaviour
 		{
 			hexMesh.SetUVs(1, uv2s);
 			ListPool<Vector2>.Add(uv2s);
+		}
+		if (useTerrainTypes)
+		{
+			hexMesh.SetUVs(2, terrainTypes);
+			ListPool<Vector3>.Add(terrainTypes);
 		}
 		hexMesh.SetTriangles(triangles, 0);
 		ListPool<int>.Add(triangles);
@@ -129,41 +136,43 @@ public class HexMesh : MonoBehaviour
 		triangles.Add(vertexIndex + 3);
 	}
 
-	public void AddTriangleCellData(Vector3 indices, Color weights1, Color weights2, Color weights3)
+
+	public void AddTriangleColor(Color color)
 	{
-		cellIndices.Add(indices);
-		cellIndices.Add(indices);
-		cellIndices.Add(indices);
-		cellWeights.Add(weights1);
-		cellWeights.Add(weights2);
-		cellWeights.Add(weights3);
+		colors.Add(color);
+		colors.Add(color);
+		colors.Add(color);
 	}
 
-	public void AddTriangleCellData(Vector3 indices, Color weights)
+	public void AddTriangleColor(Color c1, Color c2, Color c3)
 	{
-		AddTriangleCellData(indices, weights, weights, weights);
+		colors.Add(c1);
+		colors.Add(c2);
+		colors.Add(c3);
 	}
 
-	public void AddQuadCellData(Vector3 indices, Color weights1, Color weights2, Color weights3, Color weights4)
+	public void AddQuadColor(Color color)
 	{
-		cellIndices.Add(indices);
-		cellIndices.Add(indices);
-		cellIndices.Add(indices);
-		cellIndices.Add(indices);
-		cellWeights.Add(weights1);
-		cellWeights.Add(weights2);
-		cellWeights.Add(weights3);
-		cellWeights.Add(weights4);
+		colors.Add(color);
+		colors.Add(color);
+		colors.Add(color);
+		colors.Add(color);
 	}
 
-	public void AddQuadCellData(Vector3 indices, Color weights1, Color weights2)
+	public void AddQuadColor(Color c1, Color c2)
 	{
-		AddQuadCellData(indices, weights1, weights1, weights2, weights2);
+		colors.Add(c1);
+		colors.Add(c1);
+		colors.Add(c2);
+		colors.Add(c2);
 	}
 
-	public void AddQuadCellData(Vector3 indices, Color weights)
+	public void AddQuadColor(Color c1, Color c2, Color c3, Color c4)
 	{
-		AddQuadCellData(indices, weights, weights, weights, weights);
+		colors.Add(c1);
+		colors.Add(c2);
+		colors.Add(c3);
+		colors.Add(c4);
 	}
 
 	public void AddTriangleUV(Vector2 uv1, Vector2 uv2, Vector3 uv3)
@@ -210,5 +219,20 @@ public class HexMesh : MonoBehaviour
 		uv2s.Add(new Vector2(uMax, vMin));
 		uv2s.Add(new Vector2(uMin, vMax));
 		uv2s.Add(new Vector2(uMax, vMax));
+	}
+
+	public void AddTriangleTerrainTypes(Vector3 types)
+	{
+		terrainTypes.Add(types);
+		terrainTypes.Add(types);
+		terrainTypes.Add(types);
+	}
+
+	public void AddQuadTerrainTypes(Vector3 types)
+	{
+		terrainTypes.Add(types);
+		terrainTypes.Add(types);
+		terrainTypes.Add(types);
+		terrainTypes.Add(types);
 	}
 }

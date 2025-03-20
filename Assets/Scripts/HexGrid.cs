@@ -2,6 +2,7 @@ using TMPro;
 using UnityEngine;
 using System.IO;
 using System.Collections.Generic;
+using System.Xml.Linq;
 
 public class HexGrid : MonoBehaviour
 {
@@ -20,8 +21,6 @@ public class HexGrid : MonoBehaviour
 	public Texture2D noiseSource;
 	public int seed;
 
-	HexCellShaderData cellShaderData;
-
 	public bool xWrapping, zWrapping;
 
 	Transform chunksEmpty, biomesEmpty, settlementsEmpty;
@@ -37,8 +36,6 @@ public class HexGrid : MonoBehaviour
 		HexMetrics.noiseSource = noiseSource;
 		HexMetrics.InitializeHashGrid(seed);
 		HexUnit.unitPrefab = unitPrefab;
-		cellShaderData = gameObject.AddComponent<HexCellShaderData>();
-		cellShaderData.Grid = this;
 		CreateMap(cellCountX, cellCountZ, xWrapping, zWrapping);
 	}
 
@@ -85,7 +82,6 @@ public class HexGrid : MonoBehaviour
 		HexMetrics.wrapSizeZ = zWrapping ? cellCountZ : 0;
 		chunkCountX = cellCountX / HexMetrics.chunkSizeX;
 		chunkCountZ = cellCountZ / HexMetrics.chunkSizeZ;
-		cellShaderData.Initialize(cellCountX, cellCountZ);
 		CreateChunks();
 		CreateCells();
 
@@ -95,7 +91,7 @@ public class HexGrid : MonoBehaviour
 			biomes = ListPool<HexBiome>.Get();
 		else
 			biomes.Clear();
-			
+
 		settlementsEmpty = new GameObject("Settlements").transform;
 		settlementsEmpty.SetParent(transform);
 		if (settlements == null)
@@ -147,7 +143,6 @@ public class HexGrid : MonoBehaviour
 		cell.Index = i;
 		cell.ColumnIndex = x / HexMetrics.chunkSizeX;
 		cell.LineIndex = z / HexMetrics.chunkSizeZ;
-		cell.ShaderData = cellShaderData;
 
 		if (xWrapping)
 		{
@@ -359,17 +354,27 @@ public class HexGrid : MonoBehaviour
 	//============================================================================================================
 	//                                                 Биомы 
 	//============================================================================================================
-	public void AddSettlement(HexCell center, List<HexCell> borders, SettlementNation settlementNation, SettlementType settlementType, bool isCapital)
+	public void AddSettlement(HexCell center, List<HexCell> borders, SettlementType settlementType, SettlementNation settlementNation, bool isCapital, int? index = null)
 	{
 		HexSettlement settlement = Instantiate(settlementPrefab);
 		settlement.transform.SetParent(settlementsEmpty);
 		settlement.transform.localPosition = center.Position;
+
+		if (index != null)
+			settlement.index = (int)index;
+		else
+			settlement.index = settlements.Count;
 		settlement.center = center;
 		settlement.border = borders;
 		settlement.nation = settlementNation;
 		settlement.type = settlementType;
 		settlement.isCapital = isCapital;
 		settlements.Add(settlement);
+	}
+
+	public List<HexSettlement> GetSettlements()
+	{
+		return settlements;
 	}
 
 	public HexSettlement GetSettlement(HexCell center)
@@ -414,6 +419,12 @@ public class HexGrid : MonoBehaviour
 		{
 			biomes[i].Save(writer);
 		}
+
+		writer.Write(settlements.Count);
+		for (int i = 0; i < settlements.Count; i++)
+		{
+			settlements[i].Save(writer);
+		}
 	}
 
 	public void Load(BinaryReader reader, int header)
@@ -421,7 +432,7 @@ public class HexGrid : MonoBehaviour
 		ClearPath();
 		ClearUnits();
 
-		int x = 20, z = 15;
+		int x = 40, z = 24;
 		if (header >= 1)
 		{
 			x = reader.ReadInt32();
@@ -430,16 +441,11 @@ public class HexGrid : MonoBehaviour
 
 		bool xWrapping = header >= 5 ? reader.ReadBoolean() : false;
 		bool zWrapping = header >= 6 ? reader.ReadBoolean() : false;
-		if (x != cellCountX || z != cellCountZ || this.xWrapping != xWrapping)
-		{
-			if (!CreateMap(x, z, xWrapping, zWrapping))
-			{
-				return;
-			}
-		}
 
-		bool originalImmediateMode = cellShaderData.ImmediateMode;
-		cellShaderData.ImmediateMode = true;
+		if (!CreateMap(x, z, xWrapping, zWrapping))
+		{
+			return;
+		}
 
 		for (int i = 0; i < cells.Length; i++)
 		{
@@ -461,14 +467,6 @@ public class HexGrid : MonoBehaviour
 
 		if (header >= 7)
 		{
-			if (biomes == null)
-			{
-				biomes = ListPool<HexBiome>.Get();
-			}
-			else
-			{
-				biomes.Clear();
-			}
 			int biomesCount = reader.ReadInt32();
 			for (int i = 0; i < biomesCount; i++)
 			{
@@ -479,11 +477,41 @@ public class HexGrid : MonoBehaviour
 				{
 					border.Add(GetCell(reader.ReadInt32()));
 				}
-				biomes.Add(new HexBiome(center, border));
+				AddBiome(center, border);
 			}
 		}
 
-		cellShaderData.ImmediateMode = originalImmediateMode;
+		if (header >= 8)
+		{
+			int settlementsCount = reader.ReadInt32();
+			List<List<int>> connections = new();
+			for (int i = 0; i < settlementsCount; i++)
+			{
+				int index = reader.ReadInt32();
+				HexCell center = GetCell(reader.ReadInt32());
+				int borderSize = reader.ReadInt32();
+				List<HexCell> border = ListPool<HexCell>.Get();
+				for (int j = 0; j < borderSize; j++)
+				{
+					border.Add(GetCell(reader.ReadInt32()));
+				}
+				AddSettlement(center, border, (SettlementType)reader.ReadByte(), (SettlementNation)reader.ReadByte(), reader.ReadBoolean(), index);
+				int connectedWithCount = reader.ReadInt32();
+				connections.Add(new List<int>());
+				for (int j = 0; j < connectedWithCount; j++)
+				{
+					connections[i].Add(reader.ReadInt32());
+				}
+			}
+
+			for (int i = 0; i < settlementsCount; i++)
+			{
+				for (int j = 0; j < connections[i].Count; j++)
+				{
+					settlements[i].connectedWith.Add(settlements[connections[i][j]]);
+				}
+			}
+		}
 	}
 	//============================================================================================================
 	//                                            Поиск пути 

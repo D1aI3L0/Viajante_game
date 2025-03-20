@@ -134,6 +134,13 @@ public class HexBiome : MonoBehaviour
                 }
             }
         }
+
+        for (int i = 0; i < cells.Count; i++)
+            cells[i].SearchPhase -= 1;
+
+        if (!includeBorders)
+            for (int i = 0; i < border.Count; i++)
+                border[i].SearchPhase -= 1;
         return cells;
     }
 

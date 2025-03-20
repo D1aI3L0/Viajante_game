@@ -78,13 +78,6 @@ public class HexCell : MonoBehaviour
 		TMP_Text label = uiRect.GetComponent<TMP_Text>();
 		label.text = text;
 	}
-
-	public HexCellShaderData ShaderData { get; set; }
-
-	public void SetMapData(float data)
-	{
-		ShaderData.SetMapData(this, data);
-	}
 	//============================================================================================================
 	//                                              Соседи 
 	//============================================================================================================
@@ -119,7 +112,7 @@ public class HexCell : MonoBehaviour
 			elevation = value;
 			if (ViewElevation != originalViewElevation)
 			{
-				ShaderData.ViewElevationChanged();
+
 			}
 			RefreshPosition();
 
@@ -158,7 +151,7 @@ public class HexCell : MonoBehaviour
 			if (terrainTypeIndex != value)
 			{
 				terrainTypeIndex = value;
-				ShaderData.RefreshTerrain(this);
+				Refresh();
 			}
 		}
 	}
@@ -183,7 +176,7 @@ public class HexCell : MonoBehaviour
 			waterLevel = value;
 			if (ViewElevation != originalViewElevation)
 			{
-				ShaderData.ViewElevationChanged();
+			
 			}
 			ValidateRivers();
 			Refresh();
@@ -399,7 +392,7 @@ public class HexCell : MonoBehaviour
 
 	public void AddRoad(HexDirection direction)
 	{
-		if (!roads[(int)direction] && !HasRiverThroughEdge(direction) && !IsSpecial && !GetNeighbor(direction).IsSpecial && GetElevationDifference(direction) <= 1)
+		if (!roads[(int)direction] && !HasRiverThroughEdge(direction) /* && !IsSpecial && !GetNeighbor(direction).IsSpecial */ && GetElevationDifference(direction) <= 1)
 		{
 			SetRoad((int)direction, true);
 		}
@@ -525,7 +518,7 @@ public class HexCell : MonoBehaviour
 	{
 		writer.Write((byte)terrainTypeIndex);
 		writer.Write((byte)(elevation + 127));
-		writer.Write((byte)waterLevel);
+		writer.Write((byte)(waterLevel + 127));
 		writer.Write((byte)urbanLevel);
 		writer.Write((byte)farmLevel);
 		writer.Write((byte)plantLevel);
@@ -563,19 +556,19 @@ public class HexCell : MonoBehaviour
 		writer.Write(IsExplored);
 
 		writer.Write((byte)biomeName);
+		writer.Write(isSettlement);
 	}
 
 	public void Load(BinaryReader reader, int header)
 	{
 		terrainTypeIndex = reader.ReadByte();
-		ShaderData.RefreshTerrain(this);
 		elevation = reader.ReadByte();
 		if (header >= 4)
-		{
 			elevation -= 127;
-		}
 		RefreshPosition();
 		waterLevel = reader.ReadByte();
+		if (header >= 4)
+			waterLevel -= 127;
 		urbanLevel = reader.ReadByte();
 		farmLevel = reader.ReadByte();
 		plantLevel = reader.ReadByte();
@@ -611,8 +604,8 @@ public class HexCell : MonoBehaviour
 		}
 
 		IsExplored = header >= 3 ? reader.ReadBoolean() : false;
-		ShaderData.RefreshVisibility(this);
 		biomeName = (BiomeName)reader.ReadByte();
+		isSettlement = reader.ReadBoolean();
 	}
 	//============================================================================================================
 	//                                           Поиск пути 
@@ -662,7 +655,7 @@ public class HexCell : MonoBehaviour
 	//                                        Область видимости 
 	//============================================================================================================
 	int visibility;
-	bool explored;
+	bool explored = true;
 
 
 	public bool IsVisible
@@ -693,7 +686,6 @@ public class HexCell : MonoBehaviour
 		if (visibility == 1)
 		{
 			IsExplored = true;
-			ShaderData.RefreshVisibility(this);
 		}
 	}
 
@@ -702,7 +694,6 @@ public class HexCell : MonoBehaviour
 		visibility -= 1;
 		if (visibility == 0)
 		{
-			ShaderData.RefreshVisibility(this);
 		}
 	}
 
@@ -719,7 +710,6 @@ public class HexCell : MonoBehaviour
 		if (visibility > 0)
 		{
 			visibility = 0;
-			ShaderData.RefreshVisibility(this);
 		}
 	}
 	//============================================================================================================
@@ -735,9 +725,9 @@ public class HexCell : MonoBehaviour
 			for (HexDirection d = HexDirection.NE; d <= HexDirection.NW; d++)
 			{
 				HexCell neighbor = GetNeighbor(d);
-				if(!neighbor)
+				if (!neighbor)
 				{
-					maxSubBorders-=1;
+					maxSubBorders -= 1;
 					continue;
 				}
 				if (GetNeighbor(d).biomeName == BiomeName.SubBorder)
@@ -756,9 +746,9 @@ public class HexCell : MonoBehaviour
 			for (HexDirection d = HexDirection.NE; d <= HexDirection.NW; d++)
 			{
 				HexCell neighbor = GetNeighbor(d);
-				if(!neighbor)
+				if (!neighbor)
 				{
-					maxBiomes-=1;
+					maxBiomes -= 1;
 					continue;
 				}
 				if (neighbor.biomeName < BiomeName.SubBorder)

@@ -49,13 +49,13 @@ public static class HexMetrics
 	public const float waterFactor = 0.6f;
 	public const float waterBlendFactor = 1f - waterFactor;
 
-	public const float wallHeight = 4f; //высота стены
-	public const float wallThickness = 0.75f; //толщина стены
-	public const float wallYOffset = -1f; //смещение стены по Y
+	public const float wallHeight = 4f;
+	public const float wallThickness = 0.75f;
+	public const float wallYOffset = -1f;
 	public const float wallElevationOffset = verticalTerraceStepSize;
-	public const float wallTowerThreshold = 0.5f; //вероятность размещения башен
+	public const float wallTowerThreshold = 0.5f;
 
-	public const float bridgeDesignLength = 7f; //Исходная длинна префаба моста
+	public const float bridgeDesignLength = 7f;
 
 	public const int hashGridSize = 256;
 	static HexHash[] hashGrid;

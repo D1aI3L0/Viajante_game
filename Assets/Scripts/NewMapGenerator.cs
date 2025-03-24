@@ -62,7 +62,7 @@ public class NewMapGenerator : MonoBehaviour
         GenerateSettlements();
 
         if (erode) ErodeLand();
-        SetTerrain();
+        CheckTerrain();
 
         ConnectSettlements();
 
@@ -140,6 +140,12 @@ public class NewMapGenerator : MonoBehaviour
         connectionSkipRules = (cell, connectionParams, checkCell) => { return cell.biomeName != BiomeName.None; };
         cornerBreakRules = (cell) => { return cell.biomeName == BiomeName.SubBorder; };
         cornerBackRules = (cell, biome) => { return cell.biomeName != biome; };
+        
+        for(int i = 0; i < biomesCount; i++)
+        {
+            if(elevationCaps[i].min <= 0)
+                elevationCaps[i].min = waterLevel;
+        }
 
         int[] curBiomesCount = new int[biomesCount];
         int totalBiomesCount = 0, totalBiomesMaxCount = 0;
@@ -180,14 +186,6 @@ public class NewMapGenerator : MonoBehaviour
             {
                 curBiomesCount[b] += 1;
                 totalBiomesCount += 1;
-            }
-        }
-        for (int i = 0; i < cellCount; i++)
-        {
-            HexCell cell = grid.GetCell(i);
-            if (cell.biomeName == BiomeName.None && cell.AllNeighborsAreSubBorders)
-            {
-                cell.biomeName = BiomeName.SubBorder;
             }
         }
         cellsCopy.Clear();
@@ -322,7 +320,7 @@ public class NewMapGenerator : MonoBehaviour
     [Range(5, 10)]
     public int maxElevation = 7;
     [Range(-3, 3)]
-    public const int waterLevel = -3;
+    public int waterLevel = 0;
     [Range(1, 14)]
     public int perlinOctaves = 3;
     [Range(-0.5f, 0.5f)]
@@ -330,7 +328,7 @@ public class NewMapGenerator : MonoBehaviour
     [Range(-5f, 5f)]
     public float amplitude = 1f;
 
-    readonly MinMaxInt[] elevationCaps =
+    MinMaxInt[] elevationCaps =
     {
         new MinMaxInt(0, 3),
         new MinMaxInt(0, 3),
@@ -508,7 +506,7 @@ public class NewMapGenerator : MonoBehaviour
     [Range(1, 50)]
     public int minWaterCount = 15;
 
-    void SetTerrain()
+    void CheckTerrain()
     {
         for (int i = 0; i < cellCount; i++)
         {
@@ -525,8 +523,14 @@ public class NewMapGenerator : MonoBehaviour
             {
                 CheckWater(cell);
             }
+            if(cell.biomeName == BiomeName.SubBorder)
+            {
+                BiomeName biomeName = cell.CheckSubBorderBiomes();
+                if(biomeName != BiomeName.None)
+                    cell.TerrainTypeIndex = (int)biomeName;
+            }
 
-            if (cell.biomeName != BiomeName.None)
+            if (cell.biomeName > BiomeName.SubBorder)
                 cell.TerrainTypeIndex = (int)cell.biomeName;
         }
     }

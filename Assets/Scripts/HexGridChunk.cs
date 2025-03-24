@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -134,7 +135,9 @@ public class HexGridChunk : MonoBehaviour
 		}
 
 	}
-
+	//============================================================================================================
+	//                                               Вода
+	//============================================================================================================
 	void TriangulateWater(HexDirection direction, HexCell cell, Vector3 center)
 	{
 		center.y = cell.WaterSurfaceY;
@@ -260,11 +263,12 @@ public class HexGridChunk : MonoBehaviour
 			estuaries.AddQuadUV2(new Vector2(0.5f, -0.3f), new Vector2(0.7f, -0.35f), new Vector2(1f, 0f), new Vector2(1.5f, -0.2f));
 		}
 	}
-
-
+	//============================================================================================================
+	//                                               Без рек
+	//============================================================================================================
 	void TriangulateWithoutRiver(HexDirection direction, HexCell cell, Vector3 center, EdgeVertices e)
 	{
-		TriangulateEdgeFan(center, e, cell.TerrainTypeIndex); //cell.Color центры ячеек
+		TriangulateEdgeFan(center, e, cell.TerrainTypeIndex);
 
 		if (cell.HasRoads)
 		{
@@ -278,7 +282,9 @@ public class HexGridChunk : MonoBehaviour
 			);
 		}
 	}
-
+	//============================================================================================================
+	//                                               Соединения
+	//============================================================================================================
 	private void TriangulateConnection(HexDirection direction, HexCell cell, EdgeVertices e1)
 	{
 		HexCell neighbor = cell.GetNeighbor(direction);
@@ -296,7 +302,7 @@ public class HexGridChunk : MonoBehaviour
 		bool hasRiver = cell.HasRiverThroughEdge(direction);
 		bool hasRoad = cell.HasRoadThroughEdge(direction);
 
-		if (hasRiver) // заменено на if (hasRiver) ранее было if (cell.HasRiverThroughEdge(direction)) 
+		if (hasRiver)
 		{
 			e2.v3.y = neighbor.StreamBedY;
 
@@ -323,7 +329,6 @@ public class HexGridChunk : MonoBehaviour
 		}
 		else
 		{
-			//TriangulateEdgeStrip(e1, color1, e2, color2, hasRoad);
 			TriangulateEdgeStrip(e1, color1, cell.TerrainTypeIndex, e2, color2, neighbor.TerrainTypeIndex, hasRoad);
 		}
 
@@ -423,11 +428,11 @@ public class HexGridChunk : MonoBehaviour
 		else
 		{
 			terrain.AddTriangle(bottom, left, right);
-			terrain.AddTriangleColor(color1, color2, color3);
 			Vector3 types;
 			types.x = bottomCell.TerrainTypeIndex;
 			types.y = leftCell.TerrainTypeIndex;
 			types.z = rightCell.TerrainTypeIndex;
+			terrain.AddTriangleColor(color1, color2, color3);
 			terrain.AddTriangleTerrainTypes(types);
 		}
 
@@ -550,7 +555,9 @@ public class HexGridChunk : MonoBehaviour
 		terrain.AddTriangleColor(c2, leftColor, boundaryColor);
 		terrain.AddTriangleTerrainTypes(types);
 	}
-
+	//============================================================================================================
+    //                                               Реки
+    //============================================================================================================
 	void TriangulateWithRiver(HexDirection direction, HexCell cell, Vector3 center, EdgeVertices e)
 	{
 		Vector3 centerL, centerR;
@@ -624,9 +631,8 @@ public class HexGridChunk : MonoBehaviour
 			Vector3.Lerp(center, e.v5, 0.5f)
 		);
 		m.v3.y = e.v3.y;
-		//TriangulateEdgeStrip(m, color1, e, color1); //прямоугольник устья реки
 		TriangulateEdgeStrip(m, color1, cell.TerrainTypeIndex, e, color1, cell.TerrainTypeIndex);
-		TriangulateEdgeFan(center, m, cell.TerrainTypeIndex); //веер устья реки
+		TriangulateEdgeFan(center, m, cell.TerrainTypeIndex);
 
 		if (!cell.IsUnderwater)
 		{
@@ -675,7 +681,7 @@ public class HexGridChunk : MonoBehaviour
 		);
 
 		TriangulateEdgeStrip(m, color1, cell.TerrainTypeIndex, e, color1, cell.TerrainTypeIndex);
-		TriangulateEdgeFan(center, m, cell.TerrainTypeIndex); //cell.Color веер треугольников рёбер реки
+		TriangulateEdgeFan(center, m, cell.TerrainTypeIndex);
 
 		if (!cell.IsUnderwater && !cell.HasRoadThroughEdge(direction))
 		{
@@ -702,7 +708,9 @@ public class HexGridChunk : MonoBehaviour
 			rivers.AddQuadUV(0f, 1f, v, v + 0.2f);
 		}
 	}
-
+	//============================================================================================================
+    //                                               Дороги рядом с реками
+    //============================================================================================================
 	void TriangulateRoadAdjacentToRiver(HexDirection direction, HexCell cell, Vector3 center, EdgeVertices e)
 	{
 		bool hasRoadThroughEdge = cell.HasRoadThroughEdge(direction);
@@ -799,9 +807,9 @@ public class HexGridChunk : MonoBehaviour
 			TriangulateRoadEdge(roadCenter, mR, center);
 		}
 	}
-
-
-
+	//============================================================================================================
+    //                                               Дороги
+    //============================================================================================================
 	void TriangulateRoadSegment(Vector3 v1, Vector3 v2, Vector3 v3, Vector3 v4, Vector3 v5, Vector3 v6)
 	{
 		roads.AddQuad(v1, v2, v4, v5);
@@ -847,9 +855,9 @@ public class HexGridChunk : MonoBehaviour
 		}
 		return interpolators;
 	}
-
-
-
+	//============================================================================================================
+    //                                               Общее
+    //============================================================================================================
 	void TriangulateEdgeFan(Vector3 center, EdgeVertices edge, float type)
 	{
 		terrain.AddTriangle(center, edge.v1, edge.v2);
@@ -895,4 +903,5 @@ public class HexGridChunk : MonoBehaviour
 			TriangulateRoadSegment(e1.v2, e1.v3, e1.v4, e2.v2, e2.v3, e2.v4);
 		}
 	}
+	//============================================================================================================
 }

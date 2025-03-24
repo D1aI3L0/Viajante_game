@@ -176,7 +176,7 @@ public class HexCell : MonoBehaviour
 			waterLevel = value;
 			if (ViewElevation != originalViewElevation)
 			{
-			
+
 			}
 			ValidateRivers();
 			Refresh();
@@ -392,7 +392,7 @@ public class HexCell : MonoBehaviour
 
 	public void AddRoad(HexDirection direction)
 	{
-		if (!roads[(int)direction] && !HasRiverThroughEdge(direction) /* && !IsSpecial && !GetNeighbor(direction).IsSpecial */ && GetElevationDifference(direction) <= 1)
+		if (!roads[(int)direction] && !HasRiverThroughEdge(direction) && GetElevationDifference(direction) <= 1)
 		{
 			SetRoad((int)direction, true);
 		}
@@ -524,7 +524,6 @@ public class HexCell : MonoBehaviour
 		writer.Write((byte)plantLevel);
 		writer.Write((byte)specialIndex);
 		writer.Write(walled);
-
 
 		if (hasIncomingRiver)
 		{
@@ -757,6 +756,27 @@ public class HexCell : MonoBehaviour
 
 			return biomes == maxBiomes;
 		}
+	}
+
+	public BiomeName CheckSubBorderBiomes()
+	{
+		BiomeName biomeName = BiomeName.None; 
+		for (HexDirection d = HexDirection.NE; d <= HexDirection.NW; d++)
+		{
+			HexCell neighbor = GetNeighbor(d);
+			if (!neighbor)
+				continue;
+
+			if(biomeName >= BiomeName.SubBorder)
+			{
+				biomeName = neighbor.biomeName;
+			}
+			else if(biomeName != neighbor.biomeName && neighbor.biomeName < BiomeName.SubBorder)
+			{
+				return BiomeName.None;
+			}
+		}
+		return biomeName;
 	}
 	//============================================================================================================
 	//                                              Поселения

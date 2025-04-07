@@ -23,6 +23,8 @@ Shader "Custom/Road"
 
 		sampler2D _MainTex;
 
+		#include "HexMetrics.cginc"
+
 		struct Input 
         {
 			float2 uv_MainTex;
@@ -38,7 +40,7 @@ Shader "Custom/Road"
 
 		void surf (Input IN, inout SurfaceOutputStandard o) 
         {
-			float4 noise = tex2D(_MainTex, IN.worldPos.xz * 0.025);
+			float4 noise = tex2D(_MainTex, IN.worldPos.xz * (3 * TILING_SCALE));
 			fixed4 c = _Color * (noise.y * 0.75 + 0.25);
 			float blend = IN.uv_MainTex.x;
 			blend *= noise.x + 0.5;

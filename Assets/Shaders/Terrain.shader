@@ -21,6 +21,8 @@ Shader "Custom/Terrain"
 
 		UNITY_DECLARE_TEX2DARRAY(_MainTex);
 
+		#include "HexMetrics.cginc"
+
 		struct Input 
 		{
 			float4 color : COLOR;
@@ -41,7 +43,7 @@ Shader "Custom/Terrain"
 
 		float4 GetTerrainColor (Input IN, int index) 
 		{
-			float3 uvw = float3(IN.worldPos.xz * 0.02, IN.terrain[index]);
+			float3 uvw = float3(IN.worldPos.xz * (2 * TILING_SCALE), IN.terrain[index]);
 			float4 c = UNITY_SAMPLE_TEX2DARRAY(_MainTex, uvw);
 			return c * IN.color[index];
 		}

@@ -78,7 +78,12 @@ public abstract class Unit : MonoBehaviour
 		}
 	}
 
-	virtual public bool IsValidDestination(HexCell cell, bool useUnitCollision = false)
+	virtual public bool IsValidDestination(HexCell cell)
+	{
+		return cell.IsExplored && !cell.IsUnderwater;
+	}
+
+	virtual public bool IsValidMove(HexCell cell)
 	{
 		return cell.IsExplored && !cell.IsUnderwater;
 	}

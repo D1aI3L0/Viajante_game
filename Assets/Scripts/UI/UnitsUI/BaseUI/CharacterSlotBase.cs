@@ -10,7 +10,7 @@ public class CharacterSlot : MonoBehaviour
     public Button selectButton;
     public Button removeButton;
 
-    public void Initialize(Character character, SquadCreationUI squadCreationUI, bool isInSquadPanel)
+    public void Initialize(PlayerCharacter character, SquadCreationUI squadCreationUI, bool isInSquadPanel)
     {
         this.character = character;
         characterName.text = character.characterName;

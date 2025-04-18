@@ -7,7 +7,6 @@ public class CharacterSlotSquad : MonoBehaviour
     [Header("Элементы")]
     public Image characterIcon;
     public Slider healthSlider;
-    public Slider staminaSlider;
     public TMP_Text nameText;
     
     private Character character;
@@ -22,7 +21,12 @@ public class CharacterSlotSquad : MonoBehaviour
     
     public void UpdateStats()
     {
-        healthSlider.value = (float)character.currentCharactetStats.health / character.maxCharacterStats.health;
-        staminaSlider.value = (float)character.Stamina / character.maxStamina;
+        healthSlider.value = (float)character.currentSurvivalStats.health / character.maxSurvivalStats.health;
+    }
+
+    public void ShowCharacterStats()
+    {
+        if(character is PlayerCharacter playerCharacter)
+            UIReferences.playerCharacterUI.ShowForCharacter(playerCharacter);
     }
 }

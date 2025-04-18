@@ -153,9 +153,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0507e9d6f7ab97649adc533d08400b61, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  maxStamina: 24
+  stamina: 24
   characters:
-  - {fileID: 7155785576340280960, guid: 099dfd122401ba644827171109936274, type: 3}
-  - {fileID: 7155785576340280960, guid: 7c7e69c32cdf76b41a63dd8485241e78, type: 3}
-  - {fileID: 7155785576340280960, guid: 3305782688fdd5a4ab66b6ed00586f17, type: 3}
+  - {fileID: -616196469992547698, guid: 099dfd122401ba644827171109936274, type: 3}
+  - {fileID: 140681650647250043, guid: 7c7e69c32cdf76b41a63dd8485241e78, type: 3}
+  - {fileID: 4595255229866826387, guid: 3305782688fdd5a4ab66b6ed00586f17, type: 3}
   availableCharacters: []
-  baseUI: {fileID: 0}

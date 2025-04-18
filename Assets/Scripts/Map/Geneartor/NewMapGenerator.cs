@@ -215,7 +215,7 @@ public class NewMapGenerator : MonoBehaviour
         int centerIndex = UnityEngine.Random.Range(0, cellsCopy.Count - 1);
         HexCell centerCell = cellsCopy[centerIndex];
 
-        if (!CreateBorders(centerCell, biomePatterns[(int)mapType][biomeIndex].minMaxRadius, true, 1, connectionSkipRules, new ConnectionParams(BiomeName.None, ConnectionType.BiomeBorder), cornerBreakRules, cornerBackRules))
+        if (!CreateBorders(centerCell, biomePatterns[(int)mapType][biomeIndex].minMaxRadius, true, 1, new ConnectionParams(BiomeName.None, ConnectionType.BiomeBorder)))
         {
             connection.Clear();
             return false;
@@ -698,7 +698,7 @@ public class NewMapGenerator : MonoBehaviour
 
         if (center != null)
         {
-            if (!CreateBorders(center, settlementPatterns[(int)settlementType + (isCapital ? 1 : 0)].minMaxRadius, true, 0, connectionSkipRules, new ConnectionParams(center.biomeName, ConnectionType.SettlementBorder), cornerBreakRules, cornerBackRules))
+            if (!CreateBorders(center, settlementPatterns[(int)settlementType + (isCapital ? 1 : 0)].minMaxRadius, true, 0, new ConnectionParams(center.biomeName, ConnectionType.SettlementBorder)))
             {
                 connection.Clear();
                 return false;
@@ -815,7 +815,7 @@ public class NewMapGenerator : MonoBehaviour
                 if (closSett == null)
                     continue;
 
-                ConnectCells(closSett.center, settlements[i].center, connectionSkipRules, new ConnectionParams(true, ConnectionType.Roads), true);
+                ConnectCells(closSett.center, settlements[i].center, new ConnectionParams(true, ConnectionType.Roads), true);
 
                 for (int j = 0; j < connection.Count - 1; j++)
                 {
@@ -947,7 +947,7 @@ public class NewMapGenerator : MonoBehaviour
 
     }
 
-    bool CreateBorders(HexCell centerCell, MinMaxInt minMaxRadius, bool useSubCorners, int subCornersScale, ConnectionSkipRules connectionSkipRules, ConnectionParams connectionParams, CornerBreakRules cornerBreakRules, CornerBackRules cornerBackRules)
+    bool CreateBorders(HexCell centerCell, MinMaxInt minMaxRadius, bool useSubCorners, int subCornersScale, ConnectionParams connectionParams)
     {
         for (HexDirection d = HexDirection.NE; d <= HexDirection.NW; d++)
         {
@@ -1012,19 +1012,19 @@ public class NewMapGenerator : MonoBehaviour
                 if (d == HexDirection.NE)
                 {
                     connection.Add(corner1);
-                    ConnectCells(corner2, corner1, connectionSkipRules, connectionParams);
+                    ConnectCells(corner2, corner1, connectionParams);
                     connection.Add(corner2);
                 }
                 else
                 {
-                    ConnectCells(corner1, connection[^1], connectionSkipRules, connectionParams);
+                    ConnectCells(corner1, connection[^1], connectionParams);
                     connection.Add(corner1);
-                    ConnectCells(corner2, corner1, connectionSkipRules, connectionParams);
+                    ConnectCells(corner2, corner1, connectionParams);
                     connection.Add(corner2);
                 }
                 if (d == HexDirection.NW)
                 {
-                    ConnectCells(connection[0], corner2, connectionSkipRules, connectionParams);
+                    ConnectCells(connection[0], corner2, connectionParams);
                 }
             }
             else
@@ -1035,12 +1035,12 @@ public class NewMapGenerator : MonoBehaviour
                 }
                 else
                 {
-                    ConnectCells(corner, connection[^1], connectionSkipRules, connectionParams);
+                    ConnectCells(corner, connection[^1], connectionParams);
                     connection.Add(corner);
                 }
                 if (d == HexDirection.NW)
                 {
-                    ConnectCells(connection[0], corner, connectionSkipRules, connectionParams);
+                    ConnectCells(connection[0], corner, connectionParams);
                 }
             }
         }
@@ -1062,7 +1062,7 @@ public class NewMapGenerator : MonoBehaviour
         return true;
     }
 
-    bool ConnectCells(HexCell cell1, HexCell cell2, ConnectionSkipRules connectionSkipRules, ConnectionParams connectionParams, bool includeCorners = false)
+    bool ConnectCells(HexCell cell1, HexCell cell2, ConnectionParams connectionParams, bool includeCorners = false)
     {
         searchFrontierPhase += 2;
 

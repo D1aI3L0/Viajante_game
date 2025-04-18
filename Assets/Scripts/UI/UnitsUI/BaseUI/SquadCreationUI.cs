@@ -21,11 +21,8 @@ public class SquadCreationUI : MonoBehaviour
     public Button createSquadButton;
     public Button cancelButton;
 
-    Base currentBase;
-    List<Character> selectedCharacters = new List<Character>();
-
-    [Header("Главное UI")]
-    public HexUI hexUI;
+    private Base currentBase;
+    private List<PlayerCharacter> selectedCharacters = new List<PlayerCharacter>();
 
     public void Initialize(Base playerBase)
     {
@@ -40,7 +37,7 @@ public class SquadCreationUI : MonoBehaviour
     {
         ClearPanel(availableCharactersPanel);
 
-        foreach (Character character in currentBase.availableCharacters)
+        foreach (PlayerCharacter character in currentBase.availableCharacters)
         {
             if (!selectedCharacters.Contains(character))
             {
@@ -54,7 +51,7 @@ public class SquadCreationUI : MonoBehaviour
     {
         ClearPanel(squadMembersPanel);
 
-        foreach (Character character in selectedCharacters)
+        foreach (PlayerCharacter character in selectedCharacters)
         {
             CharacterSlot slot = Instantiate(characterSlotPrefab, squadMembersPanel);
             slot.Initialize(character, this, true);
@@ -71,7 +68,7 @@ public class SquadCreationUI : MonoBehaviour
         }
     }
 
-    public void ToggleCharacterSelection(Character character, bool isSelected)
+    public void ToggleCharacterSelection(PlayerCharacter character, bool isSelected)
     {
         if (isSelected && selectedCharacters.Count < 3)
         {
@@ -114,7 +111,7 @@ public class SquadCreationUI : MonoBehaviour
 
     public void ClosePanel()
     {
-        hexUI.gameUI.enabled = true;
+        UIReferences.gameUI.enabled = true;
         this.GameObject().SetActive(false);
     }
 }

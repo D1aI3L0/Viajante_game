@@ -9,21 +9,26 @@ public class GameUI : MonoBehaviour
 	public HexGrid grid;
 	HexCell currentCell;
 	public Unit selectedUnit;
-	public HexUI hexUI;
-	public GameObject panel;
+	public GameObject UIContainer;
 
-	public RectTransform currentTurnLable;
+	public TMP_Text currentTurnLable;
 	public int CurrentTurn
 	{
 		set
 		{
 			selectedUnit = null;
 			currentCell = null;
-			currentTurnLable.GetComponent<TMP_Text>().text = value.ToString();
+			currentTurnLable.text = value.ToString();
 		}
 	}
 
-	void Update()
+    void Awake()
+    {
+		UIReferences.gameUI = this;
+        Toggle(true);
+    }
+
+    void Update()
 	{
 		if (!EventSystem.current.IsPointerOverGameObject())
 		{
@@ -33,7 +38,7 @@ public class GameUI : MonoBehaviour
 			}
 			if (selectedUnit is Squad squad)
 			{
-				if (squad.squadType == Character.CharacterType.Player)
+				if (squad.squadType == SquadType.Player)
 				{
 					if (Input.GetMouseButtonDown(1))
 					{
@@ -65,11 +70,11 @@ public class GameUI : MonoBehaviour
 		}
 	}
 
-	public void ToggleEditMode(bool toggle)
+	public void Toggle(bool toggle)
 	{
 		grid.ShowUI(toggle);
 		grid.ClearPath();
-		panel.SetActive(toggle);
+		UIContainer.SetActive(toggle);
 
 		if (!toggle)
 		{
@@ -99,15 +104,15 @@ public class GameUI : MonoBehaviour
 		UpdateCurrentCell();
 		if (currentCell)
 		{
-			hexUI.DisableAllUnitsUI();
+			UIReferences.hexUI.DisableAllUnitsUI();
 			selectedUnit = currentCell.Unit;
 			if (selectedUnit is Base @base)
 			{
-				hexUI.mainBaseUI.ShowForBase(@base);
+				UIReferences.mainBaseUI.ShowForBase(@base);
 			}
-			else if (selectedUnit is Squad squad && squad.squadType == Character.CharacterType.Player)
+			else if (selectedUnit is Squad squad && squad.squadType == SquadType.Player)
 			{
-				hexUI.playerSquadUI.ShowForSquad(squad);
+				UIReferences.playerSquadUI.ShowForSquad(squad);
 			}
 		}
 	}
@@ -116,16 +121,11 @@ public class GameUI : MonoBehaviour
 	{
 		if (UpdateCurrentCell())
 		{
-			if (currentCell && selectedUnit.IsValidDestination(currentCell, false))
+			if (currentCell)
 			{
-				if (selectedUnit is Base selectedBase)
+				if (selectedUnit && (selectedUnit is Base || selectedUnit is Squad squad && squad.squadType == SquadType.Player) && selectedUnit.IsValidDestination(currentCell) && selectedUnit.Location != currentCell)
 				{
-					grid.FindPath(selectedBase.Location, currentCell, selectedBase);
-				}
-				else if (selectedUnit is Squad selectedSquad &&
-				(currentCell.Unit ? currentCell.Unit is Squad currentCellSquad && currentCellSquad.squadType != Character.CharacterType.Player && currentCell.Unit is not Base : true))
-				{
-					grid.FindPath(selectedSquad.Location, currentCell, selectedSquad);
+					grid.FindPath(selectedUnit.Location, currentCell, selectedUnit);
 				}
 				else
 				{

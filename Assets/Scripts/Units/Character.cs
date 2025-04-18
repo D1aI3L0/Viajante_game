@@ -1,34 +1,43 @@
 using System;
-using System.Collections.Generic;
 
 [Serializable]
-public struct CharactetStats
+public class SurvivalStats
 {
     public int health;
-    public int speed;
-    public int armor;
-    public int attack1, attack2;
-    public int critRate;
-    public int critResist, physResist, magRerist;
+    public int defence;
     public int evasion;
+}
+
+[Serializable]
+public class AttackStats
+{
+    public int attack;
     public int accuracy;
+    public int critRate;
+}
+
+[Serializable]
+public struct Endurance
+{
+    public int amount, regen, moveCost;
+}
+
+[Serializable]
+public class OtherStats
+{
+    public int initiative;
+    public int agro;
+    public Endurance endurance;
 }
 
 
 public class Character : Unit
 {
     public string characterName;
-    public static Character characterPrefab;
-    public enum CharacterType
-    {
-        Player,
-        Enemy
-    }
+    public SurvivalStats currentSurvivalStats, maxSurvivalStats, baseSurvivalStats;
+    public OtherStats currentOtherStats, maxOtherStats, baseOtherStats;
 
-    public CharacterType characterType;
-    public CharactetStats currentCharactetStats, maxCharacterStats;
-
-    override public bool IsValidDestination(HexCell cell, bool useUnitCollision = false)
+    override public bool IsValidDestination(HexCell cell)
     {
         return base.IsValidDestination(cell);
     }

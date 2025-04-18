@@ -3,7 +3,7 @@ using UnityEngine.EventSystems;
 
 public class HexMapEditor : MonoBehaviour
 {
-	public GameObject mainPanel;
+	public GameObject UIContainer;
 	enum OptionalToggle
 	{
 		Ignore, Yes, No
@@ -18,6 +18,7 @@ public class HexMapEditor : MonoBehaviour
 
 	void Awake()
 	{
+		UIReferences.hexMapEditor = this;
 		terrainMaterial.DisableKeyword("GRID_ON");
 		Shader.DisableKeyword("HEX_MAP_EDIT_MODE");
 		Toggle(false);
@@ -41,11 +42,11 @@ public class HexMapEditor : MonoBehaviour
 			}
 			if (Input.GetKeyDown(KeyCode.I))
 			{
-				CreateSquad(Character.CharacterType.Player);
+				CreateSquad(SquadType.Player);
 			}
 			if (Input.GetKeyDown(KeyCode.O))
 			{
-				CreateSquad(Character.CharacterType.Enemy);
+				CreateSquad(SquadType.Enemy);
 			}
 			if (Input.GetKeyDown(KeyCode.U))
 			{
@@ -59,7 +60,7 @@ public class HexMapEditor : MonoBehaviour
 	public void Toggle(bool toggle)
 	{
 		enabled = toggle;
-		mainPanel.SetActive(toggle);
+		UIContainer.SetActive(toggle);
 	}
 
 	void HandleInput()
@@ -315,12 +316,15 @@ public class HexMapEditor : MonoBehaviour
 	//============================================================================================================
 	//                                              Юниты 
 	//============================================================================================================	
-	void CreateSquad(Character.CharacterType characterType)
+	void CreateSquad(SquadType squadType)
 	{
 		HexCell cell = GetCellUnderCursor();
 		if (cell && !cell.HasUnit)
 		{
-			hexGrid.AddSquad(Instantiate(Squad.squadPrefab), cell, Random.Range(0f, 360f), characterType, null, null);
+			if(squadType == SquadType.Enemy)
+				hexGrid.AddEnemySquad(Instantiate(Squad.squadPrefab), cell, Random.Range(0f, 360f), null);
+			else
+				hexGrid.AddPlayerSquad(Instantiate(Squad.squadPrefab), cell, Random.Range(0f, 360f), null, null);
 		}
 	}
 

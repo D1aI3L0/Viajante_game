@@ -3,29 +3,29 @@ using UnityEngine;
 
 public class HexUI : MonoBehaviour
 {
-    public HexMapEditor hexMapEditor;
-    public GameUI gameUI;
-    public MainBaseUI mainBaseUI;
-    public PlayerSquadUI playerSquadUI;
+    void Awake()
+    {
+        UIReferences.hexUI = this;
+    }
 
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.F1))
         {
-            hexMapEditor.Toggle(!hexMapEditor.enabled);
-            gameUI.ToggleEditMode(!hexMapEditor.enabled);
+            UIReferences.hexMapEditor.Toggle(!UIReferences.hexMapEditor.enabled);
+            UIReferences.gameUI.Toggle(!UIReferences.hexMapEditor.enabled);
         }
         if (Input.GetKeyDown(KeyCode.F2))
         {
-            hexMapEditor.ShowGrid(!hexMapEditor.gridIsVisible);
+            UIReferences.hexMapEditor.ShowGrid(!UIReferences.hexMapEditor.gridIsVisible);
         }
     }
 
 
     public void DisableAllUnitsUI()
     {
-        mainBaseUI.HideMenu();
-        mainBaseUI.enabled = false;
-        playerSquadUI.Hide();
+        UIReferences.mainBaseUI.Hide();
+        UIReferences.playerSquadUI.Hide();
+        UIReferences.playerCharacterUI.Hide();
     }
 }

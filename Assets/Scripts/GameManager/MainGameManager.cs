@@ -14,12 +14,9 @@ public class RPGStrategyGameManager : MonoBehaviour
 
     public HexGrid grid;
 
-    public HexUI hexUI;  
-
     private void Start()
     {
-        hexUI.gameUI.CurrentTurn = CurrentTurn;
-        Debug.Log("Game started! Base Mode. Player's Turn.");
+        UIReferences.gameUI.CurrentTurn = CurrentTurn;
     }
 
     private void Update()
@@ -37,9 +34,8 @@ public class RPGStrategyGameManager : MonoBehaviour
         if (CurrentState != GameState.PlayerTurn) return;
 
         CurrentState = GameState.EnemyTurn;
-        hexUI.DisableAllUnitsUI();
-        hexUI.gameUI.enabled = false;
-        Debug.Log("Enemy's turn.");
+        UIReferences.hexUI.DisableAllUnitsUI();
+        UIReferences.gameUI.enabled = false;
 
         StartNewTurn();
     }
@@ -48,11 +44,10 @@ public class RPGStrategyGameManager : MonoBehaviour
     {
         CurrentTurn++;
         CurrentState = GameState.PlayerTurn;
-        hexUI.gameUI.enabled = true;
-        hexUI.gameUI.CurrentTurn = CurrentTurn;
+        UIReferences.gameUI.enabled = true;
+        UIReferences.gameUI.CurrentTurn = CurrentTurn;
         grid.ResetUnitsStamina();
         grid.ClearPath();
-        Debug.Log($"Turn {CurrentTurn}. Player's turn.");
     }
 
     public void CheckGameOver(bool isBaseDestroyed)

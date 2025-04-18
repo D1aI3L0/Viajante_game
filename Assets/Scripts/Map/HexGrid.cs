@@ -35,7 +35,6 @@ public class HexGrid : MonoBehaviour
 	{
 		HexMetrics.noiseSource = noiseSource;
 		HexMetrics.InitializeHashGrid(seed);
-		Character.characterPrefab = characterPrefab;
 		Squad.squadPrefab = squadPrefab;
 		Base.basePrefab = basePrefab;
 		CreateMap(cellCountX, cellCountZ, xWrapping, zWrapping);
@@ -47,7 +46,6 @@ public class HexGrid : MonoBehaviour
 		{
 			HexMetrics.noiseSource = noiseSource;
 			HexMetrics.InitializeHashGrid(seed);
-			Character.characterPrefab = characterPrefab;
 			Squad.squadPrefab = squadPrefab;
 			Base.basePrefab = basePrefab;
 			HexMetrics.wrapSizeX = xWrapping ? cellCountX : 0;
@@ -587,7 +585,7 @@ public class HexGrid : MonoBehaviour
 					continue;
 				}
 				
-				if (neighbor == toCell ? !unit.IsValidDestination(neighbor, false) : !unit.IsValidDestination(neighbor, true))
+				if (neighbor != toCell && !unit.IsValidMove(neighbor))
 				{
 					continue;
 				}
@@ -675,7 +673,6 @@ public class HexGrid : MonoBehaviour
 	//============================================================================================================
 	//                                               Юниты 
 	//============================================================================================================
-	public Character characterPrefab;
 	public Squad squadPrefab;
 	public Base basePrefab;
 	List<Unit> units = new List<Unit>();
@@ -698,15 +695,25 @@ public class HexGrid : MonoBehaviour
 		units.Clear();
 	}
 
-	public void AddSquad(Squad squad, HexCell location, float orientation, Character.CharacterType characterType, List<Character> characters, Base @base)
+	public void AddPlayerSquad(Squad squad, HexCell location, float orientation, List<PlayerCharacter> characters, Base @base)
 	{
 		units.Add(squad);
-		squad.squadType = characterType;
+		squad.squadType = SquadType.Player;
 		squad.ResetStamina();
 		squad.Grid = this;
 		squad.Location = location;
 		squad.Orientation = orientation;
 		squad.Initialize(@base, characters);
+	}
+
+	public void AddEnemySquad(Squad squad, HexCell location, float orientation, List<EnemyCharacter> characters)
+	{
+		units.Add(squad);
+		squad.squadType = SquadType.Enemy;
+		squad.Grid = this;
+		squad.Location = location;
+		squad.Orientation = orientation;
+		squad.Initialize(characters);
 	}
 
 	public void AddBase(Base _base, HexCell location, float orientation)
@@ -743,7 +750,7 @@ public class HexGrid : MonoBehaviour
 		{
 			units[i].ResetStamina();
 		}
-		@base.ResetStamina();
+		if (@base) @base.ResetStamina();
 	}
 	//============================================================================================================
 	//                                          Область видимости 

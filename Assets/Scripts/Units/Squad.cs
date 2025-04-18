@@ -1,13 +1,19 @@
 using System.Collections.Generic;
 
+public enum SquadType
+{
+    Player,
+    Enemy
+}
+
 public class Squad : Unit
 {
     public static Squad squadPrefab;
     public List<Character> characters = new List<Character>();
-    public Character.CharacterType squadType;
+    public SquadType squadType;
     private Base @base;
 
-    public void Initialize(Base @base, List<Character> characters)
+    public void Initialize(Base @base, List<PlayerCharacter> characters)
     {
         this.@base = @base;
         if (characters != null)
@@ -16,6 +22,14 @@ public class Squad : Unit
             {
                 this.characters.Add(characters[i]);
             }
+        }
+    }
+
+    public void Initialize(List<EnemyCharacter> characters)
+    {
+        if (characters != null)
+        {
+            this.characters.AddRange(characters);
         }
     }
 
@@ -28,9 +42,14 @@ public class Squad : Unit
         base.Die();
     }
 
-    override public bool IsValidDestination(HexCell cell, bool useUnitCollision = true)
+    override public bool IsValidDestination(HexCell cell)
     {
-        return base.IsValidDestination(cell) && (!useUnitCollision || !cell.HasUnit || (cell.Unit is Squad squad && squad.squadType != Character.CharacterType.Enemy) || cell.Unit is Base);
+        return base.IsValidDestination(cell) && (!cell.Unit || (cell.Unit is Squad currentCellSquad && currentCellSquad.squadType == SquadType.Enemy));
+    }
+
+    public override bool IsValidMove(HexCell cell)
+    {
+        return base.IsValidMove(cell) && (!cell.Unit || cell.Unit is Squad currentCellSquad && currentCellSquad.squadType != SquadType.Enemy || cell.Unit is Base);
     }
 
     public static bool SquadValidDestionation(HexCell cell)
@@ -62,7 +81,8 @@ public class Squad : Unit
         {
             for (int i = 0; i < characters.Count; i++)
             {
-                @base.availableCharacters.Add(characters[i]);
+                if(characters[i] is PlayerCharacter playerCharacter)
+                    @base.availableCharacters.Add(playerCharacter);
             }
         }
         characters.Clear();

@@ -6,45 +6,39 @@ using System.Collections.Generic;
 public class PlayerSquadUI : MonoBehaviour
 {
     [Header("Основные элементы")]
-    public GameObject playerSuqadPanel;
-    public TMP_Text squadNameText;
+    public GameObject UIContainer;
     public Transform charactersContainer;
     public CharacterSlotSquad characterSlotPrefab;
 
     [Header("Кнопки")]
     public Button returnToBaseButton;
-    public Image teleportScrollIcon;
 
     private Squad currentSquad;
     private List<CharacterSlotSquad> characterSlots = new List<CharacterSlotSquad>();
 
-    [Header("Главное UI")]
-    public HexUI hexUI;
-
-    void Start()
+    void Awake()
     {
-        playerSuqadPanel.SetActive(false);
+        UIReferences.playerSquadUI = this;
+        UIContainer.SetActive(false);
         enabled = false;
     }
 
     public void ShowForSquad(Squad squad)
     {
-        playerSuqadPanel.SetActive(true);
         currentSquad = squad;
         UpdateUI();
         enabled = true;
+        UIContainer.SetActive(true);
     }
 
     public void Hide()
     {
-        playerSuqadPanel.SetActive(false);
+        UIContainer.SetActive(false);
         enabled = false;
     }
 
     void UpdateUI()
     {
-        squadNameText.text = currentSquad.name;
-
         foreach (Transform child in charactersContainer)
             Destroy(child.gameObject);
 
@@ -63,7 +57,7 @@ public class PlayerSquadUI : MonoBehaviour
         if (currentSquad != null)
         {
             currentSquad.ReturnToBase();
-            hexUI.gameUI.selectedUnit = null;
+            UIReferences.gameUI.selectedUnit = null;
             Hide();
         }
     }

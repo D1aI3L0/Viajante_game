@@ -117,7 +117,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7863544141833240270}
-  - component: {fileID: 7155785576340280960}
+  - component: {fileID: 140681650647250043}
   m_Layer: 0
   m_Name: Character 2
   m_TagString: Untagged
@@ -141,7 +141,7 @@ Transform:
   - {fileID: 4484999335138960405}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7155785576340280960
+--- !u!114 &140681650647250043
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -150,34 +150,63 @@ MonoBehaviour:
   m_GameObject: {fileID: 7240670995891952157}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 48a4b82c30bf627449ae4b655d2ab84b, type: 3}
+  m_Script: {fileID: 11500000, guid: 764343d1c3fd51642956c5ee736a92e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   maxStamina: 24
   stamina: 24
   characterName: Character 2
-  characterType: 0
-  currentCharactetStats:
-    health: 100
-    speed: 0
-    armor: 0
-    attack1: 0
-    attack2: 0
-    critRate: 0
-    critResist: 0
-    physResist: 0
-    magRerist: 0
+  currentSurvivalStats:
+    health: 0
+    defence: 0
     evasion: 0
-    accuracy: 0
-  maxCharacterStats:
-    health: 120
-    speed: 0
-    armor: 0
-    attack1: 0
-    attack2: 0
-    critRate: 0
-    critResist: 0
-    physResist: 0
-    magRerist: 0
+  maxSurvivalStats:
+    health: 0
+    defence: 0
     evasion: 0
+  baseSurvivalStats:
+    health: 140
+    defence: 35
+    evasion: 20
+  currentOtherStats:
+    initiative: 0
+    agro: 0
+    endurance:
+      amount: 0
+      regen: 0
+      moveCost: 0
+  maxOtherStats:
+    initiative: 0
+    agro: 0
+    endurance:
+      amount: 0
+      regen: 0
+      moveCost: 0
+  baseOtherStats:
+    initiative: 13
+    agro: 80
+    endurance:
+      amount: 100
+      regen: 15
+      moveCost: 5
+  equipment:
+    weapon1: {fileID: -6269656581979563045, guid: e9137a1530f9d1549aecd7142a511b19, type: 3}
+    weapon2: {fileID: 199912612382725387, guid: 5f650bf6c0a23214a943cfca42da20eb, type: 3}
+    armorCore: {fileID: 0}
+    artifact: {fileID: 0}
+  currentAttack1Stats:
+    attack: 0
     accuracy: 0
+    critRate: 0
+  currentAttack2Stats:
+    attack: 0
+    accuracy: 0
+    critRate: 0
+  maxAttack1Stats:
+    attack: 0
+    accuracy: 0
+    critRate: 0
+  maxAttack2Stats:
+    attack: 0
+    accuracy: 0
+    critRate: 0

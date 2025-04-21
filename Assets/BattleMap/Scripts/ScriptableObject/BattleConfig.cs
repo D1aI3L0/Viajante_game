@@ -8,5 +8,5 @@ public class BattleConfig : ScriptableObject
     
     [Header("Параметры противников и препятствий")]
     public int enemyCount;
-    public int obstacleCount;
+    public float obstaclePercent;
 }

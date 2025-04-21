@@ -1,12 +1,12 @@
 using UnityEngine;
 
-	public enum CellState
-	{
-		Free,
-		Ally,
-		Enemy,
-		Obstacle,
-	}
+public enum CellState
+{
+	Free,
+	Ally,
+	Enemy,
+	Obstacle,
+}
 
 public class BattleCell : MonoBehaviour
 {
@@ -27,41 +27,37 @@ public class BattleCell : MonoBehaviour
 	}
 	//======================================Состояние ячейки и объекты на ней===========================================
 
-	// Основное состояние ячейки
-    [SerializeField]
-    private CellState state = CellState.Free;
+	[SerializeField] private CellState state = CellState.Free; // Основное состояние ячейки
+	[SerializeField] private GameObject obstacleObject; // Ссылка на объект, находящийся на ячейке
 
-    // Ссылка на объект, находящийся на ячейке
-    [SerializeField]
-    private GameObject obstacleObject;
 
-    // Удобное свойство для проверки доступности ячейки
-    public bool IsWalkable => state == CellState.Free;
+	public bool IsWalkable => state == CellState.Free; // Удобное свойство для проверки доступности ячейки
 
-    public CellState State
-    {
-        get => state;
-        set => state = value;
-    }
 
-    public GameObject ObstacleObject
-    {
-        get => obstacleObject;
-        set
-        {
-            obstacleObject = value;
-            // Если устанавливается препятствие, обновляем состояние ячейки
-            state = (obstacleObject != null) ? CellState.Obstacle : CellState.Free;
-        }
-    }
+	public CellState State
+	{
+		get => state;
+		set => state = value;
+	}
 
-    // Дополнительные методы взаимодействия можно добавить здесь
+	public GameObject ObstacleObject
+	{
+		get => obstacleObject;
+		set
+		{
+			obstacleObject = value;
+			// Если устанавливается препятствие, обновляем состояние ячейки
+			state = (obstacleObject != null) ? CellState.Obstacle : CellState.Free;
+		}
+	}
 
-    public void ClearObstacle()
-    {
-        obstacleObject = null;
-        state = CellState.Free;
-    }
+	// Дополнительные методы взаимодействия можно добавить здесь
+
+	public void ClearObstacle()
+	{
+		obstacleObject = null;
+		state = CellState.Free;
+	}
 
 	//==================================================Соседи==========================================================
 	[SerializeField]
@@ -76,6 +72,11 @@ public class BattleCell : MonoBehaviour
 	{
 		neighbors[(int)direction] = cell;
 		cell.neighbors[(int)direction.Opposite()] = this;
+	}
+
+	public BattleCell[] GetNeighbors()
+	{
+		return neighbors;
 	}
 	//============================================================================================================
 

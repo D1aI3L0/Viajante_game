@@ -167,6 +167,7 @@ MonoBehaviour:
   hexPrefab: {fileID: 7569648107108246269, guid: 2f6cc431aed7c8b469816461ce074f96, type: 3}
   prefabBattleCells:
   - {fileID: 919132149155446097, guid: 7d30d81d3ff241f4c85c1b5691d4374e, type: 3}
+  obstaclePrefab: {fileID: 919132149155446097, guid: 521026bbd649340419ea99a98bb23920, type: 3}
 --- !u!1 &1528094995
 GameObject:
   m_ObjectHideFlags: 0

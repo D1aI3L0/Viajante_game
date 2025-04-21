@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b8e4aa5953405a43bd6da7611d44369, type: 3}
   m_Name: BattleConfig
   m_EditorClassIdentifier: 
-  battleMapSize: {x: 10, y: 5}
+  battleMapSize: {x: 20, y: 20}
   enemyCount: 4
-  obstacleCount: 9
+  obstaclePercent: 0.1

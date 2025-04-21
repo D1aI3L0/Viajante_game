@@ -163,9 +163,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a10c9b121419ed46bbe23cefdc1cbf6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  battleConfig: {fileID: 11400000, guid: d09c0014ab91a194bbfa651276602d9e, type: 2}
   hexPrefab: {fileID: 7569648107108246269, guid: 2f6cc431aed7c8b469816461ce074f96, type: 3}
-  battleMapHeight: 5
-  battleMapWidth: 5
   prefabBattleCells:
   - {fileID: 919132149155446097, guid: 7d30d81d3ff241f4c85c1b5691d4374e, type: 3}
 --- !u!1 &1528094995

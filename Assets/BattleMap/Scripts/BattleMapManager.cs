@@ -1,43 +1,60 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System;
 
 public class BattleMapManager : MonoBehaviour
 {
+    [Header("Настройка карты")]
+    [SerializeField] private BattleConfig battleConfig;  // Ссылка на наш BattleConfig ScriptableObject
+
+    [Header("Префабы для ячеек, персонажей, препятствий и т.п.")]
     public BattleCell hexPrefab;
-    public int battleMapHeight = 5; // Z высота
-    public int battleMapWidth = 5; // X ширина
+    public GameObject[] prefabBattleCells; // Здесь можно добавить ссылки на префабы персонажей или препятствий
+
+    // Константы для расчёта ячеек
     public const float outerToInner = 0.866025404f;
     public const float outerRadius = 1.1f;
     public const float innerRadius = outerRadius * outerToInner;
     public const float innerDiameter = innerRadius * 2;
-    private List<GameObject> hexCells = new List<GameObject>(); // Список для хранения ячеек
+
+    // Хранение ячеек
+    private List<GameObject> hexCells = new List<GameObject>();
     GameObject parentObject; // Создание родительского объекта
+
+
+    private int battleMapHeight;
+    private int battleMapWidth;
 
     BattleCell[] battleCells;
 
-    [SerializeField]
-	GameObject[] prefabBattleCells;
+
 
 
     void Awake()
     {
         parentObject = new GameObject("HexGrid");
         parentObject.transform.SetParent(transform);
-        CreateBattleMap();
+
+        battleMapHeight = battleConfig.battleMapSize.y;
+        battleMapWidth = battleConfig.battleMapSize.x;
+
+        CreateBattleMap(battleMapWidth, battleMapHeight);
     }
 
-    void CreateBattleMap() // создание боевой карты
+    void CreateBattleMap(int battleMapWidth,int battleMapHeight) // создание боевой карты
     {
-        CreateBattleCells();
+        CreateBattleCells(battleMapWidth, battleMapHeight);
     }
 
-    void CreateBattleCells() 
+    void CreateBattleCells(int battleMapWidth,int battleMapHeight)
     {
-        battleCells = new BattleCell[battleMapWidth * battleMapHeight]; // создание массива ячеек
+        battleCells = new BattleCell[battleMapWidth * battleMapHeight];
 
-        for (int z = 0, i = 0; z < battleMapWidth; z++) 
+        // Внешний цикл пробегает строки (вертикаль), то есть height
+        for (int z = 0, i = 0; z < battleMapHeight; z++)
         {
-            for (int x = 0; x < battleMapHeight; x++)
+            // Внутренний цикл пробегает столбцы (горизонталь), то есть width
+            for (int x = 0; x < battleMapWidth; x++)
             {
                 CreateBattleCell(x, z, i++);
             }
@@ -62,29 +79,33 @@ public class BattleMapManager : MonoBehaviour
         battleCell.xСoordinate = x;
         battleCell.zСoordinate = z;
 
+
+
         // назначение соседей
         if (x > 0)
         {
             battleCell.SetNeighbor(HexDirection.W, battleCells[i - 1]);
         }
 
-        if (z > 0) 
+        if (z > 0)
         {
-			if ((z & 1) == 0) 
+            if ((z & 1) == 0)
             {
-				battleCell.SetNeighbor(HexDirection.SE, battleCells[i - battleMapWidth]);
-                if (x > 0) 
+                battleCell.SetNeighbor(HexDirection.SE, battleCells[i - battleMapWidth]);
+                if (x > 0)
                 {
-					battleCell.SetNeighbor(HexDirection.SW, battleCells[i - battleMapWidth - 1]);
-				}
-			}
-            else {
-				battleCell.SetNeighbor(HexDirection.SW, battleCells[i - battleMapWidth]);
-				if (x < battleMapWidth - 1) {
-					battleCell.SetNeighbor(HexDirection.SE, battleCells[i - battleMapWidth + 1]);
-				}
-			}
-		}
+                    battleCell.SetNeighbor(HexDirection.SW, battleCells[i - battleMapWidth - 1]);
+                }
+            }
+            else
+            {
+                battleCell.SetNeighbor(HexDirection.SW, battleCells[i - battleMapWidth]);
+                if (x < battleMapWidth - 1)
+                {
+                    battleCell.SetNeighbor(HexDirection.SE, battleCells[i - battleMapWidth + 1]);
+                }
+            }
+        }
     }
 
 

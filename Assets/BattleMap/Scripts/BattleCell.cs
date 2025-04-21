@@ -1,11 +1,18 @@
 using UnityEngine;
 
+	public enum CellState
+	{
+		Free,
+		Ally,
+		Enemy,
+		Obstacle,
+	}
+
 public class BattleCell : MonoBehaviour
 {
-	public int xСoordinate;
-	public int zСoordinate;
-	GameObject prefabBattleCell;
+	public int xСoordinate, zСoordinate; // координаты ячейки
 
+	GameObject prefabBattleCell;
 	public GameObject PrefabBattleCell
 	{
 		set
@@ -18,15 +25,45 @@ public class BattleCell : MonoBehaviour
 			prefabBattleCell.transform.SetParent(transform, false);
 		}
 	}
+	//======================================Состояние ячейки и объекты на ней===========================================
 
-	void Start()
-	{
+	// Основное состояние ячейки
+    [SerializeField]
+    private CellState state = CellState.Free;
 
-	}
+    // Ссылка на объект, находящийся на ячейке
+    [SerializeField]
+    private GameObject obstacleObject;
 
-	//============================================================================================================
-	//                                              Соседи 
-	//============================================================================================================
+    // Удобное свойство для проверки доступности ячейки
+    public bool IsWalkable => state == CellState.Free;
+
+    public CellState State
+    {
+        get => state;
+        set => state = value;
+    }
+
+    public GameObject ObstacleObject
+    {
+        get => obstacleObject;
+        set
+        {
+            obstacleObject = value;
+            // Если устанавливается препятствие, обновляем состояние ячейки
+            state = (obstacleObject != null) ? CellState.Obstacle : CellState.Free;
+        }
+    }
+
+    // Дополнительные методы взаимодействия можно добавить здесь
+
+    public void ClearObstacle()
+    {
+        obstacleObject = null;
+        state = CellState.Free;
+    }
+
+	//==================================================Соседи==========================================================
 	[SerializeField]
 	BattleCell[] neighbors;
 

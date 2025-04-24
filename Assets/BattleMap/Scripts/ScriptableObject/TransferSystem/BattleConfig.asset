@@ -13,5 +13,7 @@ MonoBehaviour:
   m_Name: BattleConfig
   m_EditorClassIdentifier: 
   battleMapSize: {x: 20, y: 20}
-  enemyCount: 4
-  obstaclePercent: 0.1
+  cellSize: 1
+  enemyCount: 5
+  obstaclePercent: 0.05
+  battleDifficulty: 1

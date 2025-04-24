@@ -12,10 +12,266 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 23da6f7d0f73d1c46b9f7e2cb75866be, type: 3}
   m_Name: CharacterDataTransferParameters
   m_EditorClassIdentifier: 
-  numberOfCharacters: 3
+  numberOfCharacters: 2
   characters:
   - characterClass: 0
-    selectedSubclassIndices: 0100000002000000
+    selectedSubclassIndices: 0000000001000000
+    maxHP: 180
+    currentHP: 180
+    DEF: 45
+    EVA: 12
+    PROV: 15
+    SPD: 120
+    SP: 100
+    SPreg: 15
+    SPmovecost: 5
+    weaponParameters:
+    - DMG: 40
+      ACC: 95
+      CRIT: 10
+      SE: 100
+      SEreg: 15
+      SEdec: 0
+    - DMG: 45
+      ACC: 90
+      CRIT: 12
+      SE: 100
+      SEreg: 15
+      SEdec: 0
+    weaponSkills:
+    - skills:
+      - skillName: 
+        description: 
+        minDamagePercentage: 0
+        maxDamagePercentage: 0
+        accuracyPercentage: 0
+        spCost: 0
+        seCost: 0
+        cooldownTurns: 0
+        criticalRatePercentage: 0
+        criticalHitMultiplier: 0
+      - skillName: 
+        description: 
+        minDamagePercentage: 0
+        maxDamagePercentage: 0
+        accuracyPercentage: 0
+        spCost: 0
+        seCost: 0
+        cooldownTurns: 0
+        criticalRatePercentage: 0
+        criticalHitMultiplier: 0
+      - skillName: 
+        description: 
+        minDamagePercentage: 0
+        maxDamagePercentage: 0
+        accuracyPercentage: 0
+        spCost: 0
+        seCost: 0
+        cooldownTurns: 0
+        criticalRatePercentage: 0
+        criticalHitMultiplier: 0
+      - skillName: 
+        description: 
+        minDamagePercentage: 0
+        maxDamagePercentage: 0
+        accuracyPercentage: 0
+        spCost: 0
+        seCost: 0
+        cooldownTurns: 0
+        criticalRatePercentage: 0
+        criticalHitMultiplier: 0
+      - skillName: 
+        description: 
+        minDamagePercentage: 0
+        maxDamagePercentage: 0
+        accuracyPercentage: 0
+        spCost: 0
+        seCost: 0
+        cooldownTurns: 0
+        criticalRatePercentage: 0
+        criticalHitMultiplier: 0
+    - skills:
+      - skillName: 
+        description: 
+        minDamagePercentage: 0
+        maxDamagePercentage: 0
+        accuracyPercentage: 0
+        spCost: 0
+        seCost: 0
+        cooldownTurns: 0
+        criticalRatePercentage: 0
+        criticalHitMultiplier: 0
+      - skillName: 
+        description: 
+        minDamagePercentage: 0
+        maxDamagePercentage: 0
+        accuracyPercentage: 0
+        spCost: 0
+        seCost: 0
+        cooldownTurns: 0
+        criticalRatePercentage: 0
+        criticalHitMultiplier: 0
+      - skillName: 
+        description: 
+        minDamagePercentage: 0
+        maxDamagePercentage: 0
+        accuracyPercentage: 0
+        spCost: 0
+        seCost: 0
+        cooldownTurns: 0
+        criticalRatePercentage: 0
+        criticalHitMultiplier: 0
+      - skillName: 
+        description: 
+        minDamagePercentage: 0
+        maxDamagePercentage: 0
+        accuracyPercentage: 0
+        spCost: 0
+        seCost: 0
+        cooldownTurns: 0
+        criticalRatePercentage: 0
+        criticalHitMultiplier: 0
+      - skillName: 
+        description: 
+        minDamagePercentage: 0
+        maxDamagePercentage: 0
+        accuracyPercentage: 0
+        spCost: 0
+        seCost: 0
+        cooldownTurns: 0
+        criticalRatePercentage: 0
+        criticalHitMultiplier: 0
+    selectedSkillIndices: 010000000200000003000000
+  - characterClass: 0
+    selectedSubclassIndices: 0000000001000000
+    maxHP: 180
+    currentHP: 180
+    DEF: 45
+    EVA: 12
+    PROV: 15
+    SPD: 120
+    SP: 100
+    SPreg: 15
+    SPmovecost: 5
+    weaponParameters:
+    - DMG: 40
+      ACC: 95
+      CRIT: 10
+      SE: 100
+      SEreg: 15
+      SEdec: 0
+    - DMG: 45
+      ACC: 90
+      CRIT: 12
+      SE: 100
+      SEreg: 15
+      SEdec: 0
+    weaponSkills:
+    - skills:
+      - skillName: 
+        description: 
+        minDamagePercentage: 0
+        maxDamagePercentage: 0
+        accuracyPercentage: 0
+        spCost: 0
+        seCost: 0
+        cooldownTurns: 0
+        criticalRatePercentage: 0
+        criticalHitMultiplier: 0
+      - skillName: 
+        description: 
+        minDamagePercentage: 0
+        maxDamagePercentage: 0
+        accuracyPercentage: 0
+        spCost: 0
+        seCost: 0
+        cooldownTurns: 0
+        criticalRatePercentage: 0
+        criticalHitMultiplier: 0
+      - skillName: 
+        description: 
+        minDamagePercentage: 0
+        maxDamagePercentage: 0
+        accuracyPercentage: 0
+        spCost: 0
+        seCost: 0
+        cooldownTurns: 0
+        criticalRatePercentage: 0
+        criticalHitMultiplier: 0
+      - skillName: 
+        description: 
+        minDamagePercentage: 0
+        maxDamagePercentage: 0
+        accuracyPercentage: 0
+        spCost: 0
+        seCost: 0
+        cooldownTurns: 0
+        criticalRatePercentage: 0
+        criticalHitMultiplier: 0
+      - skillName: 
+        description: 
+        minDamagePercentage: 0
+        maxDamagePercentage: 0
+        accuracyPercentage: 0
+        spCost: 0
+        seCost: 0
+        cooldownTurns: 0
+        criticalRatePercentage: 0
+        criticalHitMultiplier: 0
+    - skills:
+      - skillName: 
+        description: 
+        minDamagePercentage: 0
+        maxDamagePercentage: 0
+        accuracyPercentage: 0
+        spCost: 0
+        seCost: 0
+        cooldownTurns: 0
+        criticalRatePercentage: 0
+        criticalHitMultiplier: 0
+      - skillName: 
+        description: 
+        minDamagePercentage: 0
+        maxDamagePercentage: 0
+        accuracyPercentage: 0
+        spCost: 0
+        seCost: 0
+        cooldownTurns: 0
+        criticalRatePercentage: 0
+        criticalHitMultiplier: 0
+      - skillName: 
+        description: 
+        minDamagePercentage: 0
+        maxDamagePercentage: 0
+        accuracyPercentage: 0
+        spCost: 0
+        seCost: 0
+        cooldownTurns: 0
+        criticalRatePercentage: 0
+        criticalHitMultiplier: 0
+      - skillName: 
+        description: 
+        minDamagePercentage: 0
+        maxDamagePercentage: 0
+        accuracyPercentage: 0
+        spCost: 0
+        seCost: 0
+        cooldownTurns: 0
+        criticalRatePercentage: 0
+        criticalHitMultiplier: 0
+      - skillName: 
+        description: 
+        minDamagePercentage: 0
+        maxDamagePercentage: 0
+        accuracyPercentage: 0
+        spCost: 0
+        seCost: 0
+        cooldownTurns: 0
+        criticalRatePercentage: 0
+        criticalHitMultiplier: 0
+    selectedSkillIndices: 000000000000000000000000
+  - characterClass: 0
+    selectedSubclassIndices: 0000000000000000
     maxHP: 0
     currentHP: 0
     DEF: 0
@@ -142,35 +398,7 @@ MonoBehaviour:
         criticalRatePercentage: 0
         criticalHitMultiplier: 0
     selectedSkillIndices: 000000000000000000000000
-  - characterClass: 0
-    selectedSubclassIndices: 
-    maxHP: 0
-    currentHP: 0
-    DEF: 0
-    EVA: 0
-    PROV: 0
-    SPD: 0
-    SP: 0
-    SPreg: 0
-    SPmovecost: 0
-    weaponParameters: []
-    weaponSkills: []
-    selectedSkillIndices: 000000000000000000000000
-  - characterClass: 0
-    selectedSubclassIndices: 
-    maxHP: 0
-    currentHP: 0
-    DEF: 0
-    EVA: 0
-    PROV: 0
-    SPD: 0
-    SP: 0
-    SPreg: 0
-    SPmovecost: 0
-    weaponParameters: []
-    weaponSkills: []
-    selectedSkillIndices: 000000000000000000000000
   baseCharacterData:
   - {fileID: 11400000, guid: 712d2251579b797488c0eda6201dff33, type: 2}
-  - {fileID: 0}
+  - {fileID: 11400000, guid: 712d2251579b797488c0eda6201dff33, type: 2}
   - {fileID: 0}

@@ -5,12 +5,18 @@ using System;
 public class BattleMapManager : MonoBehaviour
 {
     [Header("Настройка карты")]
-    [SerializeField] private BattleConfig battleConfig;  // Ссылка на наш BattleConfig ScriptableObject
+    [SerializeField] private BattleConfig battleConfig;  // Ссылка на BattleConfig ScriptableObject
 
-    [Header("Префабы для ячеек, персонажей, препятствий и т.п.")]
+    [Header("Префабы ячеек, персонажей и препятствий")]
     public BattleCell hexPrefab;
     public GameObject[] prefabBattleCells;
     [SerializeField] private GameObject obstaclePrefab;  // Префаб препятствия
+
+    [Header("Настройка персонажей")]
+    public int allyCount = 3;     // Число союзников
+    public int enemyCount = 3;    // Число врагов
+    public GameObject allyPrefab; // Префаб союзного персонажа (например, Воин защитник)
+    public GameObject enemyPrefab; // Префаб вражеского персонажа (можно временно использовать тот же)
 
     // Константы для расчёта ячеек
     public const float outerToInner = 0.866025404f;
@@ -20,29 +26,40 @@ public class BattleMapManager : MonoBehaviour
 
     // Хранение ячеек
     private List<GameObject> hexCells = new List<GameObject>();
-    private GameObject parentObject; // Создание родительского объекта
-
+    private GameObject parentObject; // Родительский объект для ячеек
 
     private int battleMapHeight;
     private int battleMapWidth;
     private BattleCell[] battleCells;
 
-
-
+    // Параметры зон для размещения персонажей
+    private int allyMaxRow;   // Максимальный z для союзной зоны
+    private int enemyMinRow;  // Минимальный z для вражеской зоны
 
     void Awake()
     {
         parentObject = new GameObject("HexGrid");
         parentObject.transform.SetParent(transform);
 
-        // x - ширина (количество ячеек по горизонтали)  y - высота (по вертикали)
+        // Получаем размеры карты из BattleConfig (x - ширина, y - высота)
         battleMapWidth = battleConfig.battleMapSize.x;
         battleMapHeight = battleConfig.battleMapSize.y;
+
+        // Определяем зоны: например, союзники занимают первые ряды, враги — последние
+        // Можно оставить промежуток между ними, изменив формулу
+        allyMaxRow = Mathf.FloorToInt(battleMapHeight / 2f) - 1;
+        enemyMinRow = Mathf.CeilToInt(battleMapHeight / 2f) + 1;
 
         CreateBattleMap(battleMapWidth, battleMapHeight);
     }
 
-    void CreateBattleMap(int battleMapWidth, int battleMapHeight) // создание боевой карты
+    void Start()
+    {
+        // После создания карты и установки препятствий помещаем персонажей
+        PlaceCharacters();
+    }
+
+    void CreateBattleMap(int battleMapWidth, int battleMapHeight)
     {
         CreateBattleCells(battleMapWidth, battleMapHeight);
         PlaceObstacles();
@@ -52,10 +69,9 @@ public class BattleMapManager : MonoBehaviour
     {
         battleCells = new BattleCell[battleMapWidth * battleMapHeight];
 
-        // Внешний цикл пробегает строки (вертикаль), то есть height
+        // Внешний цикл по строкам (z), внутренний по столбцам (x)
         for (int z = 0, i = 0; z < battleMapHeight; z++)
         {
-            // Внутренний цикл пробегает столбцы (горизонталь), то есть width
             for (int x = 0; x < battleMapWidth; x++)
             {
                 CreateBattleCell(x, z, i++);
@@ -63,7 +79,7 @@ public class BattleMapManager : MonoBehaviour
         }
     }
 
-    void CreateBattleCell(int x, int z, int i) // создание боевой ячейки, назначение её соседей
+    void CreateBattleCell(int x, int z, int i)
     {
         Vector3 position;
         position.x = ((x + z * 0.5f - z / 2) * innerDiameter) + innerRadius;
@@ -73,22 +89,19 @@ public class BattleMapManager : MonoBehaviour
         BattleCell battleCell = battleCells[i] = Instantiate<BattleCell>(hexPrefab);
         battleCell.transform.localPosition = position;
         battleCell.transform.SetParent(parentObject.transform);
-        battleCell.name = $"BattleCell_{x}-{z}"; // Назначение имени с координатами
+        battleCell.name = $"BattleCell_{x}-{z}";
 
         battleCell.PrefabBattleCell = Instantiate<GameObject>(prefabBattleCells[0]);
 
-        // задание координат
+        // Назначение координат
         battleCell.xСoordinate = x;
         battleCell.zСoordinate = z;
 
-
-
-        // назначение соседей
+        // Назначение соседей
         if (x > 0)
         {
             battleCell.SetNeighbor(HexDirection.W, battleCells[i - 1]);
         }
-
         if (z > 0)
         {
             if ((z & 1) == 0)
@@ -110,17 +123,12 @@ public class BattleMapManager : MonoBehaviour
         }
     }
 
-    // Метод для размещения препятствий на карте
     void PlaceObstacles()
     {
-        // Например, если BattleConfig содержит процент заполненности, 
-        // рассчитываем количество ячеек, которые должны получить препятствие.
-        // Пусть obstaclePercent — число от 0 до 1 (например, 0.05 для 5% заполненности)
-        float obstaclePercent = battleConfig.obstaclePercent;  // поле в BattleConfig
+        float obstaclePercent = battleConfig.obstaclePercent;
         int totalCells = battleCells.Length;
         int obstaclesToPlace = Mathf.RoundToInt(totalCells * obstaclePercent);
 
-        // Собираем список индексов ячеек, где можно разместить препятствие (состояние Free)
         List<int> availableCellIndices = new List<int>();
         for (int i = 0; i < totalCells; i++)
         {
@@ -129,20 +137,14 @@ public class BattleMapManager : MonoBehaviour
                 availableCellIndices.Add(i);
             }
         }
-
-        // Перемешиваем список для случайного выбора ячеек
         Shuffle(availableCellIndices);
 
         int placed = 0;
-        // Проходим по перемешанному списку и размещаем препятствия при выполнении условия
         foreach (int index in availableCellIndices)
         {
             BattleCell cell = battleCells[index];
 
-            // Простая проверка: будем размещать препятствие,
-            // только если у ячейки есть по крайней мере один свободный сосед.
             bool hasFreeNeighbor = false;
-            // Предполагается, что у всех ячеек массив neighbors инициализирован
             foreach (var neighbor in cell.GetNeighbors())
             {
                 if (neighbor != null && neighbor.State == CellState.Free)
@@ -154,7 +156,6 @@ public class BattleMapManager : MonoBehaviour
 
             if (hasFreeNeighbor)
             {
-                // Создаём объект препятствия и привязываем его к ячейке
                 GameObject obstacleInstance = Instantiate(obstaclePrefab, cell.transform.position, Quaternion.identity, cell.transform);
                 cell.ObstacleObject = obstacleInstance;
                 placed++;
@@ -164,7 +165,7 @@ public class BattleMapManager : MonoBehaviour
         }
     }
 
-    // Пример стандартного алгоритма перемешивания списка (Fisher-Yates)
+    // Стандартный алгоритм перемешивания (Fisher-Yates)
     void Shuffle<T>(List<T> list)
     {
         for (int i = list.Count - 1; i > 0; i--)
@@ -175,5 +176,103 @@ public class BattleMapManager : MonoBehaviour
             list[j] = temp;
         }
     }
+
+    // -------------------------
+    // Размещение персонажей
+    // -------------------------
+// Метод для размещения персонажей – вызывается из PlaceCharacters()
+void PlaceCharacters()
+{
+    PlaceAllies();
+    PlaceEnemies();
+}
+
+void PlaceAllies()
+{
+    for (int i = 0; i < allyCount; i++)
+    {
+        BattleCell chosenCell = ChooseRandomCellForAlly();
+        if (chosenCell != null)
+        {
+            // Размещаем союзника, ориентируя его в сторону врага (например, смотрящий вперёд).
+            Instantiate(allyPrefab, chosenCell.transform.position, Quaternion.LookRotation(Vector3.forward));
+            // Обновляем состояние ячейки, чтобы не использовать её повторно.
+            chosenCell.State = CellState.Ally;
+        }
+        else
+        {
+            Debug.LogWarning("Нет свободной ячейки для союзника");
+        }
+    }
+}
+
+void PlaceEnemies()
+{
+    for (int i = 0; i < enemyCount; i++)
+    {
+        BattleCell chosenCell = ChooseRandomCellForEnemy();
+        if (chosenCell != null)
+        {
+            // Размещаем врага, ориентируя его в сторону союзников (например, смотрящий назад).
+            Instantiate(enemyPrefab, chosenCell.transform.position, Quaternion.LookRotation(Vector3.back));
+            chosenCell.State = CellState.Enemy;
+        }
+        else
+        {
+            Debug.LogWarning("Нет свободной ячейки для врага");
+        }
+    }
+}
+
+// Выбирает случайную свободную ячейку для союзника среди ячеек в первых двух рядах (z = 0 и 1)
+BattleCell ChooseRandomCellForAlly()
+{
+    List<BattleCell> candidateCells = new List<BattleCell>();
+
+    foreach (BattleCell cell in battleCells)
+    {
+        // Предположим, что первые два ряда (z = 0 и z = 1) задают зону союзников.
+        if (cell.State == CellState.Free && cell.zСoordinate < 2)
+        {
+            candidateCells.Add(cell);
+        }
+    }
+
+    if (candidateCells.Count > 0)
+    {
+        int randomIndex = UnityEngine.Random.Range(0, candidateCells.Count);
+        return candidateCells[randomIndex];
+    }
+    else
+    {
+        return null;
+    }
+}
+
+// Выбирает случайную свободную ячейку для врага среди ячеек в последних двух рядах
+BattleCell ChooseRandomCellForEnemy()
+{
+    List<BattleCell> candidateCells = new List<BattleCell>();
+
+    // Пусть высота карты — battleMapHeight; для врагов используем последние два ряда: battleMapHeight - 2 и battleMapHeight - 1.
+    int enemyRowThreshold = battleMapHeight - 2; 
+    foreach (BattleCell cell in battleCells)
+    {
+        if (cell.State == CellState.Free && cell.zСoordinate >= enemyRowThreshold)
+        {
+            candidateCells.Add(cell);
+        }
+    }
+
+    if (candidateCells.Count > 0)
+    {
+        int randomIndex = UnityEngine.Random.Range(0, candidateCells.Count);
+        return candidateCells[randomIndex];
+    }
+    else
+    {
+        return null;
+    }
+}
 
 }

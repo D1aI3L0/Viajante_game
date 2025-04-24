@@ -15,28 +15,28 @@ MonoBehaviour:
   characterClass: 0
   availableSubclasses: 0000000001000000
   parameters:
-    maxHP: 0
-    currentHP: 0
-    DEF: 0
-    EVA: 0
-    PROV: 0
-    SPD: 0
-    SP: 0
-    SPreg: 0
-    SPmovecost: 0
+    maxHP: 180
+    currentHP: 180
+    DEF: 45
+    EVA: 12
+    PROV: 15
+    SPD: 120
+    SP: 100
+    SPreg: 15
+    SPmovecost: 5
   weaponsCount: 2
   weaponParameters:
-  - DMG: 0
-    ACC: 0
-    CRIT: 0
-    SE: 0
-    SEreg: 0
+  - DMG: 40
+    ACC: 95
+    CRIT: 10
+    SE: 100
+    SEreg: 15
     SEdec: 0
-  - DMG: 0
-    ACC: 0
-    CRIT: 0
-    SE: 0
-    SEreg: 0
+  - DMG: 45
+    ACC: 90
+    CRIT: 12
+    SE: 100
+    SEreg: 15
     SEdec: 0
   weaponSkills:
   - skills:

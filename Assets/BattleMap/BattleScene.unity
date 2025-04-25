@@ -172,6 +172,7 @@ MonoBehaviour:
   enemyCount: 3
   allyPrefab: {fileID: 4530143948483365523, guid: 16afd70d6fa719c4c9b3dfe5e0b9bb80, type: 3}
   enemyPrefab: {fileID: 1208052373259365889, guid: 35f6d3c0ee7ece946a82eef41225b810, type: 3}
+  dataTransfer: {fileID: 11400000, guid: 623d9963a74b0fb499486929b3961852, type: 2}
 --- !u!1 &1528094995
 GameObject:
   m_ObjectHideFlags: 0

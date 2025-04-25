@@ -7,9 +7,6 @@ public class BattleConfig : ScriptableObject
     [Tooltip("Размер карты, где X - количество ячеек по горизонтали, а Y - количество ячеек по вертикали.")]
     public Vector2Int battleMapSize = new Vector2Int(20, 20);
 
-    [Tooltip("Размер каждой ячейки на карте (например, в единицах Unity).")]
-    public float cellSize = 1.0f;
-
     [Header("Параметры противников")]
     [Tooltip("Количество врагов, которые будут создаваться на боевой карте.")]
     public int enemyCount = 5;

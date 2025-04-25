@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 8298316852288704584}
   - component: {fileID: 4195878330101441860}
   m_Layer: 0
-  m_Name: VoinZastupnikBattleModel
+  m_Name: PathfinderBattleModel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -65,7 +65,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 09b91330ee8a05f419784edbd51caf70, type: 2}
+  - {fileID: 2100000, guid: 7fb218a9e0d6f144bae5c0820f37f9dc, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

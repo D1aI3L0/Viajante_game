@@ -13,10 +13,14 @@ public class BattleMapManager : MonoBehaviour
     [SerializeField] private GameObject obstaclePrefab;  // Префаб препятствия
 
     [Header("Настройка персонажей")]
-    public int allyCount = 3;     // Число союзников
-    public int enemyCount = 3;    // Число врагов
+    private int AllyCount => dataTransfer != null ? dataTransfer.numberOfCharacters : 0; // свойство кол-во юнитов игрока
+    private int EnemyCount => battleConfig.enemyCount; // свойство количество противников
     public GameObject allyPrefab; // Префаб союзного персонажа (например, Воин защитник)
     public GameObject enemyPrefab; // Префаб вражеского персонажа (можно временно использовать тот же)
+
+    [Header("Данные персонажей для боя")]
+    [SerializeField] private CharacterDataTransferParameters dataTransfer;
+
 
     // Константы для расчёта ячеек
     public const float outerToInner = 0.866025404f;
@@ -180,99 +184,124 @@ public class BattleMapManager : MonoBehaviour
     // -------------------------
     // Размещение персонажей
     // -------------------------
-// Метод для размещения персонажей – вызывается из PlaceCharacters()
-void PlaceCharacters()
-{
-    PlaceAllies();
-    PlaceEnemies();
-}
-
-void PlaceAllies()
-{
-    for (int i = 0; i < allyCount; i++)
+    // Метод для размещения персонажей – вызывается из PlaceCharacters()
+    void PlaceCharacters()
     {
-        BattleCell chosenCell = ChooseRandomCellForAlly();
-        if (chosenCell != null)
+        PlaceAllies();
+        PlaceEnemies();
+    }
+
+    // Подразумевается, что ты добавил в BattleMapManager:
+    // [Header("Данные персонажей для боя")]
+    // [SerializeField] private CharacterDataTransferParameters dataTransfer;
+
+    void PlaceAllies()
+    {
+        for (int i = 0; i < AllyCount; i++)
         {
-            // Размещаем союзника, ориентируя его в сторону врага (например, смотрящий вперёд).
-            Instantiate(allyPrefab, chosenCell.transform.position, Quaternion.LookRotation(Vector3.forward));
-            // Обновляем состояние ячейки, чтобы не использовать её повторно.
-            chosenCell.State = CellState.Ally;
+            BattleCell chosenCell = ChooseRandomCellForAlly();
+            if (chosenCell != null)
+            {
+                // Создаем префаб союзника в позиции выбранной ячейки.
+                GameObject allyObj = Instantiate(allyPrefab, chosenCell.transform.position, Quaternion.LookRotation(Vector3.forward));
+
+                // Получаем компонент BattleCharacter на созданном объекте
+                BattleCharacter bc = allyObj.GetComponent<BattleCharacter>();
+
+                // Если компонент найден и есть данные для этого персонажа, инициализируем его данные:
+                // Предполагаем, что runtime данные хранятся в массиве characters, и порядок соответствует порядку размещения.
+                if (bc != null && dataTransfer != null && dataTransfer.characters.Length > i)
+                {
+                    bc.Init(dataTransfer.characters[i]);
+                }
+                else
+                {
+                    Debug.LogWarning("BattleCharacter не найден или данные отсутствуют");
+                }
+
+                // После успешного размещения меняем состояние ячейки на занятую союзником.
+                chosenCell.State = CellState.Ally;
+            }
+            else
+            {
+                Debug.LogWarning("Нет свободной ячейки для союзника");
+            }
+        }
+    }
+
+    void PlaceEnemies()
+    {
+        for (int i = 0; i < EnemyCount; i++)
+        {
+            // Используем метод для врагов, чтобы выбрать ячейку из последних дву рядов
+            BattleCell chosenCell = ChooseRandomCellForEnemy();
+            if (chosenCell != null)
+            {
+                // Создаем префаб врага в позиции выбранной ячейки и ориентируем его так, чтобы он смотрел в сторону союзников
+                GameObject enemyObj = Instantiate(enemyPrefab, chosenCell.transform.position, Quaternion.LookRotation(Vector3.back));
+
+                // Получаем компонент BattleCharacter на созданном объекте
+                BattleCharacter bc = enemyObj.GetComponent<BattleCharacter>();
+
+                // После успешного размещения меняем состояние ячейки на занятую врагом.
+                chosenCell.State = CellState.Enemy;
+            }
+            else
+            {
+                Debug.LogWarning("Нет свободной ячейки для врагов");
+            }
+        }
+    }
+
+    // Выбирает случайную свободную ячейку для союзника среди ячеек в первых двух рядах (z = 0 и 1)
+    BattleCell ChooseRandomCellForAlly()
+    {
+        List<BattleCell> candidateCells = new List<BattleCell>();
+
+        foreach (BattleCell cell in battleCells)
+        {
+            // Предположим, что первые два ряда (z = 0 и z = 1) задают зону союзников.
+            if (cell.State == CellState.Free && cell.zСoordinate < 2)
+            {
+                candidateCells.Add(cell);
+            }
+        }
+
+        if (candidateCells.Count > 0)
+        {
+            int randomIndex = UnityEngine.Random.Range(0, candidateCells.Count);
+            return candidateCells[randomIndex];
         }
         else
         {
-            Debug.LogWarning("Нет свободной ячейки для союзника");
+            return null;
         }
     }
-}
 
-void PlaceEnemies()
-{
-    for (int i = 0; i < enemyCount; i++)
+    // Выбирает случайную свободную ячейку для врага среди ячеек в последних двух рядах
+    BattleCell ChooseRandomCellForEnemy()
     {
-        BattleCell chosenCell = ChooseRandomCellForEnemy();
-        if (chosenCell != null)
+        List<BattleCell> candidateCells = new List<BattleCell>();
+
+        // Пусть высота карты — battleMapHeight; для врагов используем последние два ряда: battleMapHeight - 2 и battleMapHeight - 1.
+        int enemyRowThreshold = battleMapHeight - 2;
+        foreach (BattleCell cell in battleCells)
         {
-            // Размещаем врага, ориентируя его в сторону союзников (например, смотрящий назад).
-            Instantiate(enemyPrefab, chosenCell.transform.position, Quaternion.LookRotation(Vector3.back));
-            chosenCell.State = CellState.Enemy;
+            if (cell.State == CellState.Free && cell.zСoordinate >= enemyRowThreshold)
+            {
+                candidateCells.Add(cell);
+            }
+        }
+
+        if (candidateCells.Count > 0)
+        {
+            int randomIndex = UnityEngine.Random.Range(0, candidateCells.Count);
+            return candidateCells[randomIndex];
         }
         else
         {
-            Debug.LogWarning("Нет свободной ячейки для врага");
+            return null;
         }
     }
-}
-
-// Выбирает случайную свободную ячейку для союзника среди ячеек в первых двух рядах (z = 0 и 1)
-BattleCell ChooseRandomCellForAlly()
-{
-    List<BattleCell> candidateCells = new List<BattleCell>();
-
-    foreach (BattleCell cell in battleCells)
-    {
-        // Предположим, что первые два ряда (z = 0 и z = 1) задают зону союзников.
-        if (cell.State == CellState.Free && cell.zСoordinate < 2)
-        {
-            candidateCells.Add(cell);
-        }
-    }
-
-    if (candidateCells.Count > 0)
-    {
-        int randomIndex = UnityEngine.Random.Range(0, candidateCells.Count);
-        return candidateCells[randomIndex];
-    }
-    else
-    {
-        return null;
-    }
-}
-
-// Выбирает случайную свободную ячейку для врага среди ячеек в последних двух рядах
-BattleCell ChooseRandomCellForEnemy()
-{
-    List<BattleCell> candidateCells = new List<BattleCell>();
-
-    // Пусть высота карты — battleMapHeight; для врагов используем последние два ряда: battleMapHeight - 2 и battleMapHeight - 1.
-    int enemyRowThreshold = battleMapHeight - 2; 
-    foreach (BattleCell cell in battleCells)
-    {
-        if (cell.State == CellState.Free && cell.zСoordinate >= enemyRowThreshold)
-        {
-            candidateCells.Add(cell);
-        }
-    }
-
-    if (candidateCells.Count > 0)
-    {
-        int randomIndex = UnityEngine.Random.Range(0, candidateCells.Count);
-        return candidateCells[randomIndex];
-    }
-    else
-    {
-        return null;
-    }
-}
 
 }

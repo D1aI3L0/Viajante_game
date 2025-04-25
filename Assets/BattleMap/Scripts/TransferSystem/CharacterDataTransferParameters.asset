@@ -142,29 +142,29 @@ MonoBehaviour:
         criticalRatePercentage: 0
         criticalHitMultiplier: 0
     selectedSkillIndices: 010000000200000003000000
-  - characterClass: 0
+  - characterClass: 1
     selectedSubclassIndices: 0000000001000000
-    maxHP: 180
-    currentHP: 180
-    DEF: 45
-    EVA: 12
-    PROV: 15
-    SPD: 120
+    maxHP: 140
+    currentHP: 140
+    DEF: 35
+    EVA: 20
+    PROV: 10
+    SPD: 140
     SP: 100
     SPreg: 15
     SPmovecost: 5
     weaponParameters:
-    - DMG: 40
-      ACC: 95
-      CRIT: 10
+    - DMG: 35
+      ACC: 88
+      CRIT: 15
       SE: 100
-      SEreg: 15
+      SEreg: 20
       SEdec: 0
-    - DMG: 45
-      ACC: 90
-      CRIT: 12
-      SE: 100
-      SEreg: 15
+    - DMG: 30
+      ACC: 92
+      CRIT: 10
+      SE: 4
+      SEreg: 0
       SEdec: 0
     weaponSkills:
     - skills:
@@ -400,5 +400,5 @@ MonoBehaviour:
     selectedSkillIndices: 010000000200000004000000
   baseCharacterData:
   - {fileID: 11400000, guid: 712d2251579b797488c0eda6201dff33, type: 2}
-  - {fileID: 11400000, guid: 712d2251579b797488c0eda6201dff33, type: 2}
+  - {fileID: 11400000, guid: 51bed3ec0c6e9854089ab52251558654, type: 2}
   - {fileID: 0}

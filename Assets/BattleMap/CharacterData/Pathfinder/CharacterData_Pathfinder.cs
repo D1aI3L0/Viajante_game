@@ -2,26 +2,22 @@ using UnityEngine;
 
 public enum Pathfinder
 {
-    LongBow,   // "Длинный лук"
-    SmallCrossbowAndTraps    // "Малый арбалет и ловушки"
+    LongBow,               // "Длинный лук"
+    SmallCrossbowAndTraps  // "Малый арбалет и ловушки"
 }
 
 [CreateAssetMenu(fileName = "CharacterData_Pathfinder", menuName = "Characters/Следопыт Data", order = 1)]
-public class CharacterData_Pathfinder : ScriptableObject
+public class CharacterData_Pathfinder : BasicCharacterTemplates
 {
-    [Header("Классификация персонажа")]
-    [ReadOnly]public new CharacterClass characterClass = CharacterClass.Pathfinder;
-    
     [Header("Доступные подклассы")]
     [Tooltip("Список допустимых подклассов для данного класса. Например, индекс 0 – \"Длинный лук\", индекс 1 – \"Малый арбалет и ловушки\".")]
-    [ReadOnly]public Pathfinder[] availableSubclasses = new Pathfinder[] 
-    { 
-        Pathfinder.LongBow, 
-        Pathfinder.SmallCrossbowAndTraps 
-    };
 
-    [Header("Параметры персонажа")]
-    public new CharacterParameters parameters = new CharacterParameters();
+    [ReadOnly]
+    public Pathfinder[] availableSubclasses = new Pathfinder[]
+    {
+        Pathfinder.LongBow,
+        Pathfinder.SmallCrossbowAndTraps
+    };
 
     [Header("Структура оружия и навыков")]
     [Tooltip("Количество оружий (и соответствующих наборов навыков) данного персонажа. Рекомендуется сделать его равным длине availableSubclasses.")]
@@ -38,25 +34,31 @@ public class CharacterData_Pathfinder : ScriptableObject
 #if UNITY_EDITOR
     private void OnValidate()
     {
-        // Если количество оружий должно совпадать с количеством доступных подклассов, можно принудительно синхронизировать:
+        // Устанавливаем, что для этого ассета всегда используется класс Pathfinder.
+        if (characterClass != CharacterClass.Pathfinder)
+        {
+            characterClass = CharacterClass.Pathfinder;
+        }
+
+        // Синхронизация количества оружий с количеством доступных подклассов.
         if (availableSubclasses != null && availableSubclasses.Length != weaponsCount)
         {
             weaponsCount = availableSubclasses.Length;
         }
 
-        // Инициализируем массив параметров оружия до длины weaponsCount.
+        // Инициализация массива параметров оружия, если он не задан или его длина не соответствует.
         if (weaponParameters == null || weaponParameters.Length != weaponsCount)
         {
             weaponParameters = new WeaponParameters[weaponsCount];
         }
 
-        // Инициализируем массив наборов навыков до длины weaponsCount.
+        // Инициализация массива наборов навыков, если он не задан или его длина не соответствует.
         if (weaponSkills == null || weaponSkills.Length != weaponsCount)
         {
             weaponSkills = new WeaponSkillSet[weaponsCount];
         }
 
-        // Для каждого набора навыков инициализируем сам массив навыков (например, стандартное количество – 5 навыков).
+        // Для каждого набора навыков инициализируем массив навыков (например, стандартное количество – 5 навыков).
         for (int i = 0; i < weaponsCount; i++)
         {
             if (weaponSkills[i] == null)

@@ -7,21 +7,16 @@ public enum WarriorSubclass
 }
 
 [CreateAssetMenu(fileName = "CharacterData_VoinZastupnik", menuName = "Characters/Воин‑заступник Data", order = 1)]
-public class CharacterData_VoinZastupnik : ScriptableObject
+public class CharacterData_VoinZastupnik : BasicCharacterTemplates
 {
-    [Header("Классификация персонажа")]
-    [ReadOnly]public new CharacterClass characterClass = CharacterClass.WarriorZastupnik;
-    
     [Header("Доступные подклассы")]
     [Tooltip("Список допустимых подклассов для данного класса. Например, индекс 0 – \"Щит и булава\", индекс 1 – \"Двуручная булава\".")]
-    [ReadOnly]public WarriorSubclass[] availableSubclasses = new WarriorSubclass[] 
-    { 
-        WarriorSubclass.ShieldAndMace, 
-        WarriorSubclass.TwoHandedMace 
+    [ReadOnly]
+    public WarriorSubclass[] availableSubclasses = new WarriorSubclass[]
+    {
+        WarriorSubclass.ShieldAndMace,
+        WarriorSubclass.TwoHandedMace
     };
-
-    [Header("Параметры персонажа")]
-    public new CharacterParameters parameters = new CharacterParameters();
 
     [Header("Структура оружия и навыков")]
     [Tooltip("Количество оружий (и соответствующих наборов навыков) данного персонажа. Рекомендуется сделать его равным длине availableSubclasses.")]
@@ -38,6 +33,12 @@ public class CharacterData_VoinZastupnik : ScriptableObject
 #if UNITY_EDITOR
     private void OnValidate()
     {
+        // Устанавливаем, что для этого ассета всегда используется класс WarriorZastupnik.
+        if (characterClass != CharacterClass.WarriorZastupnik)
+        {
+            characterClass = CharacterClass.WarriorZastupnik;
+        }
+
         // Если количество оружий должно совпадать с количеством доступных подклассов, можно принудительно синхронизировать:
         if (availableSubclasses != null && availableSubclasses.Length != weaponsCount)
         {

@@ -12,14 +12,21 @@ public class BattleMapManager : MonoBehaviour
     public GameObject[] prefabBattleCells;
     [SerializeField] private GameObject obstaclePrefab;  // Префаб препятствия
 
-    [Header("Настройка персонажей")]
-    private int AllyCount => dataTransfer != null ? dataTransfer.numberOfCharacters : 0; // свойство кол-во юнитов игрока
     private int EnemyCount => battleConfig.enemyCount; // свойство количество противников
-    public GameObject allyPrefab; // Префаб союзного персонажа (например, Воин защитник)
-    public GameObject enemyPrefab; // Префаб вражеского персонажа (можно временно использовать тот же)
+
+    [Header("Префабы персонажей")]
+    public GameObject warriorPrefab;
+    public GameObject pathfinderPrefab;
+
 
     [Header("Данные персонажей для боя")]
     [SerializeField] private CharacterDataTransferParameters dataTransfer;
+
+
+    public GameObject enemyPrefab; // Префаб вражеского персонажа (временно)
+
+
+    private Dictionary<CharacterClass, GameObject> prefabDictionary; // Словарь для сопоставления класса персонажа и префаба
 
 
     // Константы для расчёта ячеек
@@ -42,6 +49,8 @@ public class BattleMapManager : MonoBehaviour
 
     void Awake()
     {
+        InitializePrefabDictionary();
+
         parentObject = new GameObject("HexGrid");
         parentObject.transform.SetParent(transform);
 
@@ -191,36 +200,61 @@ public class BattleMapManager : MonoBehaviour
         PlaceEnemies();
     }
 
-    // Подразумевается, что ты добавил в BattleMapManager:
-    // [Header("Данные персонажей для боя")]
-    // [SerializeField] private CharacterDataTransferParameters dataTransfer;
+    private void InitializePrefabDictionary()
+    {
+        prefabDictionary = new Dictionary<CharacterClass, GameObject>
+        {
+            { CharacterClass.WarriorZastupnik, warriorPrefab },
+            { CharacterClass.Pathfinder, pathfinderPrefab }
+            // Если появятся новые классы, их можно добавить сюда:
+            // { CharacterClass.Mage, magePrefab }
+        };
+    }
+
+    // Метод, который возвращает нужный префаб по значению enum
+    private GameObject GetPrefabForCharacter(CharacterClass characterClass)
+    {
+        if (prefabDictionary.TryGetValue(characterClass, out GameObject prefab))
+        {
+            return prefab;
+        }
+        else
+        {
+            Debug.LogWarning("Префаб для класса " + characterClass + " не назначен!");
+            return null;
+        }
+    }
 
     void PlaceAllies()
     {
-        for (int i = 0; i < AllyCount; i++)
+        // Количество союзников задаётся в dataTransfer.numberOfCharacters
+        for (int i = 0; i < dataTransfer.numberOfCharacters; i++)
         {
             BattleCell chosenCell = ChooseRandomCellForAlly();
             if (chosenCell != null)
             {
-                // Создаем префаб союзника в позиции выбранной ячейки.
-                GameObject allyObj = Instantiate(allyPrefab, chosenCell.transform.position, Quaternion.LookRotation(Vector3.forward));
+                // Получаем runtime-параметры персонажа, чтобы узнать его класс
+                CharacterRuntimeParameters runtimeParams = dataTransfer.characters[i];
+                GameObject prefab = GetPrefabForCharacter(runtimeParams.characterClass);
 
-                // Получаем компонент BattleCharacter на созданном объекте
+                if (prefab == null)
+                {
+                    Debug.LogWarning("Префаб для персонажа с классом " + runtimeParams.characterClass + " не найден.");
+                    continue;
+                }
+
+                // Создаём экземпляр объекта
+                GameObject allyObj = Instantiate(prefab, chosenCell.transform.position, Quaternion.LookRotation(Vector3.forward));
+
+                // Инициализируем экземпляр, если у него есть компонент BattleCharacter
                 BattleCharacter bc = allyObj.GetComponent<BattleCharacter>();
-
-                // Если компонент найден и есть данные для этого персонажа, инициализируем его данные:
-                // Предполагаем, что runtime данные хранятся в массиве characters, и порядок соответствует порядку размещения.
-                if (bc != null && dataTransfer != null && dataTransfer.characters.Length > i)
+                if (bc != null)
                 {
-                    bc.Init(dataTransfer.characters[i]);
-                }
-                else
-                {
-                    Debug.LogWarning("BattleCharacter не найден или данные отсутствуют");
+                    bc.Init(runtimeParams);
                 }
 
-                // После успешного размещения меняем состояние ячейки на занятую союзником.
-                chosenCell.State = CellState.Ally;
+                // Помечаем ячейку, что в ней размещён союзник
+                chosenCell.occupant = bc; // bc – компонент BattleCharacter установленного персонажа
             }
             else
             {
@@ -244,7 +278,7 @@ public class BattleMapManager : MonoBehaviour
                 BattleCharacter bc = enemyObj.GetComponent<BattleCharacter>();
 
                 // После успешного размещения меняем состояние ячейки на занятую врагом.
-                chosenCell.State = CellState.Enemy;
+                chosenCell.occupant = bc; // bc – компонент BattleCharacter установленного персонажа
             }
             else
             {

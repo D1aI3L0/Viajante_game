@@ -13,7 +13,6 @@ MonoBehaviour:
   m_Name: CharacterData_VoinZastupnik
   m_EditorClassIdentifier: 
   characterClass: 0
-  availableSubclasses: 0000000001000000
   parameters:
     maxHP: 180
     currentHP: 180
@@ -24,6 +23,7 @@ MonoBehaviour:
     SP: 100
     SPreg: 15
     SPmovecost: 5
+  availableSubclasses: 0000000001000000
   weaponsCount: 2
   weaponParameters:
   - DMG: 40

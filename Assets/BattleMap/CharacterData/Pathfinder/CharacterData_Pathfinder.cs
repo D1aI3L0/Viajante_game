@@ -10,7 +10,7 @@ public enum Pathfinder
 public class CharacterData_Pathfinder : ScriptableObject
 {
     [Header("Классификация персонажа")]
-    [ReadOnly]public CharacterClass characterClass = CharacterClass.Pathfinder;
+    [ReadOnly]public new CharacterClass characterClass = CharacterClass.Pathfinder;
     
     [Header("Доступные подклассы")]
     [Tooltip("Список допустимых подклассов для данного класса. Например, индекс 0 – \"Длинный лук\", индекс 1 – \"Малый арбалет и ловушки\".")]
@@ -21,7 +21,7 @@ public class CharacterData_Pathfinder : ScriptableObject
     };
 
     [Header("Параметры персонажа")]
-    public CharacterParameters parameters = new CharacterParameters();
+    public new CharacterParameters parameters = new CharacterParameters();
 
     [Header("Структура оружия и навыков")]
     [Tooltip("Количество оружий (и соответствующих наборов навыков) данного персонажа. Рекомендуется сделать его равным длине availableSubclasses.")]

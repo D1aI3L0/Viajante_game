@@ -10,7 +10,7 @@ public enum WarriorSubclass
 public class CharacterData_VoinZastupnik : ScriptableObject
 {
     [Header("Классификация персонажа")]
-    [ReadOnly]public CharacterClass characterClass = CharacterClass.WarriorZastupnik;
+    [ReadOnly]public new CharacterClass characterClass = CharacterClass.WarriorZastupnik;
     
     [Header("Доступные подклассы")]
     [Tooltip("Список допустимых подклассов для данного класса. Например, индекс 0 – \"Щит и булава\", индекс 1 – \"Двуручная булава\".")]
@@ -21,7 +21,7 @@ public class CharacterData_VoinZastupnik : ScriptableObject
     };
 
     [Header("Параметры персонажа")]
-    public CharacterParameters parameters = new CharacterParameters();
+    public new CharacterParameters parameters = new CharacterParameters();
 
     [Header("Структура оружия и навыков")]
     [Tooltip("Количество оружий (и соответствующих наборов навыков) данного персонажа. Рекомендуется сделать его равным длине availableSubclasses.")]

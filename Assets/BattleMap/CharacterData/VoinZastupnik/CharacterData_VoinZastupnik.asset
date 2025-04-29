@@ -26,17 +26,17 @@ MonoBehaviour:
   availableSubclasses: 0000000001000000
   weaponsCount: 2
   weaponParameters:
-  - DMG: 0
-    ACC: 0
-    CRIT: 0
-    SE: 0
-    SEreg: 0
+  - ATK: 40
+    ACC: 95
+    CRIT: 10
+    SE: 100
+    SEreg: 10
     SEdec: 0
-  - DMG: 0
-    ACC: 0
-    CRIT: 0
-    SE: 0
-    SEreg: 0
+  - ATK: 45
+    ACC: 90
+    CRIT: 12
+    SE: 100
+    SEreg: 10
     SEdec: 0
   weaponSkills:
   - skills:

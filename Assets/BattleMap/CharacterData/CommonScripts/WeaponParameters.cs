@@ -6,7 +6,7 @@ public class WeaponParameters
 {
     [Header("Параметры оружия")]
     [Tooltip("Урон оружия")]
-    public int DMG;
+    public int ATK;
     
     [Tooltip("Точность удара")]
     public int ACC;

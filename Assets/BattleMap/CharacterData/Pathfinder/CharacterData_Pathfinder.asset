@@ -13,7 +13,6 @@ MonoBehaviour:
   m_Name: CharacterData_Pathfinder
   m_EditorClassIdentifier: 
   characterClass: 1
-  availableSubclasses: 0000000001000000
   parameters:
     maxHP: 140
     currentHP: 140
@@ -24,15 +23,16 @@ MonoBehaviour:
     SP: 100
     SPreg: 15
     SPmovecost: 5
+  availableSubclasses: 0000000001000000
   weaponsCount: 2
   weaponParameters:
-  - DMG: 35
+  - ATK: 35
     ACC: 88
     CRIT: 15
     SE: 100
     SEreg: 20
     SEdec: 0
-  - DMG: 30
+  - ATK: 30
     ACC: 92
     CRIT: 10
     SE: 4

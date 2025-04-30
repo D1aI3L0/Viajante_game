@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class BattleCharacter : MonoBehaviour
 {
+    public bool isActiveTurn = false;
+
     // Основные характеристики персонажа
     public CharacterClass characterClass;
 
@@ -105,21 +107,21 @@ public class BattleCharacter : MonoBehaviour
     Debug.LogFormat("BattleCharacter initialized: Class = {0}, HP = {1}/{2}", characterClass, currentHP, maxHP);
 }
 
-    public void TakeDamage(int damage)
-    {
-        int effectiveDamage = Mathf.Max(damage - currentDEF, 1);
-        currentHP -= effectiveDamage;
-        Debug.Log(gameObject.name + " получил урон: " + effectiveDamage + ". Текущее HP = " + currentHP);
+    // public void TakeDamage(int damage)
+    // {
+    //     int effectiveDamage = Mathf.Max(damage - currentDEF, 1);
+    //     currentHP -= effectiveDamage;
+    //     Debug.Log(gameObject.name + " получил урон: " + effectiveDamage + ". Текущее HP = " + currentHP);
 
-        if (currentHP <= 0)
-        {
-            Die();
-        }
-    }
+    //     if (currentHP <= 0)
+    //     {
+    //         Die();
+    //     }
+    // }
 
-    private void Die()
-    {
-        Debug.Log(gameObject.name + " погиб.");
-        Destroy(gameObject);
-    }
+    // private void Die()
+    // {
+    //     Debug.Log(gameObject.name + " погиб.");
+    //     Destroy(gameObject);
+    // }
 }

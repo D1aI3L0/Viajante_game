@@ -247,14 +247,14 @@ public class BattleMapManager : MonoBehaviour
                 GameObject allyObj = Instantiate(prefab, chosenCell.transform.position, Quaternion.LookRotation(Vector3.forward));
 
                 // Инициализируем экземпляр, если у него есть компонент BattleCharacter
-                BattleCharacter bc = allyObj.GetComponent<BattleCharacter>();
-                if (bc != null)
+                BattleCharacter ally = allyObj.GetComponent<BattleCharacter>();
+                if (ally != null)
                 {
-                    bc.Init(runtimeParams);
+                    ally.Init(runtimeParams);
                 }
 
                 // Помечаем ячейку, что в ней размещён союзник
-                chosenCell.occupant = bc; // bc – компонент BattleCharacter установленного персонажа
+                chosenCell.occupant = ally; // ally – компонент BattleCharacter установленного персонажа
             }
             else
             {
@@ -274,11 +274,19 @@ public class BattleMapManager : MonoBehaviour
                 // Создаем префаб врага в позиции выбранной ячейки и ориентируем его так, чтобы он смотрел в сторону союзников
                 GameObject enemyObj = Instantiate(enemyPrefab, chosenCell.transform.position, Quaternion.LookRotation(Vector3.back));
 
-                // Получаем компонент BattleCharacter на созданном объекте
-                BattleCharacter bc = enemyObj.GetComponent<BattleCharacter>();
+                // Получаем компонент EnemyBattleCharacter на созданном объекте
+                EnemyBattleCharacter enemyChar = enemyObj.GetComponent<EnemyBattleCharacter>();
+                if (enemyChar != null)
+                {
+                    enemyChar.Init();
+                }
+                else
+                {
+                    Debug.LogWarning("Не удалось найти компонент EnemyBattleCharacter на созданном объекте врага.");
+                }
 
-                // После успешного размещения меняем состояние ячейки на занятую врагом.
-                chosenCell.occupant = bc; // bc – компонент BattleCharacter установленного персонажа
+                // Помечаем ячейку, что в ней размещён союзник
+                //chosenCell.occupant = enemyChar;
             }
             else
             {

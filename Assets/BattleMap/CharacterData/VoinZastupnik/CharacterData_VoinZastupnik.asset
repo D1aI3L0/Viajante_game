@@ -1,0 +1,143 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 25a5a8f1bc4921241b142bbee35775e9, type: 3}
+  m_Name: CharacterData_VoinZastupnik
+  m_EditorClassIdentifier: 
+  characterClass: 0
+  parameters:
+    maxHP: 180
+    currentHP: 180
+    DEF: 45
+    EVA: 12
+    PROV: 15
+    SPD: 120
+    SP: 100
+    SPreg: 15
+    SPmovecost: 5
+  availableSubclasses: 0000000001000000
+  weaponsCount: 2
+  weaponParameters:
+  - ATK: 40
+    ACC: 95
+    CRIT: 10
+    SE: 100
+    SEreg: 10
+    SEdec: 0
+  - ATK: 45
+    ACC: 90
+    CRIT: 12
+    SE: 100
+    SEreg: 10
+    SEdec: 0
+  weaponSkills:
+  - skills:
+    - skillName: 
+      description: 
+      minDamagePercentage: 0
+      maxDamagePercentage: 0
+      accuracyPercentage: 0
+      spCost: 0
+      seCost: 0
+      cooldownTurns: 0
+      criticalRatePercentage: 0
+      criticalHitMultiplier: 0
+    - skillName: 
+      description: 
+      minDamagePercentage: 0
+      maxDamagePercentage: 0
+      accuracyPercentage: 0
+      spCost: 0
+      seCost: 0
+      cooldownTurns: 0
+      criticalRatePercentage: 0
+      criticalHitMultiplier: 0
+    - skillName: 
+      description: 
+      minDamagePercentage: 0
+      maxDamagePercentage: 0
+      accuracyPercentage: 0
+      spCost: 0
+      seCost: 0
+      cooldownTurns: 0
+      criticalRatePercentage: 0
+      criticalHitMultiplier: 0
+    - skillName: 
+      description: 
+      minDamagePercentage: 0
+      maxDamagePercentage: 0
+      accuracyPercentage: 0
+      spCost: 0
+      seCost: 0
+      cooldownTurns: 0
+      criticalRatePercentage: 0
+      criticalHitMultiplier: 0
+    - skillName: 
+      description: 
+      minDamagePercentage: 0
+      maxDamagePercentage: 0
+      accuracyPercentage: 0
+      spCost: 0
+      seCost: 0
+      cooldownTurns: 0
+      criticalRatePercentage: 0
+      criticalHitMultiplier: 0
+  - skills:
+    - skillName: 
+      description: 
+      minDamagePercentage: 0
+      maxDamagePercentage: 0
+      accuracyPercentage: 0
+      spCost: 0
+      seCost: 0
+      cooldownTurns: 0
+      criticalRatePercentage: 0
+      criticalHitMultiplier: 0
+    - skillName: 
+      description: 
+      minDamagePercentage: 0
+      maxDamagePercentage: 0
+      accuracyPercentage: 0
+      spCost: 0
+      seCost: 0
+      cooldownTurns: 0
+      criticalRatePercentage: 0
+      criticalHitMultiplier: 0
+    - skillName: 
+      description: 
+      minDamagePercentage: 0
+      maxDamagePercentage: 0
+      accuracyPercentage: 0
+      spCost: 0
+      seCost: 0
+      cooldownTurns: 0
+      criticalRatePercentage: 0
+      criticalHitMultiplier: 0
+    - skillName: 
+      description: 
+      minDamagePercentage: 0
+      maxDamagePercentage: 0
+      accuracyPercentage: 0
+      spCost: 0
+      seCost: 0
+      cooldownTurns: 0
+      criticalRatePercentage: 0
+      criticalHitMultiplier: 0
+    - skillName: 
+      description: 
+      minDamagePercentage: 0
+      maxDamagePercentage: 0
+      accuracyPercentage: 0
+      spCost: 0
+      seCost: 0
+      cooldownTurns: 0
+      criticalRatePercentage: 0
+      criticalHitMultiplier: 0

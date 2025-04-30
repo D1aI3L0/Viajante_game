@@ -550,7 +550,7 @@ public class HexGrid : MonoBehaviour
 		}
 	}
 
-	bool Search(HexCell fromCell, HexCell toCell, Unit unit)
+	private bool Search(HexCell fromCell, HexCell toCell, Unit unit)
 	{
 		searchFrontierPhase += 2;
 
@@ -755,7 +755,7 @@ public class HexGrid : MonoBehaviour
 	//============================================================================================================
 	//                                          Область видимости 
 	//============================================================================================================
-	List<HexCell> GetVisibleCells(HexCell fromCell, int range)
+	private List<HexCell> GetVisibleCells(HexCell fromCell, int range)
 	{
 		List<HexCell> visibleCells = ListPool<HexCell>.Get();
 

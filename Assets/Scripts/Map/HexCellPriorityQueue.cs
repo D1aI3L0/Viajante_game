@@ -25,7 +25,7 @@ public class HexCellPriorityQueue
 			minimum = priority;
 		}
 
-		while (priority >= list.Count) //заполнение списка ничем чтоб не выйти за его границы
+		while (priority >= list.Count)
 		{
 			list.Add(null);
 		}

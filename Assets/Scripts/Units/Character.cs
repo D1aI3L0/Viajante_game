@@ -26,19 +26,16 @@ public struct Endurance
 public class OtherStats
 {
     public int initiative;
-    public int agro;
+    public int tount;
     public Endurance endurance;
 }
 
 
-public class Character : Unit
+[Serializable]
+public class Character
 {
     public string characterName;
-    public SurvivalStats currentSurvivalStats, maxSurvivalStats, baseSurvivalStats;
-    public OtherStats currentOtherStats, maxOtherStats, baseOtherStats;
-
-    override public bool IsValidDestination(HexCell cell)
-    {
-        return base.IsValidDestination(cell);
-    }
+    public int level = 1;
+    public SurvivalStats currentSurvivalStats, maxSurvivalStats;
+    public OtherStats currentOtherStats, maxOtherStats;
 }

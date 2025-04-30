@@ -15,33 +15,41 @@ public class SquadCreationUI : MonoBehaviour
     public Transform squadMembersPanel;
 
     [Header("Префабы")]
-    public CharacterSlot characterSlotPrefab;
+    public CharacterSlotBase characterSlotPrefab;
 
     [Header("Кнопки")]
     public Button createSquadButton;
     public Button cancelButton;
 
-    private Base currentBase;
     private List<PlayerCharacter> selectedCharacters = new List<PlayerCharacter>();
 
-    public void Initialize(Base playerBase)
+    public void Show()
     {
-        currentBase = playerBase;
+        enabled = true;
+        squadCreationPanel.SetActive(true);
+
         selectedCharacters.Clear();
         RefreshAvailableCharacters();
         RefreshSquadMembers();
         UpdateUI();
     }
 
+    public void Hide()
+    {
+        UIReferences.gameUI.enabled = true;
+        enabled = false;
+        squadCreationPanel.SetActive(false);
+    }
+
     void RefreshAvailableCharacters()
     {
         ClearPanel(availableCharactersPanel);
 
-        foreach (PlayerCharacter character in currentBase.availableCharacters)
+        foreach (PlayerCharacter character in Base.Instance.availableCharacters)
         {
             if (!selectedCharacters.Contains(character))
             {
-                CharacterSlot slot = Instantiate(characterSlotPrefab, availableCharactersPanel);
+                CharacterSlotBase slot = Instantiate(characterSlotPrefab, availableCharactersPanel);
                 slot.Initialize(character, this, false);
             }
         }
@@ -53,7 +61,7 @@ public class SquadCreationUI : MonoBehaviour
 
         foreach (PlayerCharacter character in selectedCharacters)
         {
-            CharacterSlot slot = Instantiate(characterSlotPrefab, squadMembersPanel);
+            CharacterSlotBase slot = Instantiate(characterSlotPrefab, squadMembersPanel);
             slot.Initialize(character, this, true);
         }
 
@@ -95,7 +103,7 @@ public class SquadCreationUI : MonoBehaviour
         HexCell cell = null;
         for (HexDirection d = HexDirection.NE; d <= HexDirection.NW; d++)
         {
-            HexCell neighbor = currentBase.Location.GetNeighbor(d);
+            HexCell neighbor = Base.Instance.Location.GetNeighbor(d);
             if (neighbor && Squad.SquadValidDestionation(neighbor) && !neighbor.HasUnit)
             {
                 cell = neighbor;
@@ -103,15 +111,9 @@ public class SquadCreationUI : MonoBehaviour
             }
         }
         if (cell)
-            currentBase.CreateSquad(cell, selectedCharacters);
+            Base.Instance.CreateSquad(cell, selectedCharacters);
         else
             Debug.LogWarning("No available cells to create squad");
-        ClosePanel();
-    }
-
-    public void ClosePanel()
-    {
-        UIReferences.gameUI.enabled = true;
-        this.GameObject().SetActive(false);
+        Hide();
     }
 }

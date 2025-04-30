@@ -1,9 +1,9 @@
 using System;
 using UnityEngine;
-using UnityEngine.UI;
 
 [Serializable]
-public class Item : MonoBehaviour
+public class Item
 {
-    public Image icon;
+    public string itemName;
+    public Sprite icon;
 }

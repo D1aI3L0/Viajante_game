@@ -3,21 +3,30 @@ using System.Collections.Generic;
 using System.Drawing;
 using UnityEngine;
 
+[Serializable]
 public class PlayerCharacter : Character
 {
-    public int level = 1;
-    public Equipment equipment;
+    public Equipment equipment = new();
+    public SurvivalStats baseSurvivalStats;
+    public OtherStats baseOtherStats;
+    [NonSerialized]
     public AttackStats currentAttack1Stats, currentAttack2Stats, maxAttack1Stats, maxAttack2Stats;
 
-    public void UpdateStats()
+    public void Initialize()
     {
-        UpdateSurvivalStats();
-        UpdateAttack1Stats();
-        UpdateAttack2Stats();
-        UpdateOtherStats();
+        equipment = new();
+        equipment.Initialize();
     }
 
-    public void UpdateSurvivalStats()
+    public void InitializeStats()
+    {
+        InitializeSurvivalStats();
+        InitializeAttack1Stats();
+        InitializeAttack2Stats();
+        InitializeOtherStats();
+    }
+
+    public void InitializeSurvivalStats()
     {
         maxSurvivalStats.health = baseSurvivalStats.health;
         currentSurvivalStats.health = maxSurvivalStats.health;
@@ -27,32 +36,32 @@ public class PlayerCharacter : Character
         currentSurvivalStats.evasion = maxSurvivalStats.evasion;
     }
 
-    public void UpdateAttack1Stats()
+    public void InitializeAttack1Stats()
     {
-        maxAttack1Stats.attack = (int)Math.Round(equipment.weapon1.attackStats.attack * (1 + equipment.weapon1.attackBonus / 100));
+        maxAttack1Stats.attack = equipment.weapon1.attackStats.attack;
         currentAttack1Stats.attack = maxAttack1Stats.attack;
-        maxAttack1Stats.accuracy = (int)Math.Round(equipment.weapon1.attackStats.accuracy * (1 + equipment.weapon1.accuracyBonus / 100));
+        maxAttack1Stats.accuracy = equipment.weapon1.attackStats.accuracy;
         currentAttack1Stats.accuracy = maxAttack1Stats.accuracy;
-        maxAttack1Stats.critRate = (int)Math.Round(equipment.weapon1.attackStats.critRate * (1 + equipment.weapon1.critBonus / 100));
+        maxAttack1Stats.critRate = equipment.weapon1.attackStats.critRate;
         currentAttack1Stats.critRate = maxAttack1Stats.critRate;
     }
     
-    public void UpdateAttack2Stats()
+    public void InitializeAttack2Stats()
     {
-        maxAttack2Stats.attack = (int)Math.Round(equipment.weapon2.attackStats.attack * (1 + equipment.weapon2.attackBonus / 100));
+        maxAttack2Stats.attack = equipment.weapon2.attackStats.attack;
         currentAttack2Stats.attack = maxAttack2Stats.attack;
-        maxAttack2Stats.accuracy = (int)Math.Round(equipment.weapon2.attackStats.accuracy * (1 + equipment.weapon2.accuracyBonus / 100));
+        maxAttack2Stats.accuracy = equipment.weapon2.attackStats.accuracy;
         currentAttack2Stats.accuracy = maxAttack2Stats.accuracy;
-        maxAttack2Stats.critRate = (int)Math.Round(equipment.weapon2.attackStats.critRate * (1 + equipment.weapon2.critBonus / 100));
+        maxAttack2Stats.critRate = equipment.weapon2.attackStats.critRate;
         currentAttack2Stats.critRate = maxAttack2Stats.critRate;
     }
 
-    public void UpdateOtherStats()
+    public void InitializeOtherStats()
     {
         maxOtherStats.initiative = baseOtherStats.initiative;
         currentOtherStats.initiative = maxOtherStats.initiative;
-        maxOtherStats.agro = baseOtherStats.agro;
-        currentOtherStats.agro = maxOtherStats.agro;
+        maxOtherStats.tount = baseOtherStats.tount;
+        currentOtherStats.tount = maxOtherStats.tount;
         maxOtherStats.endurance.amount = baseOtherStats.endurance.amount;
         currentOtherStats.endurance.amount = maxOtherStats.endurance.amount;
         maxOtherStats.endurance.regen = baseOtherStats.endurance.regen;

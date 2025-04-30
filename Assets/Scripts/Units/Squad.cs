@@ -12,6 +12,7 @@ public class Squad : Unit
     public List<Character> characters = new List<Character>();
     public SquadType squadType;
     private Base @base;
+    public Inventory inventory;
 
     public void Initialize(Base @base, List<PlayerCharacter> characters)
     {
@@ -23,6 +24,7 @@ public class Squad : Unit
                 this.characters.Add(characters[i]);
             }
         }
+        inventory = null;
     }
 
     public void Initialize(List<EnemyCharacter> characters)
@@ -31,14 +33,11 @@ public class Squad : Unit
         {
             this.characters.AddRange(characters);
         }
+        inventory = null;
     }
 
     public override void Die()
     {
-        for (int i = characters.Count - 1; i >= 0; i++)
-        {
-            characters[i].Die();
-        }
         base.Die();
     }
 
@@ -59,31 +58,24 @@ public class Squad : Unit
 
     override public void ResetStamina()
     {
-        for (int i = 0; i < characters.Count; i++)
-        {
-            characters[i].ResetStamina();
-        }
         base.ResetStamina();
     }
 
     override public void Travel(List<HexCell> path)
     {
-        for (int i = 0; i < characters.Count; i++)
-        {
-            characters[i].Stamina -= path[^1].Distance;
-        }
         base.Travel(path);
     }
 
     public void ReturnToBase()
     {
-        if (@base)
+        if (@base && squadType == SquadType.Player)
         {
             for (int i = 0; i < characters.Count; i++)
             {
                 if(characters[i] is PlayerCharacter playerCharacter)
                     @base.availableCharacters.Add(playerCharacter);
             }
+            @base.inventory.AddRange(inventory);
         }
         characters.Clear();
         Die();

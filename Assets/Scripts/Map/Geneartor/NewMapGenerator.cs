@@ -212,10 +212,10 @@ public class NewMapGenerator : MonoBehaviour
         if (connection == null || connection.Count != 0)
             connection = ListPool<HexCell>.Get();
 
-        int centerIndex = UnityEngine.Random.Range(0, cellsCopy.Count - 1);
+        int centerIndex = UnityEngine.Random.Range(0, cellsCopy.Count);
         HexCell centerCell = cellsCopy[centerIndex];
 
-        if (!CreateBorders(centerCell, biomePatterns[(int)mapType][biomeIndex].minMaxRadius, true, 1, new ConnectionParams(BiomeName.None, ConnectionType.BiomeBorder)))
+        if (!CreateBorders(centerCell, biomePatterns[(int)mapType][biomeIndex].minMaxRadius, true, 1, new ConnectionParams(ConnectionType.BiomeBorder, BiomeName.None)))
         {
             connection.Clear();
             return false;
@@ -598,7 +598,7 @@ public class NewMapGenerator : MonoBehaviour
             List<HexCell> subBorders = grid.GetCells((long)TerrainType.None, waterLevel);
             while (subBorders.Count > 0)
             {
-                HexCell cell = subBorders[UnityEngine.Random.Range(0, subBorders.Count - 1)];
+                HexCell cell = subBorders[UnityEngine.Random.Range(0, subBorders.Count)];
                 List<long> terrains = cell.GetNeigborsTerrains();
                 if (terrains.Count == 1)
                     cell.TerrainTypeIndex = terrains[0];
@@ -669,7 +669,7 @@ public class NewMapGenerator : MonoBehaviour
                     cellsCopy = biomes[0].GetBiomeCells(false);
                     for (int d = 0; d < j && biomes[0].settlementsCount < j; d++)
                     {
-                        int settlementType = UnityEngine.Random.Range(Math.Max(j - 2, (int)SettlementType.Village), Math.Min(j - 1, (int)SettlementType.City));
+                        int settlementType = UnityEngine.Random.Range(Math.Max(j - 2, (int)SettlementType.Village), Math.Min(j, (int)SettlementType.City));
                         GenerateSettlement(biomes[0], (SettlementType)settlementType);
                     }
                     biomes.RemoveAt(0);
@@ -689,7 +689,7 @@ public class NewMapGenerator : MonoBehaviour
         int iterations = 0;
         while (iterations++ < cellsCopy.Count)
         {
-            index = UnityEngine.Random.Range(0, cellsCopy.Count - 1);
+            index = UnityEngine.Random.Range(0, cellsCopy.Count);
             center = cellsCopy[index];
             if (CheckArea(center, (int)settlementType + 2 + (isCapital ? 1 : 0), checkAreaRules, null, biome.border) && !IsSettlementNearby(center, minSettlementsDistance))
                 break;
@@ -698,7 +698,7 @@ public class NewMapGenerator : MonoBehaviour
 
         if (center != null)
         {
-            if (!CreateBorders(center, settlementPatterns[(int)settlementType + (isCapital ? 1 : 0)].minMaxRadius, true, 0, new ConnectionParams(center.biomeName, ConnectionType.SettlementBorder)))
+            if (!CreateBorders(center, settlementPatterns[(int)settlementType + (isCapital ? 1 : 0)].minMaxRadius, true, 0, new ConnectionParams(ConnectionType.SettlementBorder, center.biomeName)))
             {
                 connection.Clear();
                 return false;
@@ -815,7 +815,7 @@ public class NewMapGenerator : MonoBehaviour
                 if (closSett == null)
                     continue;
 
-                ConnectCells(closSett.center, settlements[i].center, new ConnectionParams(true, ConnectionType.Roads), true);
+                ConnectCells(closSett.center, settlements[i].center, new ConnectionParams(ConnectionType.Roads, true), true);
 
                 for (int j = 0; j < connection.Count - 1; j++)
                 {
@@ -918,14 +918,14 @@ public class NewMapGenerator : MonoBehaviour
         public bool useCliffCheck;
         public ConnectionType connectionType;
 
-        public ConnectionParams(BiomeName biome, ConnectionType connectionType, bool useCliffCheck = false)
+        public ConnectionParams(ConnectionType connectionType, BiomeName biome, bool useCliffCheck = false)
         {
             searchedBorderBiome = biome;
             this.useCliffCheck = useCliffCheck;
             this.connectionType = connectionType;
         }
 
-        public ConnectionParams(bool useCliffCheck, ConnectionType connectionType, BiomeName biome = BiomeName.None)
+        public ConnectionParams(ConnectionType connectionType, bool useCliffCheck, BiomeName biome = BiomeName.None)
         {
             searchedBorderBiome = biome;
             this.useCliffCheck = useCliffCheck;
@@ -938,20 +938,19 @@ public class NewMapGenerator : MonoBehaviour
     delegate bool CornerBackRules(HexCell cell, BiomeName biomeName);
     CornerBackRules cornerBackRules;
 
-    enum ConnectionType
+    private enum ConnectionType
     {
         None,
         BiomeBorder,
         SettlementBorder,
         Roads
-
     }
 
-    bool CreateBorders(HexCell centerCell, MinMaxInt minMaxRadius, bool useSubCorners, int subCornersScale, ConnectionParams connectionParams)
+    private bool CreateBorders(HexCell centerCell, MinMaxInt minMaxRadius, bool useSubCorners, int subCornersScale, ConnectionParams connectionParams)
     {
         for (HexDirection d = HexDirection.NE; d <= HexDirection.NW; d++)
         {
-            int cornerDistance = UnityEngine.Random.Range(minMaxRadius.min, minMaxRadius.max);
+            int cornerDistance = UnityEngine.Random.Range(minMaxRadius.min, minMaxRadius.max + 1);
             HexCell corner = centerCell;
             for (int j = 0; j < cornerDistance; j++)
             {
@@ -979,8 +978,8 @@ public class NewMapGenerator : MonoBehaviour
                 }
                 else
                 {
-                    cornerDistance1 = UnityEngine.Random.Range(0, UnityEngine.Random.Range(minMaxRadius.min, minMaxRadius.max));
-                    cornerDistance2 = UnityEngine.Random.Range(0, UnityEngine.Random.Range(minMaxRadius.min, minMaxRadius.max));
+                    cornerDistance1 = UnityEngine.Random.Range(0, UnityEngine.Random.Range(minMaxRadius.min, minMaxRadius.max + 1));
+                    cornerDistance2 = UnityEngine.Random.Range(0, UnityEngine.Random.Range(minMaxRadius.min, minMaxRadius.max + 1));
                 }
 
                 for (int j = 0; j < cornerDistance1; j++)
@@ -1062,7 +1061,7 @@ public class NewMapGenerator : MonoBehaviour
         return true;
     }
 
-    bool ConnectCells(HexCell cell1, HexCell cell2, ConnectionParams connectionParams, bool includeCorners = false)
+    private bool ConnectCells(HexCell cell1, HexCell cell2, ConnectionParams connectionParams, bool includeCorners = false)
     {
         searchFrontierPhase += 2;
 

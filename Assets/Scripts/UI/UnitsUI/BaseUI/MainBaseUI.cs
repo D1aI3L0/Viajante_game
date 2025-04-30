@@ -7,7 +7,6 @@ public class MainBaseUI : MonoBehaviour
     [Header("Основные элементы")]
     public GameObject UIContainer;
     public RectTransform buttonGroup;
-    public float slideSpeed = 5f;
 
     [Header("Кнопки")]
     public Button createSquadBtn;
@@ -16,7 +15,7 @@ public class MainBaseUI : MonoBehaviour
 
     [Header("Подменю")]
     public SquadCreationUI squadCreationMenu;
-    public GameObject workshopMenu;
+    public WorkshopUI workshopMenu;
     public GameObject upgradeMenu;
 
     private Base currentBase;
@@ -24,8 +23,8 @@ public class MainBaseUI : MonoBehaviour
     void Start()
     {
         UIReferences.mainBaseUI = this;
-        squadCreationMenu.gameObject.SetActive(false);
-        if (workshopMenu) workshopMenu.SetActive(false);
+        squadCreationMenu.Hide();
+        if (workshopMenu) workshopMenu.Hide();
         if (upgradeMenu) upgradeMenu.SetActive(false);
         UIContainer.SetActive(false);
         enabled = false;
@@ -66,15 +65,14 @@ public class MainBaseUI : MonoBehaviour
     {
         CloseAllSubmenus();
         UIReferences.gameUI.enabled = false;
-        squadCreationMenu.gameObject.SetActive(true);
-        squadCreationMenu.Initialize(currentBase);
+        squadCreationMenu.Show();
     }
 
-    public void OpenManageMenu()
+    public void OpenWorkshopMenu()
     {
         CloseAllSubmenus();
         UIReferences.gameUI.enabled = false;
-        workshopMenu.SetActive(true);
+        workshopMenu.Show();
     }
 
     public void OpenUpgradeMenu()
@@ -87,8 +85,8 @@ public class MainBaseUI : MonoBehaviour
     void CloseAllSubmenus()
     {
         UIReferences.gameUI.enabled = true;
-        squadCreationMenu.gameObject.SetActive(false);
-        if (workshopMenu) workshopMenu.SetActive(false);
+        if (squadCreationMenu) squadCreationMenu.Hide();
+        if (workshopMenu) workshopMenu.Hide();
         if (upgradeMenu) upgradeMenu.SetActive(false);
     }
 }

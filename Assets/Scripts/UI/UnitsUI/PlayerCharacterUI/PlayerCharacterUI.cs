@@ -9,12 +9,12 @@ public class PlayerCharacterUI : MonoBehaviour
 {
     public GameObject UIContainer;
     public PerkSlot perkSlotPrefab;
-    public SkillSlot skillSlotPrefab;
+    public CharacterSkillSlot skillSlotPrefab;
 
     public GameObject armorCoreSlot, artifactSlot, weapon1Slot, weapon2Slot;
     public Transform skills1Container, skills2Container, positivePerksContainer, negativePerksContainer;
 
-    private List<SkillSlot> skill1 = new(), skill2 = new();
+    private List<CharacterSkillSlot> skill1 = new(), skill2 = new();
     private List<PerkSlot> positivePerks = new(), negativePerks = new();
 
     public TMP_Text healthLabel, defenceLabel, evasionLabel, attackLabel, accurancyLabel, critLabel, enduranceAmountLabel, enduranceRegenLabel, enduranceMoveCostLabel, initiativeLabel, agroLabel;
@@ -98,6 +98,6 @@ public class PlayerCharacterUI : MonoBehaviour
         enduranceRegenLabel.text = $"{playerCharacter.currentOtherStats.endurance.regen}";
         enduranceMoveCostLabel.text = $"{playerCharacter.currentOtherStats.endurance.moveCost}";
         initiativeLabel.text = $"{playerCharacter.currentOtherStats.initiative}";
-        agroLabel.text = $"{playerCharacter.currentOtherStats.agro}";
+        agroLabel.text = $"{playerCharacter.currentOtherStats.tount}";
     }
 }

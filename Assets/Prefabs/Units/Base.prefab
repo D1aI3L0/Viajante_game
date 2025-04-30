@@ -156,7 +156,229 @@ MonoBehaviour:
   maxStamina: 24
   stamina: 24
   characters:
-  - {fileID: -616196469992547698, guid: 099dfd122401ba644827171109936274, type: 3}
-  - {fileID: 140681650647250043, guid: 7c7e69c32cdf76b41a63dd8485241e78, type: 3}
-  - {fileID: 4595255229866826387, guid: 3305782688fdd5a4ab66b6ed00586f17, type: 3}
+  - characterName: Character 1
+    level: 1
+    currentSurvivalStats:
+      health: 0
+      defence: 0
+      evasion: 0
+    maxSurvivalStats:
+      health: 0
+      defence: 0
+      evasion: 0
+    currentOtherStats:
+      initiative: 0
+      tount: 0
+      endurance:
+        amount: 0
+        regen: 0
+        moveCost: 0
+    maxOtherStats:
+      initiative: 0
+      tount: 0
+      endurance:
+        amount: 0
+        regen: 0
+        moveCost: 0
+    equipment:
+      weapon1:
+        itemName: 
+        icon: {fileID: 0}
+        attackStats:
+          attack: 0
+          accuracy: 0
+          critRate: 0
+      weapon2:
+        itemName: 
+        icon: {fileID: 0}
+        attackStats:
+          attack: 0
+          accuracy: 0
+          critRate: 0
+      armorCore:
+        itemName: 
+        icon: {fileID: 0}
+        rarity: 0
+        hiddenType: 0
+        upgrades: []
+      artifact:
+        itemName: 
+        icon: {fileID: 0}
+    baseSurvivalStats:
+      health: 0
+      defence: 0
+      evasion: 0
+    baseOtherStats:
+      initiative: 0
+      tount: 0
+      endurance:
+        amount: 0
+        regen: 0
+        moveCost: 0
+    currentAttack1Stats:
+      attack: 0
+      accuracy: 0
+      critRate: 0
+    currentAttack2Stats:
+      attack: 0
+      accuracy: 0
+      critRate: 0
+    maxAttack1Stats:
+      attack: 0
+      accuracy: 0
+      critRate: 0
+    maxAttack2Stats:
+      attack: 0
+      accuracy: 0
+      critRate: 0
+  - characterName: Character 2
+    level: 1
+    currentSurvivalStats:
+      health: 0
+      defence: 0
+      evasion: 0
+    maxSurvivalStats:
+      health: 0
+      defence: 0
+      evasion: 0
+    currentOtherStats:
+      initiative: 0
+      tount: 0
+      endurance:
+        amount: 0
+        regen: 0
+        moveCost: 0
+    maxOtherStats:
+      initiative: 0
+      tount: 0
+      endurance:
+        amount: 0
+        regen: 0
+        moveCost: 0
+    equipment:
+      weapon1:
+        itemName: 
+        icon: {fileID: 0}
+        attackStats:
+          attack: 0
+          accuracy: 0
+          critRate: 0
+      weapon2:
+        itemName: 
+        icon: {fileID: 0}
+        attackStats:
+          attack: 0
+          accuracy: 0
+          critRate: 0
+      armorCore:
+        itemName: 
+        icon: {fileID: 0}
+        rarity: 0
+        hiddenType: 0
+        upgrades: []
+      artifact:
+        itemName: 
+        icon: {fileID: 0}
+    baseSurvivalStats:
+      health: 0
+      defence: 0
+      evasion: 0
+    baseOtherStats:
+      initiative: 0
+      tount: 0
+      endurance:
+        amount: 0
+        regen: 0
+        moveCost: 0
+    currentAttack1Stats:
+      attack: 0
+      accuracy: 0
+      critRate: 0
+    currentAttack2Stats:
+      attack: 0
+      accuracy: 0
+      critRate: 0
+    maxAttack1Stats:
+      attack: 0
+      accuracy: 0
+      critRate: 0
+    maxAttack2Stats:
+      attack: 0
+      accuracy: 0
+      critRate: 0
+  - characterName: Character 3
+    level: 1
+    currentSurvivalStats:
+      health: 0
+      defence: 0
+      evasion: 0
+    maxSurvivalStats:
+      health: 0
+      defence: 0
+      evasion: 0
+    currentOtherStats:
+      initiative: 0
+      tount: 0
+      endurance:
+        amount: 0
+        regen: 0
+        moveCost: 0
+    maxOtherStats:
+      initiative: 0
+      tount: 0
+      endurance:
+        amount: 0
+        regen: 0
+        moveCost: 0
+    equipment:
+      weapon1:
+        itemName: 
+        icon: {fileID: 0}
+        attackStats:
+          attack: 0
+          accuracy: 0
+          critRate: 0
+      weapon2:
+        itemName: 
+        icon: {fileID: 0}
+        attackStats:
+          attack: 0
+          accuracy: 0
+          critRate: 0
+      armorCore:
+        itemName: 
+        icon: {fileID: 0}
+        rarity: 0
+        hiddenType: 0
+        upgrades: []
+      artifact:
+        itemName: 
+        icon: {fileID: 0}
+    baseSurvivalStats:
+      health: 0
+      defence: 0
+      evasion: 0
+    baseOtherStats:
+      initiative: 0
+      tount: 0
+      endurance:
+        amount: 0
+        regen: 0
+        moveCost: 0
+    currentAttack1Stats:
+      attack: 0
+      accuracy: 0
+      critRate: 0
+    currentAttack2Stats:
+      attack: 0
+      accuracy: 0
+      critRate: 0
+    maxAttack1Stats:
+      attack: 0
+      accuracy: 0
+      critRate: 0
+    maxAttack2Stats:
+      attack: 0
+      accuracy: 0
+      critRate: 0
   availableCharacters: []

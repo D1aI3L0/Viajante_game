@@ -4,16 +4,10 @@ using UnityEngine;
 public class WorkshopUI : MonoBehaviour
 {
     public static WorkshopUI Instance { get; private set; }
-    
-    [Header("UI References")]
-    public EquipmentUpgradeUI upgradeUI;
-    
-    [Header("Materials")]
-    public int upgradeMaterialAmount = 100;
-    
-    private PlayerCharacter selectedCharacter;
-    private Item selectedItem;
-    
+
+    public GameObject UIContainer;
+    public EquipmentUpgradeUI equipmentUpgradeUI;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -21,45 +15,34 @@ public class WorkshopUI : MonoBehaviour
             Destroy(this);
             return;
         }
-        
+
         Instance = this;
+        CloseAllSubmenus();
     }
-    
-    public void OpenWorkshop(PlayerCharacter character)
+
+    public void Show()
     {
-        selectedCharacter = character;
-        upgradeUI.Show(character);
+        enabled = true;
+        UIContainer.SetActive(true);
+        CloseAllSubmenus();
     }
-    
-    public void SelectItem(Item item)
+
+    public void Hide()
     {
-        selectedItem = item;
-        upgradeUI.ShowItemDetails(item);
+        UIReferences.gameUI.enabled = true;
+        enabled = false;
+        UIContainer.SetActive(false);
+        CloseAllSubmenus();
     }
-    
-    public void TryUpgradeItem()
+
+    public void OpenUpgradeUI()
     {
-        if (selectedItem == null) return;
-        
-        if (selectedItem is IUpgradable upgradableItem)
-        {
-            if (upgradeMaterialAmount >= upgradableItem.GetUpgradeCost())
-            {
-                upgradeMaterialAmount -= upgradableItem.GetUpgradeCost();
-                upgradableItem.Upgrade();
-                upgradeUI.ShowItemDetails(selectedItem);
-                upgradeUI.UpdateMaterialsDisplay(upgradeMaterialAmount);
-            }
-            else
-            {
-                Debug.Log("Not enough materials!");
-            }
-        }
+        CloseAllSubmenus();
+        equipmentUpgradeUI.Show();
     }
-    
-    public void AddMaterials(int amount)
+
+    private void CloseAllSubmenus()
     {
-        upgradeMaterialAmount += amount;
-        upgradeUI.UpdateMaterialsDisplay(upgradeMaterialAmount);
+        equipmentUpgradeUI.Hide();
     }
 }

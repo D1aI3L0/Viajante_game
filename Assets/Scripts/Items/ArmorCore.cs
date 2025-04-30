@@ -24,41 +24,13 @@ public class ArmorCore : Item, IUpgradable
 
     public Rarity rarity;
     public HiddenType hiddenType;
-    public int currentLevel;
-    public int maxLevel;
 
-    public int CurrentLevel => currentLevel;
-    public int MaxLevel => maxLevel;
+    [SerializeField]
+    private List<ArmorCoreUpgrade> upgrades = new();
 
-    public int GetUpgradeCost()
-    {
-        return currentLevel * 10 * ((int)rarity + 1);
-    }
-    
-    public void Upgrade()
-    {
-        if (currentLevel >= maxLevel) return;
-        
-        if (TryUpgrade(out var newUpgrade))
-        {
-            
-        }
-    }
-    
-    public string GetUpgradeDescription()
-    {
-        return $"Уровень: {currentLevel}/{maxLevel}\n" +
-               $"Редкость: {rarity}\n" +
-               $"Тип: {hiddenType}\n" +
-               $"Бонусы:\n" +
-               $"Здоровье: +{HealthBonus}%\n" +
-               $"Защита: +{DefenceBonus}%\n" +
-               $"Уклонение: +{EvasionBonus}%";
-    }
-    
-    [SerializeField] 
-    private List<ArmorCoreUpgrade> upgrades = new List<ArmorCoreUpgrade>();
-    
+    public const int xUpgradeMax = 15;
+    public const int yUpgradeMax = 15;
+
     public float HealthBonus { get; private set; }
     public float DefenceBonus { get; private set; }
     public float EvasionBonus { get; private set; }
@@ -81,38 +53,44 @@ public class ArmorCore : Item, IUpgradable
         { Rarity.Legendary, 0.05f }
     };
 
-    private static readonly Dictionary<HiddenType, Dictionary<SurvivalStatType, float>> StatProbabilities = 
+    private const float burnChance = 0.5f;
+
+    private static readonly Dictionary<HiddenType, Dictionary<SurvivalStatType, float>> StatProbabilities =
         new Dictionary<HiddenType, Dictionary<SurvivalStatType, float>>()
     {
         {
             HiddenType.Balanced, new Dictionary<SurvivalStatType, float>()
             {
+                { SurvivalStatType.Balanced, 0.01f },
                 { SurvivalStatType.Health, 0.33f },
                 { SurvivalStatType.Defence, 0.33f },
-                { SurvivalStatType.Evasion, 0.34f }
+                { SurvivalStatType.Evasion, 0.33f }
             }
         },
         {
             HiddenType.HealthFocused, new Dictionary<SurvivalStatType, float>()
             {
+                { SurvivalStatType.Balanced, 0.1f },
                 { SurvivalStatType.Health, 0.6f },
-                { SurvivalStatType.Defence, 0.2f },
-                { SurvivalStatType.Evasion, 0.2f }
+                { SurvivalStatType.Defence, 0.175f },
+                { SurvivalStatType.Evasion, 0.175f }
             }
         },
         {
             HiddenType.DefenceFocused, new Dictionary<SurvivalStatType, float>()
             {
-                { SurvivalStatType.Health, 0.2f },
+                { SurvivalStatType.Balanced, 0.05f },
+                { SurvivalStatType.Health, 0.175f },
                 { SurvivalStatType.Defence, 0.6f },
-                { SurvivalStatType.Evasion, 0.2f }
+                { SurvivalStatType.Evasion, 0.175f }
             }
         },
         {
             HiddenType.EvasionFocused, new Dictionary<SurvivalStatType, float>()
             {
-                { SurvivalStatType.Health, 0.2f },
-                { SurvivalStatType.Defence, 0.2f },
+                { SurvivalStatType.Balanced, 0.05f },
+                { SurvivalStatType.Health, 0.175f },
+                { SurvivalStatType.Defence, 0.175f },
                 { SurvivalStatType.Evasion, 0.6f }
             }
         }
@@ -120,16 +98,17 @@ public class ArmorCore : Item, IUpgradable
 
     public void Initialize()
     {
+        hiddenType = HiddenType.Balanced;
         var centerUpgrade = new ArmorCoreUpgrade()
         {
             gridPosition = Vector2Int.zero,
-            statType = SurvivalStatType.Health,
+            statType = SurvivalStatType.Balanced,
             bonusValue = 0,
             isBurned = false
         };
-        
+
         upgrades.Add(centerUpgrade);
-        currentLevel = 1;
+        CurrentLevel = 1;
         CalculateBonuses();
     }
 
@@ -138,18 +117,18 @@ public class ArmorCore : Item, IUpgradable
         newUpgrade = null;
 
         var possiblePositions = GetPossibleUpgradePositions();
-        
+
         if (possiblePositions.Count == 0)
             return false;
 
         var randomPosition = possiblePositions[UnityEngine.Random.Range(0, possiblePositions.Count)];
-        
+
         var statType = ChooseRandomStatType();
-        
+
         int bonusValue = CalculateBonusValue();
-        
+
         bool isBurned = CheckForBurn();
-        
+
         newUpgrade = new ArmorCoreUpgrade()
         {
             gridPosition = randomPosition,
@@ -157,11 +136,11 @@ public class ArmorCore : Item, IUpgradable
             bonusValue = bonusValue,
             isBurned = isBurned
         };
-        
+
         upgrades.Add(newUpgrade);
-        currentLevel++;
-        CalculateBonuses();
-        
+        CurrentLevel++;
+        AddNewBonuses(newUpgrade);
+
         return true;
     }
 
@@ -169,38 +148,35 @@ public class ArmorCore : Item, IUpgradable
     {
         var possiblePositions = new List<Vector2Int>();
         var occupiedPositions = new HashSet<Vector2Int>();
-        
+
         foreach (var upgrade in upgrades)
         {
             if (upgrade.isBurned) continue;
-            
+
             occupiedPositions.Add(upgrade.gridPosition);
-            
-            var neighbors = GetHexNeighbors(upgrade.gridPosition);
-            
-            foreach (var neighbor in neighbors)
+
+            var neighborPositions = upgrade.GetHexNeighbors();
+
+            foreach (var neighborPosition in neighborPositions)
             {
-                if (!occupiedPositions.Contains(neighbor) && !possiblePositions.Contains(neighbor))
+                if (!occupiedPositions.Contains(neighborPosition) && !possiblePositions.Contains(neighborPosition) && CheckPosition(neighborPosition))
                 {
-                    possiblePositions.Add(neighbor);
+                    possiblePositions.Add(neighborPosition);
                 }
             }
         }
-        
+
         return possiblePositions;
     }
 
-    private Vector2Int[] GetHexNeighbors(Vector2Int position)
+    private bool CheckPosition(Vector2Int position)
     {
-        return new Vector2Int[]
+        foreach (ArmorCoreUpgrade upgrade in upgrades)
         {
-            position + new Vector2Int(1, 0),
-            position + new Vector2Int(1, -1),
-            position + new Vector2Int(0, -1),
-            position + new Vector2Int(-1, 0),
-            position + new Vector2Int(-1, 1),
-            position + new Vector2Int(0, 1)
-        };
+            if (upgrade.gridPosition.Equals(position) || position.x > xUpgradeMax || position.x < -xUpgradeMax || position.y > yUpgradeMax || position.y < -yUpgradeMax)
+                return false;
+        }
+        return true;
     }
 
     private SurvivalStatType ChooseRandomStatType()
@@ -208,31 +184,31 @@ public class ArmorCore : Item, IUpgradable
         float randomValue = UnityEngine.Random.value;
         float cumulative = 0f;
         var probabilities = StatProbabilities[hiddenType];
-        
+
         foreach (var kvp in probabilities)
         {
             cumulative += kvp.Value;
             if (randomValue <= cumulative)
                 return kvp.Key;
         }
-        
-        return SurvivalStatType.Health;
+
+        return SurvivalStatType.Balanced;
     }
 
     private int CalculateBonusValue()
     {
-        int rarityBonus = (int)rarity * 2;
+        int rarityBonus = (int)rarity;
         int randomBonus = UnityEngine.Random.Range(1, 4);
-        
+
         return rarityBonus + randomBonus;
     }
 
     private bool CheckForBurn()
     {
-        if (currentLevel < BurnThresholds[rarity])
+        if (CurrentLevel < BurnThresholds[rarity])
             return false;
-        
-        return UnityEngine.Random.value <= BurnChances[rarity];
+
+        return UnityEngine.Random.value <= (burnChance * (CurrentLevel / BurnThresholds[rarity]));
     }
 
     private void CalculateBonuses()
@@ -240,11 +216,11 @@ public class ArmorCore : Item, IUpgradable
         HealthBonus = 0;
         DefenceBonus = 0;
         EvasionBonus = 0;
-        
+
         foreach (var upgrade in upgrades)
         {
             if (upgrade.isBurned) continue;
-            
+
             switch (upgrade.statType)
             {
                 case SurvivalStatType.Health:
@@ -256,12 +232,66 @@ public class ArmorCore : Item, IUpgradable
                 case SurvivalStatType.Evasion:
                     EvasionBonus += upgrade.bonusValue;
                     break;
+                default:
+                    HealthBonus += upgrade.bonusValue;
+                    DefenceBonus += upgrade.bonusValue;
+                    EvasionBonus += upgrade.bonusValue;
+                    break;
             }
+        }
+    }
+
+    private void AddNewBonuses(ArmorCoreUpgrade upgrade)
+    {
+        if (upgrade.isBurned) return;
+
+        switch (upgrade.statType)
+        {
+            case SurvivalStatType.Health:
+                HealthBonus += upgrade.bonusValue;
+                break;
+            case SurvivalStatType.Defence:
+                DefenceBonus += upgrade.bonusValue;
+                break;
+            case SurvivalStatType.Evasion:
+                EvasionBonus += upgrade.bonusValue;
+                break;
+            default:
+                HealthBonus += upgrade.bonusValue;
+                DefenceBonus += upgrade.bonusValue;
+                EvasionBonus += upgrade.bonusValue;
+                break;
         }
     }
 
     public List<ArmorCoreUpgrade> GetUpgrades()
     {
         return new List<ArmorCoreUpgrade>(upgrades);
+    }
+    //=================================================================================================
+    //                                      IUpgradable
+    //=================================================================================================
+    public int CurrentLevel { get; private set; }
+
+    public int GetUpgradeCost()
+    {
+        return CurrentLevel * 10 * ((int)rarity + 1);
+    }
+
+    public void Upgrade(out Upgrade upgrade)
+    {
+        TryUpgrade(out ArmorCoreUpgrade newUpgrade);
+        upgrade = newUpgrade;
+    }
+
+    public string GetUpgradeDescription()
+    {
+        return $"Уровень: {CurrentLevel}\n" +
+               $"Редкость: {rarity}\n" +
+               $"Тип: {hiddenType}\n" +
+               $"Бонусы:\n" +
+               $"Здоровье: +{HealthBonus}%\n" +
+               $"Защита: +{DefenceBonus}%\n" +
+               $"Уклонение: +{EvasionBonus}%";
     }
 }

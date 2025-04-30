@@ -3,19 +3,22 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
+
 public class Base : Unit
 {
     public static Base Instance;
     public static Base basePrefab;
     public List<PlayerCharacter> characters;
-    public List<PlayerCharacter> availableCharacters = new List<PlayerCharacter>();
+    public List<PlayerCharacter> availableCharacters = new();
+
+    public Inventory inventory = new();
 
     public void Initialise()
     {
+        availableCharacters.AddRange(characters);
         for (int i = 0; i < characters.Count; i++)
         {
-            characters[i].UpdateStats();
-            availableCharacters.Add(characters[i]);
+            characters[i].Initialize();
         }
         Instance = this;
     }

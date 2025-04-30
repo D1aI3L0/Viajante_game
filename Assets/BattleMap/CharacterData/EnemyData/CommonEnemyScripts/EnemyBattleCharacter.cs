@@ -3,7 +3,6 @@ using UnityEngine;
 public class EnemyBattleCharacter : BattleEntity
 {
     public override bool IsEnemy => true;
-    public bool isEnemyTurn = false; // Можно заменить общим свойством isActiveTurn из BattleEntity, если хочешь унифицировать.
     
     // Вражеские параметры, специфичные для них
     public int baseATK = 35;

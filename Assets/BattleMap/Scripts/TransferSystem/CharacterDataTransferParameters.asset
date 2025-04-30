@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 23da6f7d0f73d1c46b9f7e2cb75866be, type: 3}
   m_Name: CharacterDataTransferParameters
   m_EditorClassIdentifier: 
-  numberOfCharacters: 2
+  numberOfCharacters: 3
   characters:
   - characterClass: 0
     selectedSubclassIndices: 0000000001000000
@@ -401,4 +401,4 @@ MonoBehaviour:
   baseCharacterData:
   - {fileID: 11400000, guid: 712d2251579b797488c0eda6201dff33, type: 2}
   - {fileID: 11400000, guid: 51bed3ec0c6e9854089ab52251558654, type: 2}
-  - {fileID: 0}
+  - {fileID: 11400000, guid: 712d2251579b797488c0eda6201dff33, type: 2}

@@ -65,11 +65,11 @@ public class BattleMapCamera : MonoBehaviour
         // Обрабатываем альтернативное управление зумом клавиатурой:
         if (Input.GetKey(KeyCode.KeypadPlus) || Input.GetKey(KeyCode.Equals))
         {
-            zoomDelta += keyboardZoomSpeed * Time.deltaTime; // Плавное увеличение зума
+            zoomDelta -= keyboardZoomSpeed * Time.deltaTime; // Плавное увеличение зума
         }
         if (Input.GetKey(KeyCode.KeypadMinus) || Input.GetKey(KeyCode.Minus))
         {
-            zoomDelta -= keyboardZoomSpeed * Time.deltaTime; // Плавное уменьшение зума
+            zoomDelta += keyboardZoomSpeed * Time.deltaTime; // Плавное уменьшение зума
         }
 
         if (Mathf.Abs(zoomDelta) > 0f)

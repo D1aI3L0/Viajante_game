@@ -246,15 +246,15 @@ public class BattleMapManager : MonoBehaviour
                 // Создаём экземпляр объекта
                 GameObject allyObj = Instantiate(prefab, chosenCell.transform.position, Quaternion.LookRotation(Vector3.forward));
 
-                // Инициализируем экземпляр, если у него есть компонент BattleCharacter
-                BattleCharacter ally = allyObj.GetComponent<BattleCharacter>();
-                if (ally != null)
+                // Инициализируем экземпляр, если у него есть компонент AllyBattleCharacter
+                AllyBattleCharacter allyChar = allyObj.GetComponent<AllyBattleCharacter>();
+                if (allyChar != null)
                 {
-                    ally.Init(runtimeParams);
+                    allyChar.Init(runtimeParams);
                 }
 
                 // Помечаем ячейку, что в ней размещён союзник
-                chosenCell.occupant = ally; // ally – компонент BattleCharacter установленного персонажа
+                chosenCell.occupant = allyChar; // ally – компонент AllyBattleCharacter установленного персонажа
             }
             else
             {
@@ -286,7 +286,7 @@ public class BattleMapManager : MonoBehaviour
                 }
 
                 // Помечаем ячейку, что в ней размещён союзник
-                //chosenCell.occupant = enemyChar;
+                chosenCell.occupant = enemyChar;
             }
             else
             {

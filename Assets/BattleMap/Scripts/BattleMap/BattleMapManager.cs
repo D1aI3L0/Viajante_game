@@ -251,10 +251,9 @@ public class BattleMapManager : MonoBehaviour
                 if (allyChar != null)
                 {
                     allyChar.Init(runtimeParams);
-                }
-
-                // Помечаем ячейку, что в ней размещён союзник
-                chosenCell.occupant = allyChar; // ally – компонент AllyBattleCharacter установленного персонажа
+                    BattleManager.Instance.RegisterAlly(allyChar);
+                    chosenCell.occupant = allyChar;
+                }                
             }
             else
             {
@@ -279,14 +278,14 @@ public class BattleMapManager : MonoBehaviour
                 if (enemyChar != null)
                 {
                     enemyChar.Init();
+                    BattleManager.Instance.RegisterEnemy(enemyChar);
+                    chosenCell.occupant = enemyChar;
                 }
                 else
                 {
                     Debug.LogWarning("Не удалось найти компонент EnemyBattleCharacter на созданном объекте врага.");
                 }
-
-                // Помечаем ячейку, что в ней размещён союзник
-                chosenCell.occupant = enemyChar;
+                
             }
             else
             {

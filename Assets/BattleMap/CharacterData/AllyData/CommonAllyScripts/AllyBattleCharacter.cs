@@ -82,6 +82,6 @@ public class AllyBattleCharacter : BattleEntity
         selectedSkillIndices = (int[])runtimeParams.selectedSkillIndices.Clone();
         weaponSkills = runtimeParams.weaponSkills;
         
-        Debug.LogFormat("BattleCharacter initialized: Class = {0}, HP = {1}/{2}", characterClass, currentHP, maxHP);
+        Debug.LogFormat("BattleCharacter initialized: Class = {0}", characterClass);
     }
 }

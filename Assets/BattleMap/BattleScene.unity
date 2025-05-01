@@ -1925,7 +1925,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f94156d21d2220d448043ebe7d8cfd0e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  allEntities: []
+  Allies: []
+  Enemies: []
   turnManager: {fileID: 1056172042}
 --- !u!4 &910027363
 Transform:
@@ -2124,6 +2125,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   participants: []
+  turnThreshold: 100
+  battleActive: 1
+  updateInterval: 0.1
+  currentActiveUnit: {fileID: 0}
 --- !u!1 &1268497552
 GameObject:
   m_ObjectHideFlags: 0

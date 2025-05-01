@@ -251,9 +251,12 @@ public class BattleMapManager : MonoBehaviour
                 if (allyChar != null)
                 {
                     allyChar.Init(runtimeParams);
+                    // Регистрируем юнита в BattleManager
                     BattleManager.Instance.RegisterAlly(allyChar);
+                    // Регистрируем юнита в TurnManager
+                    TurnManager.Instance.RegisterParticipant(allyChar);
                     chosenCell.occupant = allyChar;
-                }                
+                }
             }
             else
             {
@@ -262,30 +265,33 @@ public class BattleMapManager : MonoBehaviour
         }
     }
 
+
     void PlaceEnemies()
     {
         for (int i = 0; i < EnemyCount; i++)
         {
-            // Используем метод для врагов, чтобы выбрать ячейку из последних дву рядов
+            // Выбираем ячейку для врага
             BattleCell chosenCell = ChooseRandomCellForEnemy();
             if (chosenCell != null)
             {
-                // Создаем префаб врага в позиции выбранной ячейки и ориентируем его так, чтобы он смотрел в сторону союзников
+                // Создаём экземпляр врага
                 GameObject enemyObj = Instantiate(enemyPrefab, chosenCell.transform.position, Quaternion.LookRotation(Vector3.back));
 
-                // Получаем компонент EnemyBattleCharacter на созданном объекте
+                // Получаем компонент EnemyBattleCharacter
                 EnemyBattleCharacter enemyChar = enemyObj.GetComponent<EnemyBattleCharacter>();
                 if (enemyChar != null)
                 {
                     enemyChar.Init();
+                    // Регистрируем врага в BattleManager
                     BattleManager.Instance.RegisterEnemy(enemyChar);
+                    // Регистрируем врага в TurnManager
+                    TurnManager.Instance.RegisterParticipant(enemyChar);
                     chosenCell.occupant = enemyChar;
                 }
                 else
                 {
                     Debug.LogWarning("Не удалось найти компонент EnemyBattleCharacter на созданном объекте врага.");
                 }
-                
             }
             else
             {
@@ -293,6 +299,7 @@ public class BattleMapManager : MonoBehaviour
             }
         }
     }
+
 
     // Выбирает случайную свободную ячейку для союзника среди ячеек в первых двух рядах (z = 0 и 1)
     BattleCell ChooseRandomCellForAlly()

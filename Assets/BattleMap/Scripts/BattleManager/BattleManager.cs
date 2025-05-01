@@ -49,13 +49,19 @@ public class BattleManager : MonoBehaviour
         }
     }
 
+    public void SetActiveUnit(BattleEntity entity)
+    {
+
+    }
+
+    // --- начало-окончание боя ---
     public void StartBattle()
     {
         Debug.Log("Бой начался");
         if (turnManager != null)
         {
-            turnManager.BuildTurnOrder();
-            turnManager.SetActiveTurn(0);
+            //turnManager.BuildTurnOrder();
+            //turnManager.SetActiveTurn(0);
         }
     }
 

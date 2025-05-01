@@ -2,8 +2,9 @@ using UnityEngine;
 
 public class BattleEntity : MonoBehaviour
 {
-    // Флаг, указывающий, является ли эта единица активной в текущем ходе
+    // Параметры, связанные с ходом персонажа
     public bool isActiveTurn = false;
+    public float turnGauge = 0f;
 
     public virtual bool IsEnemy => false; // По умолчанию юнит не является врагом.
     public virtual bool IsAlly => !IsEnemy; // Юнит считается союзником, если не является врагом.

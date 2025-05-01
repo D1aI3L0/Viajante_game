@@ -10,6 +10,8 @@ public class RecruitingUI : MonoBehaviour
 
     private List<PlayerCharacter> recruitingCharacters = new();
 
+    public List<BasicCharacterTemplates> characterTemplates;
+
     public void Awake()
     {
         Instance = this;

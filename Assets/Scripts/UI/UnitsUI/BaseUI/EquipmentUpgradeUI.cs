@@ -99,6 +99,7 @@ public class EquipmentUpgradeUI : MonoBehaviour
         HideSelectionPanel();
         ClearHexGrid();
         HideCharacterEquipment();
+        resetUpgradesButton.gameObject.SetActive(false);
     }
 
     void ClearPanel(Transform panel)
@@ -293,6 +294,7 @@ public class EquipmentUpgradeUI : MonoBehaviour
     private void ShowItemDetails()
     {
         HideSelectionPanel();
+        resetUpgradesButton.gameObject.SetActive(false);
 
         upgradeButton.gameObject.SetActive(true);
         upgradeGridPanel.SetActive(false);

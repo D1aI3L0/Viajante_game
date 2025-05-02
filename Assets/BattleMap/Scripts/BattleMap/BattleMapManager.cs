@@ -246,15 +246,17 @@ public class BattleMapManager : MonoBehaviour
                 // Создаём экземпляр объекта
                 GameObject allyObj = Instantiate(prefab, chosenCell.transform.position, Quaternion.LookRotation(Vector3.forward));
 
-                // Инициализируем экземпляр, если у него есть компонент BattleCharacter
-                BattleCharacter bc = allyObj.GetComponent<BattleCharacter>();
-                if (bc != null)
+                // Инициализируем экземпляр, если у него есть компонент AllyBattleCharacter
+                AllyBattleCharacter allyChar = allyObj.GetComponent<AllyBattleCharacter>();
+                if (allyChar != null)
                 {
-                    bc.Init(runtimeParams);
+                    allyChar.Init(runtimeParams);
+                    // Регистрируем юнита в BattleManager
+                    BattleManager.Instance.RegisterAlly(allyChar);
+                    // Регистрируем юнита в TurnManager
+                    TurnManager.Instance.RegisterParticipant(allyChar);
+                    chosenCell.occupant = allyChar;
                 }
-
-                // Помечаем ячейку, что в ней размещён союзник
-                chosenCell.occupant = bc; // bc – компонент BattleCharacter установленного персонажа
             }
             else
             {
@@ -263,22 +265,33 @@ public class BattleMapManager : MonoBehaviour
         }
     }
 
+
     void PlaceEnemies()
     {
         for (int i = 0; i < EnemyCount; i++)
         {
-            // Используем метод для врагов, чтобы выбрать ячейку из последних дву рядов
+            // Выбираем ячейку для врага
             BattleCell chosenCell = ChooseRandomCellForEnemy();
             if (chosenCell != null)
             {
-                // Создаем префаб врага в позиции выбранной ячейки и ориентируем его так, чтобы он смотрел в сторону союзников
+                // Создаём экземпляр врага
                 GameObject enemyObj = Instantiate(enemyPrefab, chosenCell.transform.position, Quaternion.LookRotation(Vector3.back));
 
-                // Получаем компонент BattleCharacter на созданном объекте
-                BattleCharacter bc = enemyObj.GetComponent<BattleCharacter>();
-
-                // После успешного размещения меняем состояние ячейки на занятую врагом.
-                chosenCell.occupant = bc; // bc – компонент BattleCharacter установленного персонажа
+                // Получаем компонент EnemyBattleCharacter
+                EnemyBattleCharacter enemyChar = enemyObj.GetComponent<EnemyBattleCharacter>();
+                if (enemyChar != null)
+                {
+                    enemyChar.Init();
+                    // Регистрируем врага в BattleManager
+                    BattleManager.Instance.RegisterEnemy(enemyChar);
+                    // Регистрируем врага в TurnManager
+                    TurnManager.Instance.RegisterParticipant(enemyChar);
+                    chosenCell.occupant = enemyChar;
+                }
+                else
+                {
+                    Debug.LogWarning("Не удалось найти компонент EnemyBattleCharacter на созданном объекте врага.");
+                }
             }
             else
             {
@@ -286,6 +299,7 @@ public class BattleMapManager : MonoBehaviour
             }
         }
     }
+
 
     // Выбирает случайную свободную ячейку для союзника среди ячеек в первых двух рядах (z = 0 и 1)
     BattleCell ChooseRandomCellForAlly()

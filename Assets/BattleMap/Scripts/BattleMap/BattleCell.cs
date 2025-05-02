@@ -28,10 +28,10 @@ public class BattleCell : MonoBehaviour
 
     //====================================== Состояние ячейки и объекты на ней ===========================================
     [SerializeField] private CellState state = CellState.Free;
-    
+
     // Закрытые поля для препятствия и персонажа
     [SerializeField] private GameObject _obstacleObject; // препятствия
-    [SerializeField] private BattleCharacter _occupant; // пресонажи
+    [SerializeField] private BattleEntity _occupant; // пресонажи
 
     // Публичное свойство для препятствия, которое будет обновлять состояние
     public GameObject ObstacleObject
@@ -45,7 +45,7 @@ public class BattleCell : MonoBehaviour
     }
 
     // Публичное свойство для персонажа (occupant)
-    public BattleCharacter occupant
+    public BattleEntity occupant
     {
         get => _occupant;
         set
@@ -68,21 +68,13 @@ public class BattleCell : MonoBehaviour
     // Метод обновления состояния ячейки на основе установленных полей
     private void UpdateCellState()
     {
-        // Если установлено препятствие, состояние всегда Obstacle.
         if (_obstacleObject != null)
         {
             State = CellState.Obstacle;
         }
-        // Если препятствия нет, но есть персонаж, определим состояние по типу персонажа.
         else if (_occupant != null)
         {
-            // Если у BattleCharacter есть свойство, указывающее тип (например, ally/enemy),
-            // можно использовать его для определения состояния.
-            // Здесь для примера предполагается, что все занятые ячейки с персонажем – это союзники.
-            State = CellState.Ally;
-
-            // Если в будущем появится различие, можно сделать что-то вроде:
-            // State = _occupant.IsEnemy ? CellState.Enemy : CellState.Ally;
+            State = _occupant.IsEnemy ? CellState.Enemy : CellState.Ally;
         }
         else
         {

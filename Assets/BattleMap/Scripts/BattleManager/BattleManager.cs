@@ -51,7 +51,7 @@ public class BattleManager : MonoBehaviour
 
     public void SetActiveUnit(BattleEntity entity)
     {
-
+        //действия после получения информации о активном юните
     }
 
     // --- начало-окончание боя ---

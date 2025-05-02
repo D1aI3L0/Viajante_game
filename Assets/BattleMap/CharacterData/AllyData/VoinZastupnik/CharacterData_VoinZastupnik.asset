@@ -13,30 +13,19 @@ MonoBehaviour:
   m_Name: CharacterData_VoinZastupnik
   m_EditorClassIdentifier: 
   characterClass: 0
-  parameters:
-    maxHP: 180
-    currentHP: 180
-    DEF: 45
-    EVA: 12
-    PROV: 15
-    SPD: 120
-    SP: 100
-    SPreg: 15
-    SPmovecost: 5
-  availableSubclasses: 0000000001000000
   weaponsCount: 2
   weaponParameters:
-  - ATK: 40
-    ACC: 95
-    CRIT: 10
-    SE: 100
-    SEreg: 10
+  - ATK: 2
+    ACC: 321
+    CRIT: 23
+    SE: 123
+    SEreg: 123
     SEdec: 0
-  - ATK: 45
-    ACC: 90
-    CRIT: 12
-    SE: 100
-    SEreg: 10
+  - ATK: 123
+    ACC: 213
+    CRIT: 213
+    SE: 123
+    SEreg: 123
     SEdec: 0
   weaponSkills:
   - skills:
@@ -141,3 +130,14 @@ MonoBehaviour:
       cooldownTurns: 0
       criticalRatePercentage: 0
       criticalHitMultiplier: 0
+  parameters:
+    maxHP: 180
+    currentHP: 180
+    DEF: 45
+    EVA: 12
+    PROV: 15
+    SPD: 120
+    SP: 100
+    SPreg: 15
+    SPmovecost: 5
+  availableSubclasses: 0000000001000000

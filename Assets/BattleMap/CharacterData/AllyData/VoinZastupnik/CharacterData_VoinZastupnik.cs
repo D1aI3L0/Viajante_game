@@ -18,53 +18,23 @@ public class CharacterData_VoinZastupnik : BasicCharacterTemplates
         WarriorSubclass.TwoHandedMace
     };
 
-    [Header("Структура оружия и навыков")]
-    [Tooltip("Количество оружий (и соответствующих наборов навыков) данного персонажа. Рекомендуется сделать его равным длине availableSubclasses.")]
-    public int weaponsCount = 2;
-
-    [Header("Параметры оружия")]
-    [Tooltip("Массив параметров оружия. Каждый элемент соответствует набору характеристик для конкретного оружия (подкласса).")]
-    public WeaponParameters[] weaponParameters;
-
-    [Header("Наборы навыков для оружия")]
-    [Tooltip("Массив наборов навыков, один набор для каждого оружия. Индекс в этом массиве соответствует индексам в availableSubclasses.")]
-    public WeaponSkillSet[] weaponSkills;
-
 #if UNITY_EDITOR
+    // Переопределяем метод для возврата длины availableSubclasses
+    protected override int GetAvailableSubclassesCount()
+    {
+        return availableSubclasses != null ? availableSubclasses.Length : 0;
+    }
+
     private void OnValidate()
     {
-        // Устанавливаем, что для этого ассета всегда используется класс WarriorZastupnik.
+        // Гарантируем, что для этого ассета всегда устанавливается нужный класс.
         if (characterClass != CharacterClass.WarriorZastupnik)
         {
             characterClass = CharacterClass.WarriorZastupnik;
         }
 
-        // Если количество оружий должно совпадать с количеством доступных подклассов, можно принудительно синхронизировать:
-        if (availableSubclasses != null && availableSubclasses.Length != weaponsCount)
-        {
-            weaponsCount = availableSubclasses.Length;
-        }
-
-        // Инициализируем массив параметров оружия до длины weaponsCount.
-        if (weaponParameters == null || weaponParameters.Length != weaponsCount)
-        {
-            weaponParameters = new WeaponParameters[weaponsCount];
-        }
-
-        // Инициализируем массив наборов навыков до длины weaponsCount.
-        if (weaponSkills == null || weaponSkills.Length != weaponsCount)
-        {
-            weaponSkills = new WeaponSkillSet[weaponsCount];
-        }
-
-        // Для каждого набора навыков инициализируем сам массив навыков (например, стандартное количество – 5 навыков).
-        for (int i = 0; i < weaponsCount; i++)
-        {
-            if (weaponSkills[i] == null)
-                weaponSkills[i] = new WeaponSkillSet();
-            if (weaponSkills[i].skills == null || weaponSkills[i].skills.Length != 5)
-                weaponSkills[i].skills = new SkillParameters[5];
-        }
+        // Вызываем общий метод синхронизации из базового класса.
+        OnValidateCommon();
     }
 #endif
 }

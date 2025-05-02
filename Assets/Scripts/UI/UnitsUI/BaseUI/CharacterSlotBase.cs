@@ -4,7 +4,7 @@ using TMPro;
 
 public class CharacterSlotBase : MonoBehaviour
 {
-    public Character character;
+    public PlayerCharacter linkedCharacter;
     public Image characterIcon;
     public TMP_Text characterName;
     public Button selectButton;
@@ -13,7 +13,7 @@ public class CharacterSlotBase : MonoBehaviour
 
     public void Initialize(PlayerCharacter character, SquadCreationUI squadCreationUI, bool isInSquadPanel)
     {
-        this.character = character;
+        linkedCharacter = character;
         characterName.text = character.characterName;
         
         selectButton.gameObject.SetActive(!isInSquadPanel);
@@ -21,26 +21,30 @@ public class CharacterSlotBase : MonoBehaviour
 
         if (!isInSquadPanel)
         {
-            selectButton.onClick.AddListener(() => squadCreationUI.ToggleCharacterSelection(character, true));
+            selectButton.onClick.AddListener(() => squadCreationUI.ToggleCharacterSelection(linkedCharacter, true));
         }
         else
         {
-            unselectButton.onClick.AddListener(() => squadCreationUI.ToggleCharacterSelection(character, false));
+            unselectButton.onClick.AddListener(() => squadCreationUI.ToggleCharacterSelection(linkedCharacter, false));
         }
     }
 
     public void Initialize(PlayerCharacter character, EquipmentUpgradeUI equipmentUpgradeUI)
     {
-        this.character = character;
+        linkedCharacter = character;
         characterName.text = character.characterName;
 
-        selectButton.onClick.AddListener(() => {highlight.SetActive(true); ToggleButtonsVisibility(false); equipmentUpgradeUI.SelectCharacter(this, character);});
-        unselectButton.onClick.AddListener(() => {highlight.SetActive(false); ToggleButtonsVisibility(true); equipmentUpgradeUI.UnselectCharacter();});
+        selectButton.onClick.AddListener(() => {highlight.SetActive(true); ToggleButtonsVisibility(false); equipmentUpgradeUI.OnCharacterSelection(this);});
+        unselectButton.onClick.AddListener(() => {highlight.SetActive(false); ToggleButtonsVisibility(true); equipmentUpgradeUI.OnCharacterUnselect();});
     }
 
     public void Initialize(PlayerCharacter character, RecruitingUI recruitingUI)
     {
-        
+        linkedCharacter = character;
+        characterName.text = character.characterName;
+
+        selectButton.onClick.AddListener(() => {highlight.SetActive(true); ToggleButtonsVisibility(false); recruitingUI.OnCharacterSelection(this);});
+        unselectButton.onClick.AddListener(() => {highlight.SetActive(false); ToggleButtonsVisibility(true); recruitingUI.OnCharacterUnselect();});
     }
 
     public void ToggleButtonsVisibility(bool toggle)

@@ -6,12 +6,12 @@ public class CharacterSlotSquad : MonoBehaviour
 {
     [Header("Элементы")]
     public Image characterIcon;
-    public Slider healthSlider;
+    public Image healthIndicator;
     public TMP_Text nameText;
     
-    private Character character;
+    private PlayerCharacter character;
     
-    public void Initialize(Character character)
+    public void Initialize(PlayerCharacter character)
     {
         this.character = character;
         nameText.text = character.characterName;
@@ -21,7 +21,7 @@ public class CharacterSlotSquad : MonoBehaviour
     
     public void UpdateStats()
     {
-        healthSlider.value = (float)character.currentSurvivalStats.health / character.maxSurvivalStats.health;
+        healthIndicator.fillAmount = (float)character.currentSurvivalStats.health / character.maxSurvivalStats.health;
     }
 
     public void ShowCharacterStats()

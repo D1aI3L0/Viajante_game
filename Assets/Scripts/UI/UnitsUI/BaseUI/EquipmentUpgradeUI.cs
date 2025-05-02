@@ -77,7 +77,7 @@ public class EquipmentUpgradeUI : MonoBehaviour
         }
     }
 
-    public void SelectCharacter(CharacterSlotBase characterSlotBase, PlayerCharacter character)
+    public void OnCharacterSelection(CharacterSlotBase characterSlotBase)
     {
         if (selectedCharacterSlot)
         {
@@ -85,7 +85,7 @@ public class EquipmentUpgradeUI : MonoBehaviour
             selectedCharacterSlot.highlight.SetActive(false);
         }
 
-        selectedCharacter = character;
+        selectedCharacter = characterSlotBase.linkedCharacter;
         selectedCharacterSlot = characterSlotBase;
 
         HideSelectionPanel();
@@ -93,7 +93,7 @@ public class EquipmentUpgradeUI : MonoBehaviour
         ShowCharacterEquipment();
     }
 
-    public void UnselectCharacter()
+    public void OnCharacterUnselect()
     {
         selectedCharacter = null;
         HideSelectionPanel();
@@ -219,7 +219,7 @@ public class EquipmentUpgradeUI : MonoBehaviour
         for (int i = 0; i < availableSkills.Count; i++)
         {
             SkillCellVisual newSkillCell = Instantiate(skillCellPrefab, selectionContainer);
-            newSkillCell.Setup(availableSkills[i]);
+            newSkillCell.Setup(availableSkills[i], this);
             selectionCells.Add(newSkillCell);
         }
     }

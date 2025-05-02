@@ -6,6 +6,7 @@ using UnityEngine;
 [Serializable]
 public class PlayerCharacter : Character
 {
+    private List<Weapon> availableWeapons = new();
     public Equipment equipment = new();
     public SurvivalStats baseSurvivalStats;
     public OtherStats baseOtherStats;
@@ -68,5 +69,16 @@ public class PlayerCharacter : Character
         currentOtherStats.endurance.regen = maxOtherStats.endurance.regen;
         maxOtherStats.endurance.moveCost = baseOtherStats.endurance.moveCost;
         currentOtherStats.endurance.moveCost = maxOtherStats.endurance.moveCost;
+    }
+
+    public List<Weapon> GetAvailableWeapons()
+    {
+        List<Weapon> result = new();
+        for(int i = 0; i < availableWeapons.Count; i++)
+        {
+            if(availableWeapons[i] != equipment.weapon1 && availableWeapons[i] != equipment.weapon2)
+                result.Add(availableWeapons[i]);
+        }
+        return result;
     }
 }

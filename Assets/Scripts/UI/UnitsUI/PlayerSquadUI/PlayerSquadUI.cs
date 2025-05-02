@@ -44,7 +44,7 @@ public class PlayerSquadUI : MonoBehaviour
 
         characterSlots.Clear();
 
-        foreach (Character character in currentSquad.characters)
+        foreach (PlayerCharacter character in currentSquad.characters)
         {
             CharacterSlotSquad slot = Instantiate(characterSlotPrefab, charactersContainer);
             slot.Initialize(character);

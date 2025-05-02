@@ -24,7 +24,7 @@ public class Squad : Unit
                 this.characters.Add(characters[i]);
             }
         }
-        inventory = null;
+        inventory = new();
     }
 
     public void Initialize(List<EnemyCharacter> characters)

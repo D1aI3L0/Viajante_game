@@ -15,121 +15,31 @@ MonoBehaviour:
   characterClass: 0
   weaponsCount: 2
   weaponParameters:
-  - ATK: 2
-    ACC: 321
-    CRIT: 23
-    SE: 123
-    SEreg: 123
+  - ATK: 40
+    ACC: 95
+    CRIT: 10
+    SE: 100
+    SEreg: 15
     SEdec: 0
-  - ATK: 123
-    ACC: 213
-    CRIT: 213
-    SE: 123
-    SEreg: 123
+  - ATK: 45
+    ACC: 90
+    CRIT: 12
+    SE: 100
+    SEreg: 15
     SEdec: 0
   weaponSkills:
   - skills:
-    - skillName: 
-      description: 
-      minDamagePercentage: 0
-      maxDamagePercentage: 0
-      accuracyPercentage: 0
-      spCost: 0
-      seCost: 0
-      cooldownTurns: 0
-      criticalRatePercentage: 0
-      criticalHitMultiplier: 0
-    - skillName: 
-      description: 
-      minDamagePercentage: 0
-      maxDamagePercentage: 0
-      accuracyPercentage: 0
-      spCost: 0
-      seCost: 0
-      cooldownTurns: 0
-      criticalRatePercentage: 0
-      criticalHitMultiplier: 0
-    - skillName: 
-      description: 
-      minDamagePercentage: 0
-      maxDamagePercentage: 0
-      accuracyPercentage: 0
-      spCost: 0
-      seCost: 0
-      cooldownTurns: 0
-      criticalRatePercentage: 0
-      criticalHitMultiplier: 0
-    - skillName: 
-      description: 
-      minDamagePercentage: 0
-      maxDamagePercentage: 0
-      accuracyPercentage: 0
-      spCost: 0
-      seCost: 0
-      cooldownTurns: 0
-      criticalRatePercentage: 0
-      criticalHitMultiplier: 0
-    - skillName: 
-      description: 
-      minDamagePercentage: 0
-      maxDamagePercentage: 0
-      accuracyPercentage: 0
-      spCost: 0
-      seCost: 0
-      cooldownTurns: 0
-      criticalRatePercentage: 0
-      criticalHitMultiplier: 0
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
   - skills:
-    - skillName: 
-      description: 
-      minDamagePercentage: 0
-      maxDamagePercentage: 0
-      accuracyPercentage: 0
-      spCost: 0
-      seCost: 0
-      cooldownTurns: 0
-      criticalRatePercentage: 0
-      criticalHitMultiplier: 0
-    - skillName: 
-      description: 
-      minDamagePercentage: 0
-      maxDamagePercentage: 0
-      accuracyPercentage: 0
-      spCost: 0
-      seCost: 0
-      cooldownTurns: 0
-      criticalRatePercentage: 0
-      criticalHitMultiplier: 0
-    - skillName: 
-      description: 
-      minDamagePercentage: 0
-      maxDamagePercentage: 0
-      accuracyPercentage: 0
-      spCost: 0
-      seCost: 0
-      cooldownTurns: 0
-      criticalRatePercentage: 0
-      criticalHitMultiplier: 0
-    - skillName: 
-      description: 
-      minDamagePercentage: 0
-      maxDamagePercentage: 0
-      accuracyPercentage: 0
-      spCost: 0
-      seCost: 0
-      cooldownTurns: 0
-      criticalRatePercentage: 0
-      criticalHitMultiplier: 0
-    - skillName: 
-      description: 
-      minDamagePercentage: 0
-      maxDamagePercentage: 0
-      accuracyPercentage: 0
-      spCost: 0
-      seCost: 0
-      cooldownTurns: 0
-      criticalRatePercentage: 0
-      criticalHitMultiplier: 0
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
   parameters:
     maxHP: 180
     currentHP: 180

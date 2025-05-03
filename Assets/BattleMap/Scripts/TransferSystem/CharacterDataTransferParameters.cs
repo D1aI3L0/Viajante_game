@@ -29,61 +29,67 @@ public class CharacterDataTransferParameters : ScriptableObject
     public BasicCharacterTemplates[] baseCharacterData = new BasicCharacterTemplates[3];
 
 #if UNITY_EDITOR
-private void OnValidate()
-{
-    // Если массив runtime-параметров не создан или его длина меньше требуемой, пересоздаем его.
-    if (characters == null || characters.Length < numberOfCharacters)
+    private void OnValidate()
     {
-        characters = new CharacterRuntimeParameters[3];
-    }
-
-    // Проходим по количеству персонажей, заданному в numberOfCharacters.
-    for (int i = 0; i < numberOfCharacters; i++)
-    {
-        if (baseCharacterData[i] != null)
+        // Если массив runtime-параметров не создан или его длина меньше требуемой, пересоздаем его.
+        if (characters == null || characters.Length < numberOfCharacters)
         {
-            if (characters[i] == null)
-                characters[i] = new CharacterRuntimeParameters();
+            characters = new CharacterRuntimeParameters[3];
+        }
 
-            // Копирование общих данных из базового ассета.
-            characters[i].characterClass = baseCharacterData[i].characterClass;
-            characters[i].maxHP = baseCharacterData[i].parameters.maxHP;
-            characters[i].currentHP = baseCharacterData[i].parameters.currentHP;
-            characters[i].DEF = baseCharacterData[i].parameters.DEF;
-            characters[i].EVA = baseCharacterData[i].parameters.EVA;
-            characters[i].PROV = baseCharacterData[i].parameters.PROV;
-            characters[i].SPD = baseCharacterData[i].parameters.SPD;
-            characters[i].SP = baseCharacterData[i].parameters.SP;
-            characters[i].SPreg = baseCharacterData[i].parameters.SPreg;
-            characters[i].SPmovecost = baseCharacterData[i].parameters.SPmovecost;
-
-            // Обеспечиваем, что для каждого персонажа выбрано ровно 2 подкласса (индексы выбора).
-            if (characters[i].selectedSubclassIndices == null || characters[i].selectedSubclassIndices.Length != 2)
+        // Проходим по количеству персонажей, заданному в numberOfCharacters.
+        for (int i = 0; i < numberOfCharacters; i++)
+        {
+            if (baseCharacterData[i] != null)
             {
-                characters[i].selectedSubclassIndices = new int[2] { 0, 0 };
-            }
+                if (characters[i] == null)
+                    characters[i] = new CharacterRuntimeParameters();
 
-            // Аналогично – три выбранных навыка (дополнительных), базовая атака при этом всегда имеет индекс 0.
-            if (characters[i].selectedSkillIndices == null || characters[i].selectedSkillIndices.Length != 3)
-            {
-                characters[i].selectedSkillIndices = new int[3] { 1, 1, 1 };
-            }
+                // Копирование общих данных из базового ассета.
+                characters[i].characterClass = baseCharacterData[i].characterClass;
+                characters[i].maxHP = baseCharacterData[i].parameters.maxHP;
+                characters[i].currentHP = baseCharacterData[i].parameters.currentHP;
+                characters[i].DEF = baseCharacterData[i].parameters.DEF;
+                characters[i].EVA = baseCharacterData[i].parameters.EVA;
+                characters[i].PROV = baseCharacterData[i].parameters.PROV;
+                characters[i].SPD = baseCharacterData[i].parameters.SPD;
+                characters[i].SP = baseCharacterData[i].parameters.SP;
+                characters[i].SPreg = baseCharacterData[i].parameters.SPreg;
+                characters[i].SPmovecost = baseCharacterData[i].parameters.SPmovecost;
 
-            // Обработка параметров оружия и наборов навыков.
-            // Предполагаем, что для персонажа используется два оружия.
-            characters[i].weaponParameters = new WeaponParameters[2];
-            characters[i].weaponSkills = new WeaponSkillSet[2];
+                // Обеспечиваем, что для каждого персонажа выбрано ровно 2 подкласса (индексы выбора).
+                if (characters[i].selectedSubclassIndices == null || characters[i].selectedSubclassIndices.Length != 2)
+                {
+                    characters[i].selectedSubclassIndices = new int[2] { 0, 0 };
+                }
 
-            for (int j = 0; j < 2; j++)
-            {
-                int chosenSubclass = characters[i].selectedSubclassIndices[j];
-                // Используем универсальные методы базового класса для извлечения параметров.
-                characters[i].weaponParameters[j] = baseCharacterData[i].GetWeaponParameters(chosenSubclass);
-                characters[i].weaponSkills[j] = baseCharacterData[i].GetWeaponSkillSet(chosenSubclass);
+                // Обеспечиваем, что для каждого персонажа задан набор выбранных навыков для оружия
+                if (characters[i].weaponSkillSelections == null || characters[i].weaponSkillSelections.Length != 2)
+                {
+                    characters[i].weaponSkillSelections = new WeaponSkillSelection[2];
+                    for (int j = 0; j < 2; j++)
+                    {
+                        if (characters[i].weaponSkillSelections[j] == null)
+                            characters[i].weaponSkillSelections[j] = new WeaponSkillSelection();
+                    }
+                }
+
+
+                // Обработка параметров оружия и наборов навыков.
+                // Предполагаем, что для персонажа используется два оружия.
+                characters[i].weaponParameters = new WeaponParameters[2];
+                characters[i].weaponSkills = new WeaponSkillSet[2];
+
+                for (int j = 0; j < 2; j++)
+                {
+                    int chosenSubclass = characters[i].selectedSubclassIndices[j];
+                    // Используем универсальные методы базового класса для извлечения параметров.
+                    characters[i].weaponParameters[j] = baseCharacterData[i].GetWeaponParameters(chosenSubclass);
+                    characters[i].weaponSkills[j] = baseCharacterData[i].GetWeaponSkillSet(chosenSubclass);
+                }
             }
         }
     }
-}
 #endif
 
 }

@@ -28,10 +28,12 @@ public class CharacterRuntimeParameters
     public WeaponParameters[] weaponParameters = new WeaponParameters[2];
 
     [Header("Наборы навыков для оружия")]
-    [Tooltip("Массив из 2-х наборов навыков, соответствующих каждому оружию. Базовая атака всегда есть, а остальные выбираются (индексы начинаются с 1).")]
+    [Tooltip("Массив из 2-х наборов навыков, соответствующих каждому оружию. Каждый набор содержит ссылки на ассеты навыков (SkillAsset).")]
     public WeaponSkillSet[] weaponSkills = new WeaponSkillSet[2];
 
-    [Header("Выбранные навыки (дополнительные)")]
-    [Tooltip("Массив из 3-х индексов выбранных дополнительных навыков (базовая атака всегда имеет индекс 0).")]
-    public int[] selectedSkillIndices = new int[3];
+
+    [Header("Выбранные навыки для оружия")]
+    [Tooltip("Массив из 2-х элементов: для каждого оружия (стойки) — набор из 3 индексов выбранных навыков (базовая атака всегда имеет индекс 0).")]
+    public WeaponSkillSelection[] weaponSkillSelections = new WeaponSkillSelection[2];
+
 }

@@ -19,12 +19,9 @@ public class AllyBattleCharacter : BattleEntity
     // Остальные данные о навыках и подклассах
     public int[] selectedSubclassIndices;  // Ожидается 2 значения
     public WeaponSkillSet[] weaponSkills;    // Массив из 2-х элементов
-    public WeaponSkillSelection[] weaponSkillSelections;       // Массив из 3-х элементов
+    public WeaponSkillSelection[] weaponSkillSelections;       // Массив из 2-х элементов
 
-
-    // Теперь вместо дублирования параметров храним только массив базовых показателей,
-    // а актуальные (текущие) значения вычисляем через свойства:
-
+    
     /// <summary>
     /// Текущая специальная энергия для выбранной стойки
     /// </summary>
@@ -76,6 +73,13 @@ public class AllyBattleCharacter : BattleEntity
             return 0;
         }
     }
+
+    // Метод для установки текущей клетки
+    public void SetCurrentCell(BattleCell cell)
+    {
+        currentCell = cell;
+    }
+
 
     /// <summary>
     /// Инициализация персонажа по данным runtime.

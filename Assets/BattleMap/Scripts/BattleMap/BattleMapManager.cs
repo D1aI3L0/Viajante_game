@@ -226,44 +226,49 @@ public class BattleMapManager : MonoBehaviour
     }
 
     void PlaceAllies()
+{
+    // Количество союзников задаётся в dataTransfer.numberOfCharacters
+    for (int i = 0; i < dataTransfer.numberOfCharacters; i++)
     {
-        // Количество союзников задаётся в dataTransfer.numberOfCharacters
-        for (int i = 0; i < dataTransfer.numberOfCharacters; i++)
+        BattleCell chosenCell = ChooseRandomCellForAlly();
+        if (chosenCell != null)
         {
-            BattleCell chosenCell = ChooseRandomCellForAlly();
-            if (chosenCell != null)
+            // Получаем runtime-параметры персонажа, чтобы узнать его класс
+            CharacterRuntimeParameters runtimeParams = dataTransfer.characters[i];
+            GameObject prefab = GetPrefabForCharacter(runtimeParams.characterClass);
+
+            if (prefab == null)
             {
-                // Получаем runtime-параметры персонажа, чтобы узнать его класс
-                CharacterRuntimeParameters runtimeParams = dataTransfer.characters[i];
-                GameObject prefab = GetPrefabForCharacter(runtimeParams.characterClass);
-
-                if (prefab == null)
-                {
-                    Debug.LogWarning("Префаб для персонажа с классом " + runtimeParams.characterClass + " не найден.");
-                    continue;
-                }
-
-                // Создаём экземпляр объекта
-                GameObject allyObj = Instantiate(prefab, chosenCell.transform.position, Quaternion.LookRotation(Vector3.forward));
-
-                // Инициализируем экземпляр, если у него есть компонент AllyBattleCharacter
-                AllyBattleCharacter allyChar = allyObj.GetComponent<AllyBattleCharacter>();
-                if (allyChar != null)
-                {
-                    allyChar.Init(runtimeParams);
-                    // Регистрируем юнита в BattleManager
-                    BattleManager.Instance.RegisterAlly(allyChar);
-                    // Регистрируем юнита в TurnManager
-                    TurnManager.Instance.RegisterParticipant(allyChar);
-                    chosenCell.occupant = allyChar;
-                }
+                Debug.LogWarning("Префаб для персонажа с классом " + runtimeParams.characterClass + " не найден.");
+                continue;
             }
-            else
+
+            // Создаём экземпляр объекта
+            GameObject allyObj = Instantiate(prefab, chosenCell.transform.position, Quaternion.LookRotation(Vector3.forward));
+
+            // Инициализируем экземпляр, если у него есть компонент AllyBattleCharacter
+            AllyBattleCharacter allyChar = allyObj.GetComponent<AllyBattleCharacter>();
+            if (allyChar != null)
             {
-                Debug.LogWarning("Нет свободной ячейки для союзника");
+                allyChar.Init(runtimeParams);
+                // Регистрируем юнита в BattleManager
+                BattleManager.Instance.RegisterAlly(allyChar);
+                // Регистрируем юнита в TurnManager
+                TurnManager.Instance.RegisterParticipant(allyChar);
+                
+                // Устанавливаем персонажа в выбранную клетку:
+                chosenCell.SetOccupant(allyChar);
+                // Если метод SetOccupant не устанавливает currentCell, то можно ещё явно:
+                allyChar.currentCell = chosenCell;
             }
         }
+        else
+        {
+            Debug.LogWarning("Нет свободной ячейки для союзника");
+        }
     }
+}
+
 
 
     void PlaceEnemies()
@@ -286,7 +291,9 @@ public class BattleMapManager : MonoBehaviour
                     BattleManager.Instance.RegisterEnemy(enemyChar);
                     // Регистрируем врага в TurnManager
                     TurnManager.Instance.RegisterParticipant(enemyChar);
-                    chosenCell.occupant = enemyChar;
+
+                    chosenCell.SetOccupant(enemyChar);
+                    enemyChar.currentCell = chosenCell;
                 }
                 else
                 {

@@ -2,6 +2,10 @@ using UnityEngine;
 
 public class BattleEntity : MonoBehaviour
 {
+    // Поле для хранения ссылки на клетку, в которой сейчас находится юнит
+    public BattleCell currentCell { get; set; }
+
+
     // Параметры, связанные с ходом персонажа
     public bool isActiveTurn = false;
     public float turnGauge = 0f;

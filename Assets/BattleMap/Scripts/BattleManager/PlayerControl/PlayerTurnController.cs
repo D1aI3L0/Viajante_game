@@ -150,7 +150,7 @@ public class PlayerTurnController : MonoBehaviour
         ClearPathDisplay();
         currentPath = null;
 
-        EndTurn();
+        //EndTurn(); 
     }
 
     // --------------------- Корректировка маршрута ---------------------

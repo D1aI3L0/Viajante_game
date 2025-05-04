@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 23da6f7d0f73d1c46b9f7e2cb75866be, type: 3}
   m_Name: CharacterDataTransferParameters
   m_EditorClassIdentifier: 
-  numberOfCharacters: 1
+  numberOfCharacters: 2
   characters:
   - characterClass: 1
     selectedSubclassIndices: 0000000001000000
@@ -54,43 +54,43 @@ MonoBehaviour:
     weaponSkillSelections:
     - selectedSkillIndices: 010000000200000003000000
     - selectedSkillIndices: 010000000300000004000000
-  - characterClass: 1
+  - characterClass: 0
     selectedSubclassIndices: 0000000001000000
-    maxHP: 140
-    currentHP: 140
-    DEF: 35
-    EVA: 20
-    PROV: 10
-    SPD: 140
+    maxHP: 180
+    currentHP: 180
+    DEF: 45
+    EVA: 12
+    PROV: 15
+    SPD: 120
     SP: 100
     SPreg: 15
     SPmovecost: 5
     weaponParameters:
-    - ATK: 35
-      ACC: 88
-      CRIT: 15
-      SE: 100
-      SEreg: 20
-      SEdec: 0
-    - ATK: 30
-      ACC: 92
+    - ATK: 40
+      ACC: 95
       CRIT: 10
-      SE: 4
-      SEreg: 0
+      SE: 100
+      SEreg: 15
+      SEdec: 0
+    - ATK: 45
+      ACC: 90
+      CRIT: 12
+      SE: 100
+      SEreg: 15
       SEdec: 0
     weaponSkills:
     - skills:
-      - {fileID: 11400000, guid: 491aebf19dc6af2418ebc4524de7eb36, type: 2}
-      - {fileID: 11400000, guid: 491aebf19dc6af2418ebc4524de7eb36, type: 2}
-      - {fileID: 11400000, guid: 491aebf19dc6af2418ebc4524de7eb36, type: 2}
-      - {fileID: 11400000, guid: 491aebf19dc6af2418ebc4524de7eb36, type: 2}
-      - {fileID: 11400000, guid: 491aebf19dc6af2418ebc4524de7eb36, type: 2}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
     - skills:
-      - {fileID: 11400000, guid: 491aebf19dc6af2418ebc4524de7eb36, type: 2}
-      - {fileID: 11400000, guid: 491aebf19dc6af2418ebc4524de7eb36, type: 2}
-      - {fileID: 11400000, guid: 491aebf19dc6af2418ebc4524de7eb36, type: 2}
-      - {fileID: 11400000, guid: 491aebf19dc6af2418ebc4524de7eb36, type: 2}
-      - {fileID: 11400000, guid: 491aebf19dc6af2418ebc4524de7eb36, type: 2}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
     weaponSkillSelections:
     - selectedSkillIndices: 010000000100000001000000
     - selectedSkillIndices: 010000000100000001000000
@@ -136,5 +136,5 @@ MonoBehaviour:
     - selectedSkillIndices: 010000000100000001000000
   baseCharacterData:
   - {fileID: 11400000, guid: 51bed3ec0c6e9854089ab52251558654, type: 2}
-  - {fileID: 0}
+  - {fileID: 11400000, guid: 712d2251579b797488c0eda6201dff33, type: 2}
   - {fileID: 0}

@@ -6,6 +6,7 @@ using UnityEngine.EventSystems;
 
 public class GameUI : MonoBehaviour
 {
+	public static GameUI Instance;
 	public HexGrid grid;
 	HexCell currentCell;
 	public Unit selectedUnit;
@@ -24,7 +25,7 @@ public class GameUI : MonoBehaviour
 
     void Awake()
     {
-		UIReferences.gameUI = this;
+		Instance = this;
         Toggle(true);
     }
 
@@ -104,11 +105,11 @@ public class GameUI : MonoBehaviour
 		UpdateCurrentCell();
 		if (currentCell)
 		{
-			UIReferences.hexUI.DisableAllUnitsUI();
+			HexUI.Instance.DisableAllUnitsUI();
 			selectedUnit = currentCell.Unit;
 			if (selectedUnit is Base @base)
 			{
-				UIReferences.mainBaseUI.ShowForBase(@base);
+				MainBaseUI.Instance.ShowForBase(@base);
 			}
 			else if (selectedUnit is Squad squad && squad.squadType == SquadType.Player)
 			{

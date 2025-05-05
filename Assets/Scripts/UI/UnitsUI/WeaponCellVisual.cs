@@ -14,6 +14,11 @@ public class WeaponCellVisual : CellVisual, IPointerClickHandler
         onButtonClick = () => { recruitingUI.OnWeaponSelection(this); };
     }
 
+    public void Setup(Weapon weapon)
+    {
+        linkedWeapon = weapon;
+    }
+
     public void OnPointerClick(PointerEventData eventData)
     {
         onButtonClick();

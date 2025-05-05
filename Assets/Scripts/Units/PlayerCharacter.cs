@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 [Serializable]
@@ -8,10 +10,12 @@ public class PlayerCharacter : Character
 {
     private List<Weapon> availableWeapons = new();
     public Equipment equipment = new();
-    public SurvivalStats baseSurvivalStats;
-    public OtherStats baseOtherStats;
+
     [NonSerialized]
-    public AttackStats currentAttack1Stats, currentAttack2Stats, maxAttack1Stats, maxAttack2Stats;
+    public AttackStats currentAttack1Stats = new(), currentAttack2Stats = new();
+
+    [SerializeField]
+    private List<Trait> activeTraits = new();
 
     public void Initialize()
     {
@@ -19,65 +23,171 @@ public class PlayerCharacter : Character
         equipment.Initialize();
     }
 
-    public void InitializeStats()
+    public void Initialize(BasicCharacterTemplates characterTemplate)
     {
-        InitializeSurvivalStats();
-        InitializeAttack1Stats();
-        InitializeAttack2Stats();
-        InitializeOtherStats();
+        equipment.Initialize();
+        characterName = characterTemplate.characterClass.ToString();
+        InitializeStats(characterTemplate.parameters);
+        InitializeAvailableWeapons(characterTemplate.weaponsCount, characterTemplate.weaponParameters, characterTemplate.weaponSkills);
+        RecalculateStats();
     }
 
-    public void InitializeSurvivalStats()
+    private void InitializeStats(CharacterParameters characterParameters)
     {
-        maxSurvivalStats.health = baseSurvivalStats.health;
-        currentSurvivalStats.health = maxSurvivalStats.health;
-        maxSurvivalStats.defence = baseSurvivalStats.defence;
-        currentSurvivalStats.defence = maxSurvivalStats.defence;
-        maxSurvivalStats.evasion = baseSurvivalStats.evasion;
-        currentSurvivalStats.evasion = maxSurvivalStats.evasion;
+        baseCharacterStats.maxHealth = characterParameters.maxHP;
+        baseCharacterStats.defence = characterParameters.DEF;
+        baseCharacterStats.evasion = characterParameters.EVA;
+        baseCharacterStats.SPamount = characterParameters.SP;
+        baseCharacterStats.SPregen = characterParameters.SPreg;
+        baseCharacterStats.SPmoveCost = characterParameters.SPmovecost;
+        baseCharacterStats.speed = characterParameters.SPD;
+        baseCharacterStats.tount = characterParameters.PROV;
+
+        currentCharacterStats.maxHealth = baseCharacterStats.maxHealth;
+        currentCharacterStats.defence = baseCharacterStats.defence;
+        currentCharacterStats.evasion = baseCharacterStats.evasion;
+        currentCharacterStats.SPamount = baseCharacterStats.SPamount;
+        currentCharacterStats.SPregen = baseCharacterStats.SPregen;
+        currentCharacterStats.SPmoveCost = baseCharacterStats.SPmoveCost;
+        currentCharacterStats.speed = baseCharacterStats.speed;
+        currentCharacterStats.tount = baseCharacterStats.tount;
     }
 
-    public void InitializeAttack1Stats()
+    private void InitializeAvailableWeapons(int weaponsCount, WeaponParameters[] weaponsParameters, WeaponSkillSet[] weaponsSkillSets)
     {
-        maxAttack1Stats.attack = equipment.weapon1.attackStats.attack;
-        currentAttack1Stats.attack = maxAttack1Stats.attack;
-        maxAttack1Stats.accuracy = equipment.weapon1.attackStats.accuracy;
-        currentAttack1Stats.accuracy = maxAttack1Stats.accuracy;
-        maxAttack1Stats.critRate = equipment.weapon1.attackStats.critRate;
-        currentAttack1Stats.critRate = maxAttack1Stats.critRate;
-    }
-    
-    public void InitializeAttack2Stats()
-    {
-        maxAttack2Stats.attack = equipment.weapon2.attackStats.attack;
-        currentAttack2Stats.attack = maxAttack2Stats.attack;
-        maxAttack2Stats.accuracy = equipment.weapon2.attackStats.accuracy;
-        currentAttack2Stats.accuracy = maxAttack2Stats.accuracy;
-        maxAttack2Stats.critRate = equipment.weapon2.attackStats.critRate;
-        currentAttack2Stats.critRate = maxAttack2Stats.critRate;
+        for (int i = 0; i < weaponsCount; i++)
+        {
+            Weapon newWeapon = new();
+            newWeapon.Initialize(weaponsParameters[i], weaponsSkillSets[i]);
+            availableWeapons.Add(newWeapon);
+        }
     }
 
-    public void InitializeOtherStats()
+    public void SetupWeapons()
     {
-        maxOtherStats.initiative = baseOtherStats.initiative;
-        currentOtherStats.initiative = maxOtherStats.initiative;
-        maxOtherStats.tount = baseOtherStats.tount;
-        currentOtherStats.tount = maxOtherStats.tount;
-        maxOtherStats.endurance.amount = baseOtherStats.endurance.amount;
-        currentOtherStats.endurance.amount = maxOtherStats.endurance.amount;
-        maxOtherStats.endurance.regen = baseOtherStats.endurance.regen;
-        currentOtherStats.endurance.regen = maxOtherStats.endurance.regen;
-        maxOtherStats.endurance.moveCost = baseOtherStats.endurance.moveCost;
-        currentOtherStats.endurance.moveCost = maxOtherStats.endurance.moveCost;
+        if (availableWeapons.Count >= 1)
+            equipment.weapon1 = availableWeapons[0];
+
+        if (availableWeapons.Count >= 2)
+            equipment.weapon2 = availableWeapons[1];
     }
 
     public List<Weapon> GetAvailableWeapons()
     {
         List<Weapon> result = new();
-        for(int i = 0; i < availableWeapons.Count; i++)
+        for (int i = 0; i < availableWeapons.Count; i++)
         {
-            if(availableWeapons[i] != equipment.weapon1 && availableWeapons[i] != equipment.weapon2)
+            if (availableWeapons[i] != equipment.weapon1 && availableWeapons[i] != equipment.weapon2)
                 result.Add(availableWeapons[i]);
+        }
+        return result;
+    }
+
+    public void AddTrait(TraitData traitData)
+    {
+        activeTraits.Add(new Trait(traitData));
+        RecalculateStats();
+    }
+
+    public void RemoveTrait(Trait trait)
+    {
+        activeTraits.Remove(trait);
+        RecalculateStats();
+    }
+
+    public void ProcessTurnEnd()
+    {
+        foreach (var trait in activeTraits)
+        {
+            trait.OnTurnEnd();
+            if (trait.IsExpired) RemoveTrait(trait);
+        }
+    }
+
+    public void RecalculateStats()
+    {
+        // Сохраняем отношение здоровья перед изменениями
+        float healthRatio = currentHealth / (float)currentCharacterStats.maxHealth;
+
+        currentCharacterStats.maxHealth = baseCharacterStats.maxHealth;
+        currentCharacterStats.defence = baseCharacterStats.defence;
+        currentCharacterStats.evasion = baseCharacterStats.evasion;
+        currentCharacterStats.SPamount = baseCharacterStats.SPamount;
+        currentCharacterStats.SPregen = baseCharacterStats.SPregen;
+        currentCharacterStats.SPmoveCost = baseCharacterStats.SPmoveCost;
+        currentCharacterStats.speed = baseCharacterStats.speed;
+        currentCharacterStats.tount = baseCharacterStats.tount;
+
+        foreach (var trait in activeTraits)
+        {
+            foreach (var effect in trait.Data.effects)
+            {
+                ApplyTraitEffect(effect);
+            }
+        }
+
+        // Обновляем текущее здоровье с сохранением пропорций
+        currentHealth = Mathf.RoundToInt(currentCharacterStats.maxHealth * healthRatio);
+
+        // Ограничиваем здоровье в допустимых пределах
+        currentHealth = Mathf.Clamp(currentHealth, 1, currentCharacterStats.maxHealth);
+    }
+
+    private void ApplyTraitEffect(TraitEffect effect)
+    {
+        switch (effect.statType)
+        {
+            case StatType.Health:
+                currentCharacterStats.maxHealth += GetTraitModifierStat(baseCharacterStats.maxHealth, effect);
+                break;
+            case StatType.Defence:
+                currentCharacterStats.defence += GetTraitModifierStat(baseCharacterStats.defence, effect);
+                break;
+            case StatType.Evasion:
+                currentCharacterStats.evasion += GetTraitModifierStat(baseCharacterStats.evasion, effect);
+                break;
+            case StatType.SPamount:
+                currentCharacterStats.SPamount += GetTraitModifierStat(baseCharacterStats.SPamount, effect);
+                break;
+            case StatType.SPregen:
+                currentCharacterStats.SPregen += GetTraitModifierStat(baseCharacterStats.SPregen, effect);
+                break;
+            case StatType.SPmoveCost:
+                currentCharacterStats.SPmoveCost += GetTraitModifierStat(baseCharacterStats.SPmoveCost, effect);
+                break;
+            case StatType.Speed:
+                currentCharacterStats.speed += GetTraitModifierStat(baseCharacterStats.speed, effect);
+                break;
+            case StatType.Tount:
+                currentCharacterStats.tount += GetTraitModifierStat(baseCharacterStats.tount, effect);
+                break;
+        }
+    }
+
+
+    private int GetTraitModifierStat(int baseStat, TraitEffect effect)
+    {
+        switch (effect.effectType)
+        {
+            case TraitEffectType.Additive:
+                return Mathf.RoundToInt(effect.value);
+
+            case TraitEffectType.Multiplicative:
+                return Mathf.RoundToInt(baseStat * effect.value);
+
+            default:
+                return 0;
+        }
+
+    }
+
+    public List<Trait> GetTraits(TraitType traitType)
+    {
+        List<Trait> result = new();
+        foreach (Trait trait in activeTraits)
+        {
+            if (trait.Data.traitType == traitType)
+                result.Add(trait);
         }
         return result;
     }

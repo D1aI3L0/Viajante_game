@@ -3,9 +3,10 @@ using UnityEngine;
 
 public class HexUI : MonoBehaviour
 {
+    public static HexUI Instance;
     void Awake()
     {
-        UIReferences.hexUI = this;
+        Instance = this;
     }
 
     void Update()
@@ -13,7 +14,7 @@ public class HexUI : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.F1))
         {
             UIReferences.hexMapEditor.Toggle(!UIReferences.hexMapEditor.enabled);
-            UIReferences.gameUI.Toggle(!UIReferences.hexMapEditor.enabled);
+            GameUI.Instance.Toggle(!UIReferences.hexMapEditor.enabled);
         }
         if (Input.GetKeyDown(KeyCode.F2))
         {
@@ -24,7 +25,7 @@ public class HexUI : MonoBehaviour
 
     public void DisableAllUnitsUI()
     {
-        UIReferences.mainBaseUI.Hide();
+        MainBaseUI.Instance.Hide();
         UIReferences.playerSquadUI.Hide();
         UIReferences.playerCharacterUI.Hide();
     }

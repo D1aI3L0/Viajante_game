@@ -1,33 +1,14 @@
 using System;
 
 [Serializable]
-public class SurvivalStats
+public class CharacterStats
 {
-    public int health;
+    public int maxHealth;
     public int defence;
     public int evasion;
-}
-
-[Serializable]
-public class AttackStats
-{
-    public int attack;
-    public int accuracy;
-    public int critRate;
-}
-
-[Serializable]
-public struct Endurance
-{
-    public int amount, regen, moveCost;
-}
-
-[Serializable]
-public class OtherStats
-{
-    public int initiative;
+    public int SPamount, SPregen, SPmoveCost;
+    public int speed;
     public int tount;
-    public Endurance endurance;
 }
 
 
@@ -36,6 +17,6 @@ public class Character
 {
     public string characterName;
     public int level = 1;
-    public SurvivalStats currentSurvivalStats, maxSurvivalStats;
-    public OtherStats currentOtherStats, maxOtherStats;
+    public CharacterStats currentCharacterStats = new(), baseCharacterStats = new();
+    public int currentHealth;
 }

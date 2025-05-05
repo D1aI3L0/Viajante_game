@@ -4,6 +4,8 @@ using UnityEngine.UI;
 
 public class MainBaseUI : MonoBehaviour
 {
+    public static MainBaseUI Instance;
+
     [Header("Основные элементы")]
     public GameObject UIContainer;
     public RectTransform buttonGroup;
@@ -12,17 +14,19 @@ public class MainBaseUI : MonoBehaviour
     public Button createSquadBtn;
     public Button workshopBtn;
     public Button upgradeBtn;
+    public Button recruitmentgBtn;
 
     [Header("Подменю")]
     public SquadCreationUI squadCreationMenu;
     public WorkshopUI workshopMenu;
+    public RecruitingUI recruitmentMenu;
     public GameObject upgradeMenu;
 
     private Base currentBase;
 
     void Start()
     {
-        UIReferences.mainBaseUI = this;
+        Instance = this;
         squadCreationMenu.Hide();
         if (workshopMenu) workshopMenu.Hide();
         if (upgradeMenu) upgradeMenu.SetActive(false);
@@ -44,6 +48,7 @@ public class MainBaseUI : MonoBehaviour
 
         createSquadBtn.interactable = playerBase.availableCharacters.Count > 0;
         workshopBtn.interactable = workshopMenu;
+        recruitmentgBtn.interactable = recruitmentMenu;
         upgradeBtn.interactable = upgradeMenu;
     }
 
@@ -64,29 +69,37 @@ public class MainBaseUI : MonoBehaviour
     public void OpenSquadCreation()
     {
         CloseAllSubmenus();
-        UIReferences.gameUI.enabled = false;
+        GameUI.Instance.enabled = false;
         squadCreationMenu.Show();
     }
 
     public void OpenWorkshopMenu()
     {
         CloseAllSubmenus();
-        UIReferences.gameUI.enabled = false;
+        GameUI.Instance.enabled = false;
         workshopMenu.Show();
+    }
+
+    public void OpenRecruitmentMenu()
+    {
+        CloseAllSubmenus();
+        GameUI.Instance.enabled = false;
+        recruitmentMenu.Show();
     }
 
     public void OpenUpgradeMenu()
     {
         CloseAllSubmenus();
-        UIReferences.gameUI.enabled = false;
+        GameUI.Instance.enabled = false;
         upgradeMenu.SetActive(true);
     }
 
     void CloseAllSubmenus()
     {
-        UIReferences.gameUI.enabled = true;
+        GameUI.Instance.enabled = true;
         if (squadCreationMenu) squadCreationMenu.Hide();
         if (workshopMenu) workshopMenu.Hide();
+        if (recruitmentMenu) recruitmentMenu.Hide();
         if (upgradeMenu) upgradeMenu.SetActive(false);
     }
 }

@@ -8,18 +8,18 @@ public class Base : Unit
 {
     public static Base Instance;
     public static Base basePrefab;
-    public List<PlayerCharacter> characters;
+    public List<PlayerCharacter> characters = new();
     public List<PlayerCharacter> availableCharacters = new();
 
     public Inventory inventory = new();
 
     public void Initialise()
     {
-        availableCharacters.AddRange(characters);
-        for (int i = 0; i < characters.Count; i++)
-        {
-            characters[i].Initialize();
-        }
+        // availableCharacters.AddRange(characters);
+        // for (int i = 0; i < characters.Count; i++)
+        // {
+        //     characters[i].Initialize();
+        // }
         Instance = this;
     }
 
@@ -38,5 +38,12 @@ public class Base : Unit
         for (int i = 0; i < characters.Count; i++)
             availableCharacters.Remove(characters[i]);
         Grid.AddPlayerSquad(Instantiate(Squad.squadPrefab), cell, UnityEngine.Random.Range(0f, 360f), characters, this);
+    }
+
+    public void AddCharacter(PlayerCharacter character)
+    {
+        character.SetupWeapons();
+        characters.Add(character);
+        availableCharacters.Add(character);
     }
 }

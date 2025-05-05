@@ -1,26 +1,63 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using OpenCover.Framework.Model;
 using UnityEngine;
 
 
+
+[Serializable]
+public class AttackStats
+{
+    public int attack;
+    public int accuracy;
+    public int critRate;
+}
+
 public enum SpecialEnergyType
 {
-    
+    Rage,
+    Endurance,
+
 }
 
 [Serializable]
 public struct SpecialEnergy
 {
+    public static Color[] SpecialEnergyColors = 
+    {
+        Color.blue,
+        Color.cyan,
+        Color.green,
+        Color.yellow
+    };
+    private const int combinedCoefficient = 85;
 
+    public SpecialEnergyType energyType;
+    public int amount;
+    public int regen;
+    public int decrease;
+
+    public static SpecialEnergy? GetCombinedEnergy(SpecialEnergy specialEnergy1, SpecialEnergy specialEnergy2)
+    {
+        if(specialEnergy1.energyType != specialEnergy2.energyType)
+            return null;
+
+        return new SpecialEnergy()
+        { 
+            energyType = specialEnergy1.energyType,
+            amount = (specialEnergy1.amount + specialEnergy2.amount) * combinedCoefficient / 100,
+            regen = (specialEnergy1.amount + specialEnergy2.amount) * combinedCoefficient / 100,
+            decrease = (specialEnergy1.amount + specialEnergy2.amount) * combinedCoefficient / 100
+        };
+    }
 }
 
 
 [Serializable]
 public class Weapon : Item, IUpgradable
 {
-    public AttackStats attackStats;
+    public AttackStats attackStats = new();
+    public SpecialEnergy specialEnergy = new();
 
     public List<Skill> skills = new();
     public List<WeaponUpgrade> upgrades = new();
@@ -29,19 +66,35 @@ public class Weapon : Item, IUpgradable
     public const int xUpgradeMax = 12;
     public const int yUpgradeMax = 12;
 
-    public void Initialize()
+    public void Initialize(WeaponParameters weaponParameters, WeaponSkillSet weaponSkillSet)
     {
         CurrentLevel = 1;
-        ReadSkills();
-        InitializeBaseAttackUpgrade();
-        InitializeSkillUpgrades(xUpgradeMax / 3, xUpgradeMax * 2 / 3, -(yUpgradeMax / 3), yUpgradeMax / 3);
-        InitializeSkillUpgrades(-(xUpgradeMax * 2 / 3), -(xUpgradeMax / 3), yUpgradeMax / 3, yUpgradeMax * 2 / 3);
-        InitializeSkillUpgrades(-(xUpgradeMax * 2 / 3), -(xUpgradeMax / 3), -(yUpgradeMax / 3), -(yUpgradeMax * 2 / 3));
+        InitializeStats(weaponParameters);
+        InitializeSkillSet(weaponSkillSet);
+        InitializeSkillUpgrades();
     }
 
-    private void ReadSkills()
+    private void InitializeStats(WeaponParameters weaponParameters)
+    {
+        attackStats.attack = weaponParameters.ATK;
+        attackStats.accuracy = weaponParameters.ACC;
+        attackStats.critRate = weaponParameters.CRIT;
+        specialEnergy.amount = weaponParameters.SE;
+        specialEnergy.regen = weaponParameters.SEreg;
+        specialEnergy.decrease = weaponParameters.SEdec;
+    }
+
+    private void InitializeSkillSet(WeaponSkillSet weaponSkillSet)
     {
 
+    }
+
+    private void InitializeSkillUpgrades()
+    {
+        InitializeBaseAttackUpgrade();
+        InitializeSkillUpgrade(xUpgradeMax / 3, xUpgradeMax * 2 / 3, -(yUpgradeMax / 3), yUpgradeMax / 3);
+        InitializeSkillUpgrade(-(xUpgradeMax * 2 / 3), -(xUpgradeMax / 3), yUpgradeMax / 3, yUpgradeMax * 2 / 3);
+        InitializeSkillUpgrade(-(xUpgradeMax * 2 / 3), -(xUpgradeMax / 3), -(yUpgradeMax / 3), -(yUpgradeMax * 2 / 3));
     }
 
     private void InitializeBaseAttackUpgrade()
@@ -56,7 +109,7 @@ public class Weapon : Item, IUpgradable
         upgrades.Add(baseAttackUpgrade);
     }
 
-    private void InitializeSkillUpgrades(int xMin, int xMax, int yMin, int yMax)
+    private void InitializeSkillUpgrade(int xMin, int xMax, int yMin, int yMax)
     {
         Vector2Int position;
 
@@ -266,13 +319,13 @@ public class Weapon : Item, IUpgradable
                     {
                         if (findedWeaponUpgrade is WeaponUpgradeSkill upgradeSkill && upgradeSkill == weaponUpgradeSkill)
                             return true;
-                        
-                        if(possibleUpgradesToPath.Contains(findedWeaponUpgrade) || occupiedUpgrades.Contains(findedWeaponUpgrade))
+
+                        if (possibleUpgradesToPath.Contains(findedWeaponUpgrade) || occupiedUpgrades.Contains(findedWeaponUpgrade))
                         {
                             continue;
                         }
 
-                        if(findedWeaponUpgrade is WeaponUpgradeRune findedUpgradeRune && findedUpgradeRune.linkedRune != null && findedUpgradeRune.linkedRune.runeConnections.Contains(d.Opposite()))
+                        if (findedWeaponUpgrade is WeaponUpgradeRune findedUpgradeRune && findedUpgradeRune.linkedRune != null && findedUpgradeRune.linkedRune.runeConnections.Contains(d.Opposite()))
                         {
                             possibleUpgradesToPath.Enqueue(findedWeaponUpgrade);
                         }

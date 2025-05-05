@@ -5,19 +5,22 @@ using System;
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class HexMesh : MonoBehaviour
 {
+	private Mesh hexMesh;
+	private MeshCollider meshCollider;
 
-	Mesh hexMesh;
-	MeshCollider meshCollider;
-
-	[NonSerialized] List<Vector3> vertices, terrainTypes;
-	[NonSerialized] List<Color> colors;
-	[NonSerialized] List<int> triangles;
-	[NonSerialized] List<Vector2> uvs, uv2s;
+	[NonSerialized] 
+	private List<Vector3> vertices, terrainTypes;
+	[NonSerialized] 
+	private List<Color> colors;
+	[NonSerialized] 
+	private List<int> triangles;
+	[NonSerialized] 
+	private List<Vector2> uvs, uv2s;
 
 	public bool useCollider, useColors, useUVCoordinates, useUV2Coordinates;
 	public bool useTerrainTypes;
 
-	void Awake()
+	private void Awake()
 	{
 		GetComponent<MeshFilter>().mesh = hexMesh = new Mesh();
 		if (useCollider)

@@ -6,30 +6,30 @@ using System.Collections.Generic;
 public class HexGrid : MonoBehaviour
 {
 	public int cellCountX = 20, cellCountZ = 15;
-	int cellsCount;
+	private int cellsCount;
 
-	int chunkCountX, chunkCountZ;
+	private int chunkCountX, chunkCountZ;
 
 	public HexCell cellPrefab;
-	HexCell[] cells;
+	private HexCell[] cells;
 
 	public TMP_Text cellLabelPrefab;
 
 	public HexGridChunk chunkPrefab;
-	HexGridChunk[] chunks;
+	private HexGridChunk[] chunks;
 
 	public Texture2D noiseSource;
 	public int seed;
 
 	public bool xWrapping, zWrapping;
 
-	Transform chunksEmpty, biomesEmpty, settlementsEmpty;
+	private Transform chunksEmpty, biomesEmpty, settlementsEmpty;
 
 	public HexBiome biomePrefab;
-	List<HexBiome> biomes;
+	private List<HexBiome> biomes;
 
 	public HexSettlement settlementPrefab;
-	List<HexSettlement> settlements;
+	private List<HexSettlement> settlements;
 
 	void Awake()
 	{
@@ -104,7 +104,7 @@ public class HexGrid : MonoBehaviour
 		return true;
 	}
 
-	void CreateChunks()
+	private void CreateChunks()
 	{
 		chunksEmpty = new GameObject("Chunks").transform;
 		chunksEmpty.SetParent(transform);
@@ -119,7 +119,7 @@ public class HexGrid : MonoBehaviour
 		}
 	}
 
-	void CreateCells()
+	private void CreateCells()
 	{
 		cells = new HexCell[cellCountZ * cellCountX];
 
@@ -132,7 +132,7 @@ public class HexGrid : MonoBehaviour
 		}
 	}
 
-	void CreateCell(int x, int z, int i)
+	private void CreateCell(int x, int z, int i)
 	{
 		Vector3 position;
 		position.x = (x + z * 0.5f - z / 2) * HexMetrics.innerDiameter;
@@ -221,7 +221,7 @@ public class HexGrid : MonoBehaviour
 		AddCellToChunk(x, z, cell);
 	}
 
-	void AddCellToChunk(int x, int z, HexCell cell)
+	private void AddCellToChunk(int x, int z, HexCell cell)
 	{
 		int chunkX = x / HexMetrics.chunkSizeX;
 		int chunkZ = z / HexMetrics.chunkSizeZ;
@@ -529,18 +529,16 @@ public class HexGrid : MonoBehaviour
 	//============================================================================================================
 	//                                            Поиск пути 
 	//============================================================================================================
-	HexCellPriorityQueue searchFrontier;
-	int searchFrontierPhase;
+	private HexCellPriorityQueue searchFrontier = new();
+	private int searchFrontierPhase;
 
-	HexCell currentPathFrom, currentPathTo;
-	bool currentPathExists;
-
-	int pathCost;
+	private HexCell currentPathFrom, currentPathTo;
+	private bool currentPathExists;
 
 	public void FindPath(HexCell fromCell, HexCell toCell, Unit unit)
 	{
 		ClearPath();
-		currentPathExists = Search(fromCell, toCell, unit);
+		currentPathExists = PathSearch(fromCell, toCell, unit);
 		currentPathFrom = fromCell;
 		currentPathTo = toCell;
 
@@ -550,18 +548,11 @@ public class HexGrid : MonoBehaviour
 		}
 	}
 
-	private bool Search(HexCell fromCell, HexCell toCell, Unit unit)
+	private bool PathSearch(HexCell fromCell, HexCell toCell, Unit unit)
 	{
 		searchFrontierPhase += 2;
 
-		if (searchFrontier == null)
-		{
-			searchFrontier = new HexCellPriorityQueue();
-		}
-		else
-		{
-			searchFrontier.Clear();
-		}
+		searchFrontier.Clear();
 
 		fromCell.SearchPhase = searchFrontierPhase;
 		fromCell.Distance = 0;
@@ -581,26 +572,18 @@ public class HexGrid : MonoBehaviour
 			{
 				HexCell neighbor = current.GetNeighbor(d);
 				if (neighbor == null || neighbor.SearchPhase > searchFrontierPhase)
-				{
 					continue;
-				}
-				
-				if (neighbor != toCell && !unit.IsValidMove(neighbor))
-				{
-					continue;
-				}
 
-				int moveCost = unit.GetMoveCost(current, neighbor, d);
-				if (moveCost < 0)
-				{
+				if (neighbor != toCell && !unit.IsValidMove(neighbor))
 					continue;
-				}
+
+				int moveCost = unit.GetMoveCost(current, d);
+				if (moveCost < 0)
+					continue;
 
 				int distance = current.Distance + moveCost;
 				if (distance > unit.Stamina)
-				{
 					continue;
-				}
 
 				if (neighbor.SearchPhase < searchFrontierPhase)
 				{
@@ -622,7 +605,7 @@ public class HexGrid : MonoBehaviour
 		return false;
 	}
 
-	void ShowPath()
+	private void ShowPath()
 	{
 		if (currentPathExists)
 		{
@@ -675,8 +658,8 @@ public class HexGrid : MonoBehaviour
 	//============================================================================================================
 	public Squad squadPrefab;
 	public Base basePrefab;
-	List<Unit> units = new List<Unit>();
-	Base @base;
+	private List<Unit> units = new List<Unit>();
+	private Base @base;
 
 	public bool HasPath
 	{
@@ -686,7 +669,7 @@ public class HexGrid : MonoBehaviour
 		}
 	}
 
-	void ClearSquads()
+	private void ClearSquads()
 	{
 		for (int i = 0; i < units.Count; i++)
 		{
@@ -846,8 +829,8 @@ public class HexGrid : MonoBehaviour
 	//============================================================================================================
 	//                                        Сворачивание карты 
 	//============================================================================================================
-	int currentCenterColumnIndex = -1;
-	int currentCenterLineIndex = -1;
+	private int currentCenterColumnIndex = -1;
+	private int currentCenterLineIndex = -1;
 
 	public void CenterMapX(float xPosition)
 	{

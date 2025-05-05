@@ -120,21 +120,20 @@ public abstract class Unit : MonoBehaviour
 		float orientation = reader.ReadSingle();
 	}
 
-	public int GetMoveCost(HexCell fromCell, HexCell toCell, HexDirection direction)
+	public int GetMoveCost(HexCell fromCell, HexDirection direction)
 	{
+		HexCell toCell = fromCell.GetNeighbor(direction);
 		HexEdgeType edgeType = fromCell.GetEdgeType(toCell);
 		if (edgeType == HexEdgeType.Cliff)
-		{
 			return -1;
-		}
+
+		if (fromCell.Walled != toCell.Walled)
+			return -1;
+
 		int moveCost;
 		if (fromCell.HasRoadThroughEdge(direction))
 		{
 			moveCost = 1;
-		}
-		else if (fromCell.Walled != toCell.Walled)
-		{
-			return -1;
 		}
 		else
 		{

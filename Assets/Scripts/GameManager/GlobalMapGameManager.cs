@@ -13,10 +13,13 @@ public class GlobalMapGameManager : MonoBehaviour
     public KeyCode endTurnKey = KeyCode.LeftAlt;
 
     public HexGrid grid;
+    
+    private int recruitCycle = 7;
 
     private void Start()
     {
-        UIReferences.gameUI.CurrentTurn = CurrentTurn;
+        GameUI.Instance.CurrentTurn = CurrentTurn;
+        RecruitingUI.Instance.UpdateRecruitingCharacters();
     }
 
     private void Update()
@@ -34,8 +37,8 @@ public class GlobalMapGameManager : MonoBehaviour
         if (CurrentState != GameState.PlayerTurn) return;
 
         CurrentState = GameState.EnemyTurn;
-        UIReferences.hexUI.DisableAllUnitsUI();
-        UIReferences.gameUI.enabled = false;
+        HexUI.Instance.DisableAllUnitsUI();
+        GameUI.Instance.enabled = false;
 
         StartNewTurn();
     }
@@ -43,9 +46,11 @@ public class GlobalMapGameManager : MonoBehaviour
     private void StartNewTurn()
     {
         CurrentTurn++;
+        if(CurrentTurn%recruitCycle == 0)
+            RecruitingUI.Instance.UpdateRecruitingCharacters();
         CurrentState = GameState.PlayerTurn;
-        UIReferences.gameUI.enabled = true;
-        UIReferences.gameUI.CurrentTurn = CurrentTurn;
+        GameUI.Instance.enabled = true;
+        GameUI.Instance.CurrentTurn = CurrentTurn;
         grid.ResetUnitsStamina();
         grid.ClearPath();
     }

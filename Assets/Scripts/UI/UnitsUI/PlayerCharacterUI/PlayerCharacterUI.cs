@@ -3,24 +3,27 @@ using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.UIElements;
 
 public class PlayerCharacterUI : MonoBehaviour
 {
     public GameObject UIContainer;
-    public PerkSlot perkSlotPrefab;
-    public CharacterSkillSlot skillSlotPrefab;
 
-    public GameObject armorCoreSlot, artifactSlot, weapon1Slot, weapon2Slot;
-    public Transform skills1Container, skills2Container, positivePerksContainer, negativePerksContainer;
+    public GameObject armorCoreSlot, artifactSlot;
+    public WeaponCellVisual weapon1Cell, weapon2Cell;
 
-    private List<CharacterSkillSlot> skill1 = new(), skill2 = new();
-    private List<PerkSlot> positivePerks = new(), negativePerks = new();
+    public TraitCellVisual traitCellPrefab;
+    public SkillCellVisual skillCellPrefab;
+    public Transform skills1Container, skills2Container, positiveTraitsContainer, negativeTraitsContainer;
 
-    public TMP_Text healthLabel, defenceLabel, evasionLabel, attackLabel, accurancyLabel, critLabel, enduranceAmountLabel, enduranceRegenLabel, enduranceMoveCostLabel, initiativeLabel, agroLabel;
+    private List<SkillCellVisual> skills1 = new(), skills2 = new();
+    private List<TraitCellVisual> positiveTraits = new(), negativeTraits = new();
 
-    private PlayerCharacter playerCharacter;
+    public TMP_Text healthLabel, defenceLabel, evasionLabel, attackLabel, accurancyLabel, critLabel, SPAmountLabel, SPRegenLabel, SPMoveCostLabel, speedLabel, tountLabel;
 
+    public Image specialEnergy1, specialEnergy2, specialEnergyCombined;
+    public TMP_Text specialEnergy1Amount, specialEnergy2Amount, specialEnergyCombinedAmount;
+
+    private PlayerCharacter playerCharacter; 
 
     void Awake()
     {
@@ -28,12 +31,6 @@ public class PlayerCharacterUI : MonoBehaviour
         enabled = false;
         UIContainer.SetActive(false);
         playerCharacter = null;
-    }
-
-    void Update()
-    {
-        if(Input.GetKeyDown(KeyCode.Escape))
-            Hide();
     }
 
     public void ShowForCharacter(PlayerCharacter character)
@@ -46,43 +43,59 @@ public class PlayerCharacterUI : MonoBehaviour
 
     public void Hide()
     {
+        HideSpecialEnergies();
         enabled = false;
         UIContainer.SetActive(false);
     }
 
+    private void HideSpecialEnergies()
+    {
+        specialEnergy1.gameObject.SetActive(false);
+        specialEnergy2.gameObject.SetActive(false);
+        specialEnergyCombined.gameObject.SetActive(false);
+    }
+
     public void UpdateUI()
     {
-        foreach (Transform child in skills1Container)
-            Destroy(child.gameObject);
-        foreach (Transform child in skills2Container)
-            Destroy(child.gameObject);
-        foreach (Transform child in positivePerksContainer)
-            Destroy(child.gameObject);
-        foreach (Transform child in negativePerksContainer)
-            Destroy(child.gameObject);
+        ClearPanel(skills1Container);
+        ClearPanel(skills2Container);
+        ClearPanel(positiveTraitsContainer);
+        ClearPanel(negativeTraitsContainer);
 
-        skill1.Clear();
-        skill2.Clear();
-        positivePerks.Clear();
-        negativePerks.Clear();
+        HideSpecialEnergies();
 
-
+        skills1.Clear();
+        skills2.Clear();
+        positiveTraits.Clear();
+        negativeTraits.Clear();
 
         UpdateInfo();
     }
 
+    void ClearPanel(Transform panel)
+    {
+        foreach (Transform child in panel)
+        {
+            Destroy(child.gameObject);
+        }
+    }
+
     private void UpdateInfo()
     {
+        weapon1Cell.Setup(playerCharacter.equipment.weapon1);
+        weapon2Cell.Setup(playerCharacter.equipment.weapon2);
         UpdateSurvivalInfo();
         UpdateAttackInfo();
         UpdateOtherInfo();
+        UpdateSkillsInfo();
+        UpdateTraitsInfo();
     }
 
     private void UpdateSurvivalInfo()
     {
-        healthLabel.text = $"{playerCharacter.currentSurvivalStats.health}/{playerCharacter.maxSurvivalStats.health}";
-        defenceLabel.text = $"{playerCharacter.currentSurvivalStats.defence}";
-        evasionLabel.text = $"{playerCharacter.maxSurvivalStats.evasion}";
+        healthLabel.text = $"{playerCharacter.currentCharacterStats.maxHealth}/{playerCharacter.currentCharacterStats.maxHealth}";
+        defenceLabel.text = $"{playerCharacter.currentCharacterStats.defence}";
+        evasionLabel.text = $"{playerCharacter.currentCharacterStats.evasion}";
     }
 
     private void UpdateAttackInfo()
@@ -94,10 +107,43 @@ public class PlayerCharacterUI : MonoBehaviour
 
     private void UpdateOtherInfo()
     {
-        enduranceAmountLabel.text = $"{playerCharacter.currentOtherStats.endurance.amount}";
-        enduranceRegenLabel.text = $"{playerCharacter.currentOtherStats.endurance.regen}";
-        enduranceMoveCostLabel.text = $"{playerCharacter.currentOtherStats.endurance.moveCost}";
-        initiativeLabel.text = $"{playerCharacter.currentOtherStats.initiative}";
-        agroLabel.text = $"{playerCharacter.currentOtherStats.tount}";
+        SPAmountLabel.text = $"{playerCharacter.baseCharacterStats.SPamount}";
+        SPRegenLabel.text = $"{playerCharacter.baseCharacterStats.SPregen}";
+        SPMoveCostLabel.text = $"{playerCharacter.baseCharacterStats.SPmoveCost}";
+        speedLabel.text = $"{playerCharacter.baseCharacterStats.speed}";
+        tountLabel.text = $"{playerCharacter.baseCharacterStats.tount}";
+    }
+
+    private void UpdateSkillsInfo()
+    {
+        ClearPanel(skills1Container);
+
+        for (int i = 0; i < playerCharacter.equipment.weapon1.skills.Count; i++)
+        {
+            SkillCellVisual skillCell = Instantiate(skillCellPrefab, skills1Container);
+            skillCell.Setup(playerCharacter.equipment.weapon1.skills[i]);
+            skills1.Add(skillCell);
+        }
+        specialEnergy1.gameObject.SetActive(true);
+        specialEnergy1.color = SpecialEnergy.SpecialEnergyColors[0];
+        specialEnergy1Amount.text = $"{playerCharacter.equipment.weapon1.specialEnergy.amount}";
+
+        ClearPanel(skills2Container);
+
+        for (int i = 0; i < playerCharacter.equipment.weapon2.skills.Count; i++)
+        {
+            SkillCellVisual skillCell = Instantiate(skillCellPrefab, skills2Container);
+            skillCell.Setup(playerCharacter.equipment.weapon2.skills[i]);
+            skills2.Add(skillCell);
+        }
+
+        specialEnergy2.gameObject.SetActive(true);
+        specialEnergy2.color = SpecialEnergy.SpecialEnergyColors[0];
+        specialEnergy2Amount.text = $"{playerCharacter.equipment.weapon2.specialEnergy.amount}";
+    }
+
+    private void UpdateTraitsInfo()
+    {
+
     }
 }

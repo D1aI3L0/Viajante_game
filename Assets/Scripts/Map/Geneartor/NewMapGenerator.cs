@@ -19,7 +19,7 @@ public struct MinMaxInt
 public class NewMapGenerator : MonoBehaviour
 {
     public HexGrid grid;
-    int cellCount;
+    private int cellCount;
 
     public int seed;
     public bool useFixedSeed;
@@ -35,11 +35,11 @@ public class NewMapGenerator : MonoBehaviour
     }
     public MapType mapType = MapType.Standart;
 
-    HexCellPriorityQueue searchFrontier;
-    int searchFrontierPhase;
+    private HexCellPriorityQueue searchFrontier;
+    private int searchFrontierPhase;
 
-    List<HexCell> cellsCopy;
-    List<HexCell> connection;
+    private List<HexCell> cellsCopy;
+    private List<HexCell> connection;
 
     public bool fill = true;
 
@@ -89,8 +89,8 @@ public class NewMapGenerator : MonoBehaviour
     //============================================================================================================
     //                                              Биомы 
     //============================================================================================================
-    static readonly int biomesCount = 5;
-    readonly BiomePattern[][] biomePatterns =
+    private static readonly int biomesCount = 5;
+    private readonly BiomePattern[][] biomePatterns =
     {
         new BiomePattern[]
         {
@@ -150,7 +150,7 @@ public class NewMapGenerator : MonoBehaviour
     [Range(3, 10)]
     public int maxSubCornersScale = 3;
 
-    void GenerateBiomes()
+    private void GenerateBiomes()
     {
         connectionSkipRules = (cell, connectionParams, checkCell) => { return cell.biomeName != BiomeName.None; };
         cornerBreakRules = (cell) => { return cell.biomeName == BiomeName.SubBorder; };
@@ -165,6 +165,7 @@ public class NewMapGenerator : MonoBehaviour
         int[] curBiomesCount = new int[biomesCount];
         int totalBiomesCount = 0, totalBiomesMaxCount = 0;
         biomeWeights = new float[biomesCount];
+
         for (int i = 0; i < biomesCount; i++)
             totalBiomesMaxCount += biomesMaxCount[i];
 
@@ -183,23 +184,23 @@ public class NewMapGenerator : MonoBehaviour
         while (cellsCopy.Count > coveredCells && totalBiomesCount < totalBiomesMaxCount && itCount < 10000)
         {
             itCount++;
-            int b = 0;
+            int biomeNumber = 0;
             float w = UnityEngine.Random.value;
-            while (b < biomesCount)
+            while (biomeNumber < biomesCount)
             {
-                if ((w -= biomeWeights[b]) <= 0)
+                if ((w -= biomeWeights[biomeNumber]) <= 0)
                     break;
-                b++;
+                biomeNumber++;
             }
 
-            if (b >= biomesCount)
+            if (biomeNumber >= biomesCount)
                 continue;
-            if (curBiomesCount[b] >= biomesMaxCount[b])
+            if (curBiomesCount[biomeNumber] >= biomesMaxCount[biomeNumber])
                 continue;
 
-            if (GenerateBiome(b))
+            if (GenerateBiome(biomeNumber))
             {
-                curBiomesCount[b] += 1;
+                curBiomesCount[biomeNumber] += 1;
                 totalBiomesCount += 1;
             }
         }
@@ -207,7 +208,7 @@ public class NewMapGenerator : MonoBehaviour
     }
 
 
-    bool GenerateBiome(int biomeIndex)
+    private bool GenerateBiome(int biomeIndex)
     {
         if (connection == null || connection.Count != 0)
             connection = ListPool<HexCell>.Get();
@@ -231,7 +232,7 @@ public class NewMapGenerator : MonoBehaviour
     }
 
 
-    void CreateSubBorders(List<HexCell> borders)
+    private void CreateSubBorders(List<HexCell> borders)
     {
         foreach (HexCell border in borders)
         {
@@ -252,7 +253,7 @@ public class NewMapGenerator : MonoBehaviour
         }
     }
 
-    void FillBiome(List<HexCell> borders, HexCell centerCell, int biomeIndex)
+    private void FillBiome(List<HexCell> borders, HexCell centerCell, int biomeIndex)
     {
         searchFrontierPhase += 1;
         searchFrontier.Clear();
@@ -328,7 +329,7 @@ public class NewMapGenerator : MonoBehaviour
     //============================================================================================================
     //                                               Высоты
     //============================================================================================================
-    public bool elevation = true;
+    public bool useElevation = true;
     [Range(1f, 0.001f)]
     public float elevationScaling = 0.003f;
     [Range(-3, 2)]
@@ -344,7 +345,7 @@ public class NewMapGenerator : MonoBehaviour
     [Range(-5f, 5f)]
     public float amplitude = 1f;
 
-    MinMaxInt[] elevationCaps =
+    private MinMaxInt[] elevationCaps =
     {
         new MinMaxInt(0, 3),
         new MinMaxInt(0, 3),
@@ -354,40 +355,17 @@ public class NewMapGenerator : MonoBehaviour
         new MinMaxInt(0, 3)
     };
 
-    public enum PerlinChoise
+    private void GenerateElevationMap()
     {
-        Integrated,
-        Personal,
-        PersonalWithOctaves
-    }
-
-    public PerlinChoise perlinType = PerlinChoise.PersonalWithOctaves;
-
-    void GenerateElevationMap()
-    {
-        if (elevation)
+        if (useElevation)
         {
-            Perlin perlin = new Perlin();
-            Perlin2D perlin2D = new Perlin2D(seed);
-            perlin.SetSeed(seed);
+            Perlin2D perlin2D = new(seed);
             for (int i = 0; i < cellCount; i++)
             {
                 HexCell cell = grid.GetCell(i);
 
                 Vector3 pos = cell.Position * elevationScaling;
-                float fElevation;
-                switch (perlinType)
-                {
-                    default:
-                        fElevation = perlin.Noise(pos.x, pos.z);
-                        break;
-                    case PerlinChoise.Personal:
-                        fElevation = perlin2D.Noise(pos.x, pos.z);
-                        break;
-                    case PerlinChoise.PersonalWithOctaves:
-                        fElevation = perlin2D.Noise(pos.x, pos.z, perlinOctaves, perlinPersistence);
-                        break;
-                }
+                float fElevation = perlin2D.Noise(pos.x, pos.z, perlinOctaves, perlinPersistence);
 
                 int iElevation = (int)(Math.Sin(fElevation * amplitude) * 10);
 
@@ -426,7 +404,7 @@ public class NewMapGenerator : MonoBehaviour
     public int erosionPercentage = 50;
 
 
-    void ErodeLand()
+    private void ErodeLand()
     {
         List<HexCell> erodibleCells = ListPool<HexCell>.Get();
         for (int i = 0; i < cellCount; i++)
@@ -448,7 +426,9 @@ public class NewMapGenerator : MonoBehaviour
 
             if (cell.Elevation != waterLevel)
                 cell.Elevation -= 1;
+
             targetCell.Elevation += 1;
+
             if (targetCell.biomeName == BiomeName.None && !targetCell.IsUnderwater)
                 targetCell.biomeName = BiomeName.SubBorder;
 
@@ -461,45 +441,37 @@ public class NewMapGenerator : MonoBehaviour
             for (HexDirection d = HexDirection.NE; d <= HexDirection.NW; d++)
             {
                 HexCell neighbor = cell.GetNeighbor(d);
-                if (neighbor && neighbor && neighbor.Elevation == cell.Elevation + 2 && !erodibleCells.Contains(neighbor))
-                {
+                if (neighbor && neighbor.Elevation == cell.Elevation + 2 && !erodibleCells.Contains(neighbor))
                     erodibleCells.Add(neighbor);
-                }
             }
 
             if (IsErodible(targetCell) && !erodibleCells.Contains(targetCell))
-            {
                 erodibleCells.Add(targetCell);
-            }
 
             for (HexDirection d = HexDirection.NE; d <= HexDirection.NW; d++)
             {
                 HexCell neighbor = targetCell.GetNeighbor(d);
                 if (neighbor && neighbor != cell && !IsErodible(neighbor) && neighbor.Elevation == targetCell.Elevation + 1)
-                {
                     erodibleCells.Remove(neighbor);
-                }
             }
         }
 
         ListPool<HexCell>.Add(erodibleCells);
     }
 
-    bool IsErodible(HexCell cell)
+    private bool IsErodible(HexCell cell)
     {
         int erodibleElevation = cell.Elevation - 2;
         for (HexDirection d = HexDirection.NE; d <= HexDirection.NW; d++)
         {
             HexCell neighbor = cell.GetNeighbor(d);
             if (neighbor && neighbor.Elevation <= erodibleElevation)
-            {
                 return true;
-            }
         }
         return false;
     }
 
-    HexCell GetErosionTarget(HexCell cell)
+    private HexCell GetErosionTarget(HexCell cell)
     {
         List<HexCell> candidates = ListPool<HexCell>.Get();
         int erodibleElevation = cell.Elevation - 2;
@@ -507,9 +479,7 @@ public class NewMapGenerator : MonoBehaviour
         {
             HexCell neighbor = cell.GetNeighbor(d);
             if (neighbor && neighbor.Elevation <= erodibleElevation)
-            {
                 candidates.Add(neighbor);
-            }
         }
         HexCell target = candidates[UnityEngine.Random.Range(0, candidates.Count)];
         ListPool<HexCell>.Add(candidates);
@@ -522,7 +492,7 @@ public class NewMapGenerator : MonoBehaviour
     [Range(1, 50)]
     public int minWaterCount = 15;
 
-    void CheckTerrain()
+    private void CheckTerrain()
     {
         for (int i = 0; i < cellCount; i++)
         {
@@ -545,7 +515,7 @@ public class NewMapGenerator : MonoBehaviour
         }
     }
 
-    void CheckWater(HexCell cell)
+    private void CheckWater(HexCell cell)
     {
         searchFrontierPhase += 1;
         searchFrontier.Clear();
@@ -591,7 +561,7 @@ public class NewMapGenerator : MonoBehaviour
         ListPool<HexCell>.Add(waterCells);
     }
 
-    void SetSubBordersTerrain()
+    private void SetSubBordersTerrain()
     {
         for (int i = 0; i < 4; i++)
         {
@@ -613,7 +583,7 @@ public class NewMapGenerator : MonoBehaviour
     //============================================================================================================
     //                                                 Поселения
     //============================================================================================================
-    SettlementPattern[] settlementPatterns =
+    private SettlementPattern[] settlementPatterns =
     {
         new SettlementPattern(SettlementType.Village, 1, 1),
         new SettlementPattern(SettlementType.Town, 1, 2),
@@ -625,7 +595,7 @@ public class NewMapGenerator : MonoBehaviour
     public int minSettlementsDistance = 7;
 
 
-    void GenerateSettlements()
+    private void GenerateSettlements()
     {
         checkAreaRules = (cell1, cell2, deviation) =>
         {
@@ -679,7 +649,7 @@ public class NewMapGenerator : MonoBehaviour
         }
     }
 
-    bool GenerateSettlement(HexBiome biome, SettlementType settlementType, bool isCapital = false)
+    private bool GenerateSettlement(HexBiome biome, SettlementType settlementType, bool isCapital = false)
     {
         if (connection == null || connection.Count != 0)
             connection = ListPool<HexCell>.Get();
@@ -728,7 +698,7 @@ public class NewMapGenerator : MonoBehaviour
             return false;
     }
 
-    void FillSettlement(HexCell center, SettlementType settlementType)
+    private void FillSettlement(HexCell center, SettlementType settlementType)
     {
         searchFrontierPhase += 1;
         searchFrontier.Clear();
@@ -761,7 +731,7 @@ public class NewMapGenerator : MonoBehaviour
         }
     }
 
-    bool IsSettlementNearby(HexCell center, int minDistance)
+    private bool IsSettlementNearby(HexCell center, int minDistance)
     {
         searchFrontierPhase += 1;
         searchFrontier.Clear();
@@ -794,7 +764,7 @@ public class NewMapGenerator : MonoBehaviour
         return false;
     }
 
-    void ConnectSettlements()
+    private void ConnectSettlements()
     {
         if (connection == null || connection.Count != 0)
             connection = ListPool<HexCell>.Get();
@@ -842,7 +812,7 @@ public class NewMapGenerator : MonoBehaviour
     }
 
 
-    HexSettlement FindClosestSettlement(HexSettlement settlement, List<HexSettlement> allSettlements)
+    private HexSettlement FindClosestSettlement(HexSettlement settlement, List<HexSettlement> allSettlements)
     {
         HexCoordinates settCoords = settlement.center.coordinates;
 
@@ -871,10 +841,10 @@ public class NewMapGenerator : MonoBehaviour
     //============================================================================================================
     //                                                 Универсальные функции
     //============================================================================================================
-    delegate bool CheckAreaRules(HexCell cell1, HexCell cell2, MinMaxInt? minMaxElevationVediation);
-    CheckAreaRules checkAreaRules;
+    private delegate bool CheckAreaRules(HexCell cell1, HexCell cell2, MinMaxInt? minMaxElevationVediation);
+    private CheckAreaRules checkAreaRules;
 
-    bool CheckArea(HexCell center, int radius, CheckAreaRules rules, MinMaxInt? minMaxElevationDeviation, List<HexCell> border = null)
+    private bool CheckArea(HexCell center, int radius, CheckAreaRules rules, MinMaxInt? minMaxElevationDeviation, List<HexCell> border = null)
     {
         searchFrontierPhase += 1;
         searchFrontier.Clear();
@@ -910,9 +880,9 @@ public class NewMapGenerator : MonoBehaviour
     }
 
 
-    delegate bool ConnectionSkipRules(HexCell cell, ConnectionParams connectionParams, HexCell checkCell = null);
-    ConnectionSkipRules connectionSkipRules;
-    struct ConnectionParams
+    private delegate bool ConnectionSkipRules(HexCell cell, ConnectionParams connectionParams, HexCell checkCell = null);
+    private ConnectionSkipRules connectionSkipRules;
+    private struct ConnectionParams
     {
         public BiomeName searchedBorderBiome;
         public bool useCliffCheck;
@@ -933,10 +903,10 @@ public class NewMapGenerator : MonoBehaviour
         }
     }
 
-    delegate bool CornerBreakRules(HexCell cell);
-    CornerBreakRules cornerBreakRules;
-    delegate bool CornerBackRules(HexCell cell, BiomeName biomeName);
-    CornerBackRules cornerBackRules;
+    private delegate bool CornerBreakRules(HexCell cell);
+    private CornerBreakRules cornerBreakRules;
+    private delegate bool CornerBackRules(HexCell cell, BiomeName biomeName);
+    private CornerBackRules cornerBackRules;
 
     private enum ConnectionType
     {
@@ -1061,25 +1031,25 @@ public class NewMapGenerator : MonoBehaviour
         return true;
     }
 
-    private bool ConnectCells(HexCell cell1, HexCell cell2, ConnectionParams connectionParams, bool includeCorners = false)
+    private bool ConnectCells(HexCell FromCell, HexCell toCell, ConnectionParams connectionParams, bool includeCorners = false)
     {
         searchFrontierPhase += 2;
 
         searchFrontier.Clear();
 
-        cell1.SearchPhase = searchFrontierPhase;
-        cell1.Distance = 0;
-        searchFrontier.Enqueue(cell1);
+        FromCell.SearchPhase = searchFrontierPhase;
+        FromCell.Distance = 0;
+        bool isExist = false;
+        searchFrontier.Enqueue(FromCell);
 
-        bool isFind = false;
         while (searchFrontier.Count > 0)
         {
             HexCell current = searchFrontier.Dequeue();
             current.SearchPhase += 1;
 
-            if (current == cell2)
+            if (current == toCell)
             {
-                isFind = true;
+                isExist = true;
                 break;
             }
 
@@ -1096,7 +1066,7 @@ public class NewMapGenerator : MonoBehaviour
                 }
 
                 int distance = current.Distance;
-                var extraDistance = connectionParams.connectionType switch
+                int extraDistance = connectionParams.connectionType switch
                 {
                     ConnectionType.Roads => (neighbor.HasRoads ? 0 : 4) + (UnityEngine.Random.value > 0.3f ? (int)neighbor.GetEdgeType(current) * 2 : 0),
                     _ => 0,
@@ -1109,7 +1079,7 @@ public class NewMapGenerator : MonoBehaviour
                     neighbor.SearchPhase = searchFrontierPhase;
                     neighbor.Distance = distance;
                     neighbor.PathFrom = current;
-                    neighbor.SearchHeuristic = neighbor.coordinates.DistanceTo(cell2.coordinates);
+                    neighbor.SearchHeuristic = neighbor.coordinates.DistanceTo(toCell.coordinates);
                     searchFrontier.Enqueue(neighbor);
                 }
                 else if (distance < neighbor.Distance)
@@ -1122,15 +1092,15 @@ public class NewMapGenerator : MonoBehaviour
             }
         }
 
-        if (isFind)
+        if (isExist)
         {
             if (includeCorners)
-                connection.Add(cell2);
-            HexCell currentCell = cell2;
-            while (currentCell != cell1)
+                connection.Add(toCell);
+            HexCell currentCell = toCell;
+            while (currentCell != FromCell)
             {
                 currentCell = currentCell.PathFrom;
-                if (currentCell == cell1 && !includeCorners)
+                if (currentCell == FromCell && !includeCorners)
                     break;
                 connection.Add(currentCell);
             }

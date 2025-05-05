@@ -57,7 +57,7 @@ public class PlayerSquadUI : MonoBehaviour
         if (currentSquad != null)
         {
             currentSquad.ReturnToBase();
-            UIReferences.gameUI.selectedUnit = null;
+            GameUI.Instance.selectedUnit = null;
             Hide();
         }
     }

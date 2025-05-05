@@ -29,7 +29,7 @@ public class WorkshopUI : MonoBehaviour
 
     public void Hide()
     {
-        UIReferences.gameUI.enabled = true;
+        GameUI.Instance.enabled = true;
         enabled = false;
         UIContainer.SetActive(false);
         CloseAllSubmenus();

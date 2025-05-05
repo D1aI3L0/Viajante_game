@@ -21,7 +21,7 @@ public class CharacterSlotSquad : MonoBehaviour
     
     public void UpdateStats()
     {
-        healthIndicator.fillAmount = (float)character.currentSurvivalStats.health / character.maxSurvivalStats.health;
+        healthIndicator.fillAmount = (float)character.currentCharacterStats.maxHealth / character.currentCharacterStats.maxHealth;
     }
 
     public void ShowCharacterStats()

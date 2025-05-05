@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class CellClickForwarder : MonoBehaviour
 {
@@ -11,7 +12,7 @@ public class CellClickForwarder : MonoBehaviour
             Debug.LogWarning("Не найден компонент BattleCell у родительского объекта.");
             return;
         }
-        
+
         // Проверяем, зажата ли клавиша Shift (можно расширить для права или обеих клавиш)
         if (Input.GetKey(KeyCode.LeftShift))
         {
@@ -31,7 +32,12 @@ public class CellClickForwarder : MonoBehaviour
             // Обычный клик – рассчитываем маршрут
             if (PlayerTurnController.Instance != null)
             {
-                Debug.Log("Клик по клетке: " + cell.name);
+                if (EventSystem.current.IsPointerOverGameObject())
+                {
+                    // Если указатель над UI, то не обрабатываем клик для игрового поля.
+                    return;
+                }
+                //Debug.Log("Клик по клетке: " + cell.name);
                 PlayerTurnController.Instance.OnCellClicked(cell);
             }
             else

@@ -7,13 +7,7 @@ public class AllyBattleCharacter : BattleEntity
 
     // Индекс текущей стойки (текущего оружия)
     public int currentWeaponIndex;
-
-    // Параметры SP
-    public int maxSP;
-    public int currentSP;
-    public int SPreg;
-    public int SPmovecost;
-
+    
     // Массив базовых параметров оружия (для двух стойк)
     public WeaponParameters[] weaponParameters;
     // Остальные данные о навыках и подклассах
@@ -91,7 +85,7 @@ public class AllyBattleCharacter : BattleEntity
 
         // Инициализация HP
         maxHP = runtimeParams.maxHP;
-        currentHP = runtimeParams.currentHP;
+        CurrentHP = runtimeParams.currentHP;
 
         // Инициализация DEF
         baseDEF = runtimeParams.DEF;
@@ -107,7 +101,7 @@ public class AllyBattleCharacter : BattleEntity
 
         // Инициализация SP
         maxSP = runtimeParams.SP;
-        currentSP = maxSP;
+        CurrentSP = maxSP;
         SPreg = runtimeParams.SPreg;
         SPmovecost = runtimeParams.SPmovecost;
 

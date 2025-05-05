@@ -17,7 +17,7 @@ public class EnemyBattleCharacter : BattleEntity
     public void Init()
     {
         // Общие параметры уже могут быть установлены в инспекторе или инициализироваться заранее
-        currentHP = maxHP;
+        CurrentHP = maxHP;
         currentDEF = baseDEF;
         currentEVA = baseEVA;
         currentSPD = baseSPD;
@@ -25,5 +25,7 @@ public class EnemyBattleCharacter : BattleEntity
         currentATK = baseATK;
         currentACC = baseACC;
         currentCRIT = baseCRIT;
+
+        CurrentSP = maxSP;
     }
 }

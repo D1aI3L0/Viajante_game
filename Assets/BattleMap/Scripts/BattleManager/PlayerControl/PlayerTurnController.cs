@@ -38,6 +38,7 @@ public class PlayerTurnController : MonoBehaviour
             Debug.LogError("Переданный юнит не является AllyBattleCharacter.");
             return;
         }
+        BattleUIController.Instance.SetPlayer(currentPlayerUnit);
         Debug.Log("Ход игрока: " + currentPlayerUnit.name);
         ClearPathDisplay();
         currentPath = null;
@@ -59,6 +60,7 @@ public class PlayerTurnController : MonoBehaviour
     /// <param name="targetCell">Клетка, по которой кликнули.</param>
     public void OnCellClicked(BattleCell targetCell)
     {
+        
         Debug.Log("Start cell: " + (currentPlayerUnit.currentCell != null ? currentPlayerUnit.currentCell.name : "null") +
           "; Target cell: " + targetCell.name);
 
@@ -75,10 +77,11 @@ public class PlayerTurnController : MonoBehaviour
         if (currentPath != null)
         {
             int cost = currentPath.Count * currentPlayerUnit.SPmovecost;
-            if (cost > currentPlayerUnit.currentSP)
+            if (cost > currentPlayerUnit.CurrentSP)
             {
                 Debug.Log("Недостаточно SP для заданного маршрута.");
                 ClearPathDisplay();
+                currentPath = null;
                 return;
             }
             UpdatePathDisplay(currentPath);
@@ -122,7 +125,7 @@ public class PlayerTurnController : MonoBehaviour
     {
         foreach (BattleCell nextCell in path)
         {
-            currentPlayerUnit.currentSP -= currentPlayerUnit.SPmovecost;
+            currentPlayerUnit.CurrentSP -= currentPlayerUnit.SPmovecost;
 
             BattleCell previousCell = currentPlayerUnit.currentCell;
             if (previousCell != null)
@@ -170,7 +173,7 @@ public class PlayerTurnController : MonoBehaviour
             newPath.AddRange(secondSegment.GetRange(1, secondSegment.Count - 1));
 
             int cost = newPath.Count * currentPlayerUnit.SPmovecost;
-            if (cost > currentPlayerUnit.currentSP)
+            if (cost > currentPlayerUnit.CurrentSP)
             {
                 Debug.Log("Недостаточно SP для маршрута с ключевой точкой.");
                 return;

@@ -4,6 +4,8 @@ using TMPro;
 
 public class BattleUIController : MonoBehaviour
 {
+    public static BattleUIController Instance { get; private set; }
+
     [Header("Turn Panel")]
     public Button endTurnButton;
     public GameObject turnOrderPanel; // Панель очередности ходов (можно заменить на список/контейнер)
@@ -14,6 +16,9 @@ public class BattleUIController : MonoBehaviour
     public Image spBarFill;
     public TMP_Text spText;
 
+    [Header("Movement  Panel")]
+    public Button confirmPathButton;
+
     [Header("Subclass Panel")]
     public Image specialEnergyBarFill;
     public TMP_Text specialEnergyText; // если нужна числовая информация
@@ -23,19 +28,48 @@ public class BattleUIController : MonoBehaviour
     // Ссылка на активного игрока
     private AllyBattleCharacter player;
 
+    private void Awake()
+    {
+        // Устанавливаем синглтон
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
+
+
+
     /// <summary>
     /// Вызывается для установки ссылки на активного персонажа.
     /// Эту функцию можно вызвать из PlayerTurnController при начале хода.
     /// </summary>
     public void SetPlayer(AllyBattleCharacter newPlayer)
     {
+        // Если ранее уже был установлен игрок, отписываемся от его события
+        if (player != null)
+        {
+            player.OnStatsChanged -= UpdateCharacterStats;
+        }
+
         player = newPlayer;
-        UpdateCharacterStats();
+
+        if (player != null)
+        {
+            // Подписываемся на событие изменений характеристик
+            player.OnStatsChanged += UpdateCharacterStats;
+            // Обновляем UI сразу после установки нового персонажа
+            UpdateCharacterStats();
+        }
     }
+
 
     /// <summary>
     /// Обновляет отображение характеристик персонажа.
-    /// Можно вызывать в Update(), либо подписаться на изменения у персонажа.
     /// </summary>
     public void UpdateCharacterStats()
     {
@@ -43,26 +77,20 @@ public class BattleUIController : MonoBehaviour
             return;
 
         // Обновление HealthBar
-        float hpRatio = (float)player.currentHP / player.maxHP;
+        float hpRatio = (float)player.CurrentHP / player.maxHP;
         healthBarFill.fillAmount = hpRatio;
-        hpText.text = player.currentHP + " / " + player.maxHP;
+        hpText.text = player.CurrentHP + " / " + player.maxHP;
 
         // Обновление SPBar
-        float spRatio = (float)player.currentSP / player.maxSP;
+        float spRatio = (float)player.CurrentSP / player.maxSP;
         spBarFill.fillAmount = spRatio;
-        spText.text = player.currentSP + " / " + player.maxSP;
+        spText.text = player.CurrentSP + " / " + player.maxSP;
 
         // Обновление SpecialEnergyBar (если используется)
         // Например, если специальные очки зависят от currentSE
         float seRatio = (float)player.CurrentSE / 100f; // здесь 100f – максимальное значение, можно заменить на player.maxSE, если такое поле есть
         specialEnergyBarFill.fillAmount = seRatio;
         specialEnergyText.text = player.CurrentSE.ToString();
-    }
-
-    private void Update()
-    {
-        // Здесь можно обновлять данные каждый кадр, либо переключиться на события
-        UpdateCharacterStats();
     }
 
     // Обработчики для кнопок навыков
@@ -72,7 +100,7 @@ public class BattleUIController : MonoBehaviour
         if (player != null)
         {
             // Предполагается, что у персонажа есть метод использования навыка
-        //    player.UseSkill(skillIndex);
+            //    player.UseSkill(skillIndex);
         }
     }
 
@@ -80,14 +108,20 @@ public class BattleUIController : MonoBehaviour
     {
         if (player != null)
         {
-        //    player.SwitchWeapon(); // Реализуйте этот метод в AllyBattleCharacter
+            //    player.SwitchWeapon(); // Реализуйте этот метод в AllyBattleCharacter
         }
     }
 
     // Обработчик для End Turn кнопки
     public void OnEndTurnButtonClicked()
     {
-        // Можно вызвать соответствующий метод в BattleManager или TurnManager
-        BattleManager.Instance.OnTurnComplete();
+        // Вызывает соответствующий метод в PlayerTurnController
+        PlayerTurnController.Instance.EndTurn();
+    }
+
+    public void OnConfirmPathClicked()
+    {
+        // Вызывает соответствующий метод в PlayerTurnController
+        PlayerTurnController.Instance.ConfirmMove();
     }
 }

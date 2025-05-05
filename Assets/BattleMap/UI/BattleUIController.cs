@@ -64,6 +64,7 @@ public class BattleUIController : MonoBehaviour
             player.OnStatsChanged += UpdateCharacterStats;
             // Обновляем UI сразу после установки нового персонажа
             UpdateCharacterStats();
+            UpdateSkillButtons();
         }
     }
 
@@ -86,12 +87,84 @@ public class BattleUIController : MonoBehaviour
         spBarFill.fillAmount = spRatio;
         spText.text = player.CurrentSP + " / " + player.maxSP;
 
-        // Обновление SpecialEnergyBar (если используется)
-        // Например, если специальные очки зависят от currentSE
-        float seRatio = (float)player.CurrentSE / 100f; // здесь 100f – максимальное значение, можно заменить на player.maxSE, если такое поле есть
+        // Обновление SpecialEnergyBar
+        float seRatio = (float)player.CurrentSE / player.weaponParameters[player.currentWeaponIndex].SE;
         specialEnergyBarFill.fillAmount = seRatio;
-        specialEnergyText.text = player.CurrentSE.ToString();
+        specialEnergyText.text = player.CurrentSE + " / " + player.weaponParameters[player.currentWeaponIndex].SE;
     }
+
+    public void UpdateSkillButtons()
+    {
+        if (player == null || player.weaponSkillSelections == null || player.weaponSkills == null)
+            return;
+
+        // Получаем выбранный набор навыков для текущего оружия.
+        WeaponSkillSelection currentSelection = player.weaponSkillSelections[player.currentWeaponIndex];
+        WeaponSkillSet currentWeaponSkillSet = player.weaponSkills[player.currentWeaponIndex];
+
+        // Обновляем кнопку базовой атаки (индекс 0) — базовая атака всегда берётся из текущего оружия по индексу 0.
+        if (currentWeaponSkillSet.skills != null && currentWeaponSkillSet.skills.Length > 0)
+        {
+            SkillAsset basicSkill = currentWeaponSkillSet.skills[0];
+            if (basicSkill != null)
+            {
+                // Обновляем изображение базовой атаки.
+                Image baseBtnImage = skillButtons[0].GetComponentInChildren<Image>();
+                if (baseBtnImage != null)
+                    baseBtnImage.sprite = basicSkill.skillIcon;
+
+                // Обновляем текст базовой атаки.
+                TMP_Text baseBtnText = skillButtons[0].GetComponentInChildren<TMP_Text>();
+                if (baseBtnText != null)
+                    baseBtnText.text = basicSkill.skillName;
+            }
+            else
+            {
+                Debug.LogWarning("Базовая атака (SkillAsset, индекс 0) отсутствует.");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("Не найден массив навыков у текущего оружия.");
+        }
+
+        // Обновляем остальные кнопки навыков (начиная со второй кнопки, индекс 1)
+        // При этом используем выбранные индексы из массива currentSelection.selectedSkillIndices.
+        // Количество обновляемых кнопок будет равно минимальному значению: (skillButtons.Length - 1) и длине массива индексов.
+        int count = Mathf.Min(skillButtons.Length - 1, currentSelection.selectedSkillIndices.Length);
+        for (int i = 0; i < count; i++)
+        {
+            int selectedSkillIndex = currentSelection.selectedSkillIndices[i];
+            if (selectedSkillIndex < 0 || selectedSkillIndex >= currentWeaponSkillSet.skills.Length)
+            {
+                Debug.LogWarning("Неверный индекс навыка: " + selectedSkillIndex);
+                continue;
+            }
+
+            SkillAsset skillAsset = currentWeaponSkillSet.skills[selectedSkillIndex];
+            if (skillAsset != null)
+            {
+                // Обновляем изображение кнопки (индекс в массиве кнопок = i+1).
+                Image btnImage = skillButtons[i + 1].GetComponentInChildren<Image>();
+                if (btnImage != null)
+                    btnImage.sprite = skillAsset.skillIcon;
+
+                // Обновляем текст кнопки (индекс в массиве кнопок = i+1).
+                TMP_Text btnText = skillButtons[i + 1].GetComponentInChildren<TMP_Text>();
+                if (btnText != null)
+                    btnText.text = skillAsset.skillName;
+            }
+            else
+            {
+                Debug.LogWarning("SkillAsset отсутствует для выбранного индекса: " + selectedSkillIndex);
+            }
+        }
+    }
+
+
+
+
+
 
     // Обработчики для кнопок навыков
     // Можно задать каждому навыковому индексу
@@ -108,7 +181,9 @@ public class BattleUIController : MonoBehaviour
     {
         if (player != null)
         {
-            //    player.SwitchWeapon(); // Реализуйте этот метод в AllyBattleCharacter
+            player.SwitchWeapon(); // Вызов смены стойки в AllyBattleCharacter
+            UpdateSkillButtons(); // Обновление кнопок
+            UpdateCharacterStats(); // Обновление параметров для обновления SE
         }
     }
 
@@ -124,4 +199,13 @@ public class BattleUIController : MonoBehaviour
         // Вызывает соответствующий метод в PlayerTurnController
         PlayerTurnController.Instance.ConfirmMove();
     }
+
+    private void OnDestroy() // для отписки от событий при уничтожении
+    {
+        if (player != null)
+        {
+            player.OnStatsChanged -= UpdateCharacterStats;
+        }
+    }
+
 }

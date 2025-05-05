@@ -7,7 +7,7 @@ public class AllyBattleCharacter : BattleEntity
 
     // Индекс текущей стойки (текущего оружия)
     public int currentWeaponIndex;
-    
+
     // Массив базовых параметров оружия (для двух стойк)
     public WeaponParameters[] weaponParameters;
     // Остальные данные о навыках и подклассах
@@ -15,7 +15,7 @@ public class AllyBattleCharacter : BattleEntity
     public WeaponSkillSet[] weaponSkills;    // Массив из 2-х элементов
     public WeaponSkillSelection[] weaponSkillSelections;       // Массив из 2-х элементов
 
-    
+
     /// <summary>
     /// Текущая специальная энергия для выбранной стойки
     /// </summary>
@@ -73,6 +73,17 @@ public class AllyBattleCharacter : BattleEntity
     {
         currentCell = cell;
     }
+
+    public void SwitchWeapon()
+    {
+        currentWeaponIndex = (currentWeaponIndex == 0) ? 1 : 0;
+        Debug.Log($"{name} переключился на стойку {currentWeaponIndex}");
+        // Если требуется, можно добавить дополнительные действия, например, пересчет характеристик.
+
+        // Если предусмотрено уведомление об изменениях, можно вызвать событие OnStatsChanged из базового класса:
+        //OnStatsChanged?.Invoke();
+    }
+
 
 
     /// <summary>

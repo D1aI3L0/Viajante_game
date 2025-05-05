@@ -9,11 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1d3dda54dae6bb4499ed0de8165da1fc, type: 3}
-  m_Name: DamageEffect 1
+  m_Script: {fileID: 11500000, guid: f9c69719383ea494f8bb6f4222ed3271, type: 3}
+  m_Name: Pathfinder_BA_0-0
   m_EditorClassIdentifier: 
-  additionalSPCost: 0
-  damageMultiplierMin: 0.8
-  damageMultiplierMax: 1.1
-  skillAccuracyBonus: 1.1
-  critBonus: 5
+  skillName: dfgh
+  skillIcon: {fileID: 21300000, guid: acc618bb315d77c4c9bb07c51531c40e, type: 3}
+  description: 
+  baseSPCost: 0
+  baseSECost: 0
+  cooldown: 0
+  skillType: 0
+  effects: []

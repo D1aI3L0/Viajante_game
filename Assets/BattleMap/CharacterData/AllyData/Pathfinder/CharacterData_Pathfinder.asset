@@ -29,17 +29,17 @@ MonoBehaviour:
     SEdec: 0
   weaponSkills:
   - skills:
-    - {fileID: 11400000, guid: 491aebf19dc6af2418ebc4524de7eb36, type: 2}
-    - {fileID: 11400000, guid: 491aebf19dc6af2418ebc4524de7eb36, type: 2}
-    - {fileID: 11400000, guid: 491aebf19dc6af2418ebc4524de7eb36, type: 2}
-    - {fileID: 11400000, guid: 491aebf19dc6af2418ebc4524de7eb36, type: 2}
-    - {fileID: 11400000, guid: 491aebf19dc6af2418ebc4524de7eb36, type: 2}
+    - {fileID: 11400000, guid: 0b4bd94867f037d4e89028a348a950b8, type: 2}
+    - {fileID: 11400000, guid: 31339e9875265c04b93e1af615457998, type: 2}
+    - {fileID: 11400000, guid: 6065331286a7f5f46b8a4e483b4f37bf, type: 2}
+    - {fileID: 11400000, guid: 1861594e63510994cb904438192d9e4f, type: 2}
+    - {fileID: 11400000, guid: a0426329c3ab052429c75af10a6d6cda, type: 2}
   - skills:
-    - {fileID: 11400000, guid: 491aebf19dc6af2418ebc4524de7eb36, type: 2}
-    - {fileID: 11400000, guid: 491aebf19dc6af2418ebc4524de7eb36, type: 2}
-    - {fileID: 11400000, guid: 491aebf19dc6af2418ebc4524de7eb36, type: 2}
-    - {fileID: 11400000, guid: 491aebf19dc6af2418ebc4524de7eb36, type: 2}
-    - {fileID: 11400000, guid: 491aebf19dc6af2418ebc4524de7eb36, type: 2}
+    - {fileID: 11400000, guid: 219c94ea15858f54ba92f5665bd899cd, type: 2}
+    - {fileID: 11400000, guid: 6d3e4c579a6456145a0f5010a9057801, type: 2}
+    - {fileID: 11400000, guid: 712d5cbd74ca4aa4fb45edacdd385975, type: 2}
+    - {fileID: 11400000, guid: aac31a3deb2a18945bb32933813f2010, type: 2}
+    - {fileID: 11400000, guid: 52bf328e4c5eee4448fffaf018cdf17c, type: 2}
   parameters:
     maxHP: 140
     currentHP: 140

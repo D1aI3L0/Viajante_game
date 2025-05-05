@@ -12,6 +12,9 @@ public class BattleEntity : MonoBehaviour
     // Параметры, связанные с ходом персонажа
     public bool isActiveTurn = false;
     public float turnGauge = 0f;
+    
+    // Спрайд для панели действий
+    public Sprite unitIcon; // назначать через инспектор префаба боевого персонажа
 
     public virtual bool IsEnemy => false; // По умолчанию юнит не является врагом.
     public virtual bool IsAlly => !IsEnemy; // Юнит считается союзником, если не является врагом.

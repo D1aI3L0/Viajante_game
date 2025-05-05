@@ -101,6 +101,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isActiveTurn: 0
   turnGauge: 0
+  unitIcon: {fileID: 21300000, guid: 4cc1ab808b2e89b40b64e85894b769cd, type: 3}
   maxHP: 200
   baseDEF: 35
   currentDEF: 0

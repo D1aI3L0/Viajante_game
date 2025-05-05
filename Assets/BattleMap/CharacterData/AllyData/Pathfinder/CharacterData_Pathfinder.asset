@@ -13,17 +13,6 @@ MonoBehaviour:
   m_Name: CharacterData_Pathfinder
   m_EditorClassIdentifier: 
   characterClass: 1
-  parameters:
-    maxHP: 140
-    currentHP: 140
-    DEF: 35
-    EVA: 20
-    PROV: 10
-    SPD: 140
-    SP: 100
-    SPreg: 15
-    SPmovecost: 5
-  availableSubclasses: 0000000001000000
   weaponsCount: 2
   weaponParameters:
   - ATK: 35
@@ -40,104 +29,25 @@ MonoBehaviour:
     SEdec: 0
   weaponSkills:
   - skills:
-    - skillName: 
-      description: 
-      minDamagePercentage: 0
-      maxDamagePercentage: 0
-      accuracyPercentage: 0
-      spCost: 0
-      seCost: 0
-      cooldownTurns: 0
-      criticalRatePercentage: 0
-      criticalHitMultiplier: 0
-    - skillName: 
-      description: 
-      minDamagePercentage: 0
-      maxDamagePercentage: 0
-      accuracyPercentage: 0
-      spCost: 0
-      seCost: 0
-      cooldownTurns: 0
-      criticalRatePercentage: 0
-      criticalHitMultiplier: 0
-    - skillName: 
-      description: 
-      minDamagePercentage: 0
-      maxDamagePercentage: 0
-      accuracyPercentage: 0
-      spCost: 0
-      seCost: 0
-      cooldownTurns: 0
-      criticalRatePercentage: 0
-      criticalHitMultiplier: 0
-    - skillName: 
-      description: 
-      minDamagePercentage: 0
-      maxDamagePercentage: 0
-      accuracyPercentage: 0
-      spCost: 0
-      seCost: 0
-      cooldownTurns: 0
-      criticalRatePercentage: 0
-      criticalHitMultiplier: 0
-    - skillName: 
-      description: 
-      minDamagePercentage: 0
-      maxDamagePercentage: 0
-      accuracyPercentage: 0
-      spCost: 0
-      seCost: 0
-      cooldownTurns: 0
-      criticalRatePercentage: 0
-      criticalHitMultiplier: 0
+    - {fileID: 11400000, guid: 491aebf19dc6af2418ebc4524de7eb36, type: 2}
+    - {fileID: 11400000, guid: 491aebf19dc6af2418ebc4524de7eb36, type: 2}
+    - {fileID: 11400000, guid: 491aebf19dc6af2418ebc4524de7eb36, type: 2}
+    - {fileID: 11400000, guid: 491aebf19dc6af2418ebc4524de7eb36, type: 2}
+    - {fileID: 11400000, guid: 491aebf19dc6af2418ebc4524de7eb36, type: 2}
   - skills:
-    - skillName: 
-      description: 
-      minDamagePercentage: 0
-      maxDamagePercentage: 0
-      accuracyPercentage: 0
-      spCost: 0
-      seCost: 0
-      cooldownTurns: 0
-      criticalRatePercentage: 0
-      criticalHitMultiplier: 0
-    - skillName: 
-      description: 
-      minDamagePercentage: 0
-      maxDamagePercentage: 0
-      accuracyPercentage: 0
-      spCost: 0
-      seCost: 0
-      cooldownTurns: 0
-      criticalRatePercentage: 0
-      criticalHitMultiplier: 0
-    - skillName: 
-      description: 
-      minDamagePercentage: 0
-      maxDamagePercentage: 0
-      accuracyPercentage: 0
-      spCost: 0
-      seCost: 0
-      cooldownTurns: 0
-      criticalRatePercentage: 0
-      criticalHitMultiplier: 0
-    - skillName: 
-      description: 
-      minDamagePercentage: 0
-      maxDamagePercentage: 0
-      accuracyPercentage: 0
-      spCost: 0
-      seCost: 0
-      cooldownTurns: 0
-      criticalRatePercentage: 0
-      criticalHitMultiplier: 0
-    - skillName: 
-      description: 
-      minDamagePercentage: 0
-      maxDamagePercentage: 0
-      accuracyPercentage: 0
-      spCost: 0
-      seCost: 0
-      cooldownTurns: 0
-      criticalRatePercentage: 0
-      criticalHitMultiplier: 0
+    - {fileID: 11400000, guid: 491aebf19dc6af2418ebc4524de7eb36, type: 2}
+    - {fileID: 11400000, guid: 491aebf19dc6af2418ebc4524de7eb36, type: 2}
+    - {fileID: 11400000, guid: 491aebf19dc6af2418ebc4524de7eb36, type: 2}
+    - {fileID: 11400000, guid: 491aebf19dc6af2418ebc4524de7eb36, type: 2}
+    - {fileID: 11400000, guid: 491aebf19dc6af2418ebc4524de7eb36, type: 2}
+  parameters:
+    maxHP: 140
+    currentHP: 140
+    DEF: 35
+    EVA: 20
+    PROV: 10
+    SPD: 140
+    SP: 100
+    SPreg: 15
+    SPmovecost: 5
+  availableSubclasses: 0000000001000000

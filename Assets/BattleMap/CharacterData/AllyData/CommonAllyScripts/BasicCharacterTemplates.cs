@@ -14,7 +14,7 @@ public class BasicCharacterTemplates : ScriptableObject
     public WeaponParameters[] weaponParameters;
 
     [Header("Наборы навыков для оружия")]
-    [Tooltip("Массив наборов навыков, один набор для каждого оружия. Индекс в этом массиве соответствует индексам в availableSubclasses.")]
+    [Tooltip("Массив наборов навыков, один набор для каждого оружия. Индекс в этом массиве соответствует индексам в availableSubclasses. Здесь каждый набор хранит ссылки на ассеты навыков (SkillAsset).")]
     public WeaponSkillSet[] weaponSkills;
 
     public CharacterParameters parameters;
@@ -35,7 +35,6 @@ public class BasicCharacterTemplates : ScriptableObject
             return weaponSkills[subclassIndex];
         return null;
     }
-
 
 #if UNITY_EDITOR
     /// <summary>
@@ -74,8 +73,7 @@ public class BasicCharacterTemplates : ScriptableObject
         {
             if (weaponSkills[i] == null)
                 weaponSkills[i] = new WeaponSkillSet();
-            if (weaponSkills[i].skills == null || weaponSkills[i].skills.Length != defaultSkillCount)
-                weaponSkills[i].skills = new SkillParameters[defaultSkillCount];
+            // Здесь больше не используется SkillParameters, поэтому дополнительная инициализация не нужна.
         }
     }
 #endif

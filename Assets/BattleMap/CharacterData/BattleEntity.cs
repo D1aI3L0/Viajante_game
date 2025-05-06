@@ -12,7 +12,7 @@ public class BattleEntity : MonoBehaviour
     // Параметры, связанные с ходом персонажа
     public bool isActiveTurn = false;
     public float turnGauge = 0f;
-    
+
     // Спрайд для панели действий
     public Sprite unitIcon; // назначать через инспектор префаба боевого персонажа
 
@@ -66,6 +66,15 @@ public class BattleEntity : MonoBehaviour
     }
     public int SPreg;
     public int SPmovecost;
+
+    public void RaiseOnStatsChanged() // метод для вызова события из других классов
+    {
+        OnStatsChanged?.Invoke();
+    }
+
+
+
+
 
     /// <summary>
     /// Метод для получения урона. Принимает количество урона в качестве параметра.

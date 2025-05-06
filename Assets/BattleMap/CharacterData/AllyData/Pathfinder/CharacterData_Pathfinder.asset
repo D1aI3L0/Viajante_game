@@ -19,8 +19,8 @@ MonoBehaviour:
     ACC: 88
     CRIT: 15
     SE: 100
-    SEreg: 20
-    SEdec: 0
+    SEreg: 0
+    SEdec: 10
   - ATK: 30
     ACC: 92
     CRIT: 10

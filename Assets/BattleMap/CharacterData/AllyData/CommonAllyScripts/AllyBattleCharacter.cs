@@ -15,31 +15,34 @@ public class AllyBattleCharacter : BattleEntity
     public WeaponSkillSet[] weaponSkills;    // Массив из 2-х элементов
     public WeaponSkillSelection[] weaponSkillSelections;       // Массив из 2-х элементов
 
+    // Массивы для текущех current параметров из оружия
+    public int[] currentATKValues = new int[2];
+    public int[] currentACCValues = new int[2];
+    public int[] currentCRITValues = new int[2];
+    public int[] currentSEValues = new int[2];
+
 
     /// <summary>
     /// Текущая специальная энергия для выбранной стойки
     /// </summary>
     public int CurrentSE
     {
-        get
+        get { return currentSEValues[currentWeaponIndex]; }
+        set
         {
-            if (weaponParameters != null && weaponParameters.Length > currentWeaponIndex)
-                return weaponParameters[currentWeaponIndex].SE;  // Можно добавить модификаторы, если нужно
-            return 0;
+            currentSEValues[currentWeaponIndex] = value;
+            RaiseOnStatsChanged();
         }
     }
+
 
     /// <summary>
     /// Текущая атака для выбранной стойки
     /// </summary>
     public int CurrentATK
     {
-        get
-        {
-            if (weaponParameters != null && weaponParameters.Length > currentWeaponIndex)
-                return weaponParameters[currentWeaponIndex].ATK;
-            return 0;
-        }
+        get { return currentATKValues[currentWeaponIndex]; }
+        set { currentATKValues[currentWeaponIndex] = value; }
     }
 
     /// <summary>
@@ -47,12 +50,8 @@ public class AllyBattleCharacter : BattleEntity
     /// </summary>
     public int CurrentACC
     {
-        get
-        {
-            if (weaponParameters != null && weaponParameters.Length > currentWeaponIndex)
-                return weaponParameters[currentWeaponIndex].ACC;
-            return 0;
-        }
+        get { return currentACCValues[currentWeaponIndex]; }
+        set { currentACCValues[currentWeaponIndex] = value; }
     }
 
     /// <summary>
@@ -60,12 +59,8 @@ public class AllyBattleCharacter : BattleEntity
     /// </summary>
     public int CurrentCRIT
     {
-        get
-        {
-            if (weaponParameters != null && weaponParameters.Length > currentWeaponIndex)
-                return weaponParameters[currentWeaponIndex].CRIT;
-            return 0;
-        }
+        get { return currentCRITValues[currentWeaponIndex]; }
+        set { currentCRITValues[currentWeaponIndex] = value; }
     }
 
     // Метод для установки текущей клетки
@@ -94,50 +89,61 @@ public class AllyBattleCharacter : BattleEntity
     {
         characterClass = runtimeParams.characterClass;
 
-        // Инициализация HP
+        // Инициализация HP, DEF, EVA, SPD
         maxHP = runtimeParams.maxHP;
         CurrentHP = runtimeParams.currentHP;
 
-        // Инициализация DEF
         baseDEF = runtimeParams.DEF;
         currentDEF = baseDEF;
 
-        // Инициализация EVA
         baseEVA = runtimeParams.EVA;
         currentEVA = baseEVA;
 
-        // Инициализация SPD
         baseSPD = runtimeParams.SPD;
         currentSPD = baseSPD;
 
-        // Инициализация SP
+        // Инициализация SP и восстановление значений
         maxSP = runtimeParams.SP;
         CurrentSP = maxSP;
         SPreg = runtimeParams.SPreg;
         SPmovecost = runtimeParams.SPmovecost;
 
-        // Инициализация параметров оружия, если массив заполнен
+        // Сначала присвоить weaponParameters из runtimeParams
         weaponParameters = runtimeParams.weaponParameters;
-
         if (weaponParameters == null || weaponParameters.Length < 2)
         {
             Debug.LogWarning("Недостаточно параметров оружия для установки специализированных характеристик.");
         }
+        else
+        {
+            // Инициализировать SE для каждой стойки
+            currentSEValues[0] = weaponParameters[0].SE;
+            currentSEValues[1] = weaponParameters[1].SE;
+            // Инициализировать ATK для каждой стойки
+            currentATKValues[0] = weaponParameters[0].ATK;
+            currentATKValues[1] = weaponParameters[1].ATK;
+            // Инициализировать ACC (меткость) для каждой стойки
+            currentACCValues[0] = weaponParameters[0].ACC;
+            currentACCValues[1] = weaponParameters[1].ACC;
+            // Инициализировать CRIT для каждой стойки
+            currentCRITValues[0] = weaponParameters[0].CRIT;
+            currentCRITValues[1] = weaponParameters[1].CRIT;
+        }
 
+        // Инициализация остальных массивов
         selectedSubclassIndices = (int[])runtimeParams.selectedSubclassIndices.Clone();
         weaponSkillSelections = new WeaponSkillSelection[runtimeParams.weaponSkillSelections.Length];
         for (int i = 0; i < runtimeParams.weaponSkillSelections.Length; i++)
         {
-            // Глубокое клонирование или копирование значений, если необходимо.
-            // Например, можно просто присвоить ссылку, если это не вызывает нежелательного поведения:
             weaponSkillSelections[i] = runtimeParams.weaponSkillSelections[i];
         }
 
         weaponSkills = runtimeParams.weaponSkills;
 
-        // Можно инициализировать currentWeaponIndex начальным значением, например 0:
+        // Установить текущую стойку по умолчанию
         currentWeaponIndex = 0;
 
         Debug.LogFormat("BattleCharacter initialized: Class = {0}", characterClass);
     }
+
 }

@@ -36,19 +36,6 @@ public class SkillHandler : MonoBehaviour
         {
             if (effect != null)
             {
-                // Если у эффекта есть дополнительная стоимость, списываем её
-                if (user is AllyBattleCharacter a)
-                {
-                    if (a.CurrentSP >= effect.additionalSPCost)
-                    {
-                        a.CurrentSP -= effect.additionalSPCost;
-                    }
-                    else
-                    {
-                        Debug.LogFormat("{0} недостаточно SP для выполнения эффекта {1}.", a.name, effect.name);
-                        continue;
-                    }
-                }
                 effect.ApplyEffect(user, target);
             }
         }

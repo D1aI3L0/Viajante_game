@@ -3,28 +3,30 @@ using UnityEngine.EventSystems;
 
 public class HexMapEditor : MonoBehaviour
 {
+	public static HexMapEditor Instance;
+
 	public GameObject UIContainer;
-	enum OptionalToggle
+	private enum OptionalToggle
 	{
 		Ignore, Yes, No
 	}
 
 	public HexGrid hexGrid;
 
-	bool isDrag;
-	HexDirection dragDirection;
+	private bool isDrag;
+	private HexDirection dragDirection;
 
-	HexCell previousCell;
+	private HexCell previousCell;
 
-	void Awake()
+	private void Awake()
 	{
-		UIReferences.hexMapEditor = this;
+		Instance = this;
 		terrainMaterial.DisableKeyword("GRID_ON");
 		Shader.DisableKeyword("HEX_MAP_EDIT_MODE");
 		Toggle(false);
 	}
 
-	void Update()
+	private void Update()
 	{
 		if (!EventSystem.current.IsPointerOverGameObject())
 		{
@@ -63,7 +65,7 @@ public class HexMapEditor : MonoBehaviour
 		UIContainer.SetActive(toggle);
 	}
 
-	void HandleInput()
+	private void HandleInput()
 	{
 		HexCell currentCell = GetCellUnderCursor();
 		if (currentCell)
@@ -85,12 +87,12 @@ public class HexMapEditor : MonoBehaviour
 		}
 	}
 
-	HexCell GetCellUnderCursor()
+	private HexCell GetCellUnderCursor()
 	{
 		return hexGrid.GetCell(Camera.main.ScreenPointToRay(Input.mousePosition));
 	}
 
-	void EditCells(HexCell center)
+	private void EditCells(HexCell center)
 	{
 		int centerX = center.coordinates.X;
 		int centerZ = center.coordinates.Z;
@@ -112,7 +114,7 @@ public class HexMapEditor : MonoBehaviour
 		}
 	}
 
-	void EditCell(HexCell cell)
+	private void EditCell(HexCell cell)
 	{
 		if (cell)
 		{
@@ -174,7 +176,7 @@ public class HexMapEditor : MonoBehaviour
 		}
 	}
 
-	void ValidateDrag(HexCell currentCell)
+	private void ValidateDrag(HexCell currentCell)
 	{
 		for (dragDirection = HexDirection.NE; dragDirection <= HexDirection.NW; dragDirection++)
 		{
@@ -189,8 +191,8 @@ public class HexMapEditor : MonoBehaviour
 	//============================================================================================================
 	//                                          Тип рельефа и высота
 	//============================================================================================================
+	private int activeTerrainTypeIndex = -1;
 
-	int activeTerrainTypeIndex = -1;
 	public void SetTerrainTypeIndex(int index)
 	{
 		activeTerrainTypeIndex = index;
@@ -220,7 +222,7 @@ public class HexMapEditor : MonoBehaviour
 	//============================================================================================================
 	//                                           Реки и дороги 
 	//============================================================================================================
-	OptionalToggle riverMode, roadMode;
+	private OptionalToggle riverMode, roadMode;
 	public void SetRiverMode(int mode)
 	{
 		riverMode = (OptionalToggle)mode;
@@ -248,9 +250,9 @@ public class HexMapEditor : MonoBehaviour
 	//============================================================================================================
 	//                                            Объекты рельефа 
 	//============================================================================================================
-	bool applyUrbanLevel, applyFarmLevel, applyPlantLevel, applySpecialIndex;
-	int activeUrbanLevel, activeFarmLevel, activePlantLevel, activeSpecialIndex;
-	OptionalToggle walledMode;
+	private bool applyUrbanLevel, applyFarmLevel, applyPlantLevel, applySpecialIndex;
+	private int activeUrbanLevel, activeFarmLevel, activePlantLevel, activeSpecialIndex;
+	private OptionalToggle walledMode;
 	public void SetApplyUrbanLevel(bool toggle)
 	{
 		applyUrbanLevel = toggle;
@@ -316,19 +318,19 @@ public class HexMapEditor : MonoBehaviour
 	//============================================================================================================
 	//                                              Юниты 
 	//============================================================================================================	
-	void CreateSquad(SquadType squadType)
+	private void CreateSquad(SquadType squadType)
 	{
 		HexCell cell = GetCellUnderCursor();
 		if (cell && !cell.HasUnit)
 		{
 			if(squadType == SquadType.Enemy)
-				hexGrid.AddEnemySquad(Instantiate(Squad.squadPrefab), cell, Random.Range(0f, 360f), null);
+				hexGrid.AddEnemySquad(cell, Random.Range(0f, 360f), null);
 			else
-				hexGrid.AddPlayerSquad(Instantiate(Squad.squadPrefab), cell, Random.Range(0f, 360f), null, null);
+				hexGrid.AddPlayerSquad(cell, Random.Range(0f, 360f), null, null);
 		}
 	}
 
-	void DestroySquad()
+	private void DestroySquad()
 	{
 		HexCell cell = GetCellUnderCursor();
 		if (cell && cell.Unit is Squad squad)
@@ -337,16 +339,16 @@ public class HexMapEditor : MonoBehaviour
 		}
 	}
 
-	void CreateBase()
+	private void CreateBase()
 	{
 		HexCell cell = GetCellUnderCursor();
 		if (cell && !cell.HasUnit)
 		{
-			hexGrid.AddBase(Instantiate(Base.basePrefab), cell, Random.Range(0f, 360f));
+			hexGrid.AddBase(cell, Random.Range(0f, 360f));
 		}
 	}
 
-	void DestroyBase()
+	private void DestroyBase()
 	{
 		HexCell cell = GetCellUnderCursor();
 		if (cell && cell.Unit is Base)

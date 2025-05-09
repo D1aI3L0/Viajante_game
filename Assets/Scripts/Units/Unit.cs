@@ -2,12 +2,13 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using UnityEngine.SceneManagement;
 
 public abstract class Unit : MonoBehaviour
 {
 	public HexGrid Grid { get; set; }
-	public int maxStamina = 24;
-	public int stamina = 24;
+	protected int maxStamina = 24;
+	protected int stamina = 24;
 	public int VisionRange
 	{
 		get
@@ -29,7 +30,7 @@ public abstract class Unit : MonoBehaviour
 	}
 
 	protected HexCell location, currentTravelLocation;
-	virtual public HexCell Location
+	public virtual HexCell Location
 	{
 		get
 		{
@@ -39,18 +40,16 @@ public abstract class Unit : MonoBehaviour
 		{
 			if (location)
 			{
-				Grid.DecreaseVisibility(location, VisionRange);
 				location.Unit = null;
 			}
 			value.Unit = this;
 			location = value;
-			Grid.IncreaseVisibility(value, VisionRange);
 			transform.localPosition = value.Position;
 			Grid.MakeChildOfChunk(transform, value.ColumnIndex, value.LineIndex);
 		}
 	}
 
-	float orientation;
+	protected float orientation;
 	public float Orientation
 	{
 		get
@@ -64,26 +63,24 @@ public abstract class Unit : MonoBehaviour
 		}
 	}
 
-	void OnEnable()
+	protected virtual void OnEnable()
 	{
 		if (location)
 		{
 			transform.localPosition = location.Position;
 			if (currentTravelLocation)
 			{
-				Grid.IncreaseVisibility(location, VisionRange);
-				Grid.DecreaseVisibility(currentTravelLocation, VisionRange);
 				currentTravelLocation = null;
 			}
 		}
 	}
 
-	virtual public bool IsValidDestination(HexCell cell)
+	public virtual bool IsValidDestination(HexCell cell)
 	{
 		return cell.IsExplored && !cell.IsUnderwater;
 	}
 
-	virtual public bool IsValidMove(HexCell cell)
+	public virtual bool IsValidMove(HexCell cell)
 	{
 		return cell.IsExplored && !cell.IsUnderwater;
 	}
@@ -98,12 +95,8 @@ public abstract class Unit : MonoBehaviour
 		transform.localPosition = location.Position;
 	}
 
-	virtual public void Die()
+	public virtual void Die()
 	{
-		if (location)
-		{
-			Grid.DecreaseVisibility(location, VisionRange);
-		}
 		location.Unit = null;
 		Destroy(gameObject);
 	}
@@ -127,13 +120,14 @@ public abstract class Unit : MonoBehaviour
 		if (edgeType == HexEdgeType.Cliff)
 			return -1;
 
-		if (fromCell.Walled != toCell.Walled)
-			return -1;
-
 		int moveCost;
 		if (fromCell.HasRoadThroughEdge(direction))
 		{
 			moveCost = 1;
+		}
+		else if (fromCell.Walled != toCell.Walled)
+		{
+			return -1;
 		}
 		else
 		{
@@ -143,7 +137,7 @@ public abstract class Unit : MonoBehaviour
 		return moveCost;
 	}
 
-	virtual public void ResetStamina()
+	public virtual void ResetStamina()
 	{
 		Stamina = maxStamina;
 	}
@@ -151,18 +145,19 @@ public abstract class Unit : MonoBehaviour
 	//                                       Движение по пути и анимация
 	//============================================================================================================
 	protected List<HexCell> pathToTravel;
-	const float travelSpeed = 3f;
-	const float rotationSpeed = 180f;
+	private const float travelSpeed = 3f;
+	private const float rotationSpeed = 180f;
 
-	virtual public void Travel(List<HexCell> path)
+	public virtual void Travel(List<HexCell> path)
 	{
-		location.Unit = null;
-		location = path[^1];
-		location.Unit = this;
+		// location.Unit = null;
+		// location = path[^1];
+		// location.Unit = this;
 		pathToTravel = path;
-		Stamina -= path[^1].Distance;
+		//Stamina -= path[^1].Distance;
 		StopAllCoroutines();
-		StartCoroutine(TravelPath());
+		//StartCoroutine(TravelPath());
+		StartCoroutine(TravelPath_v2());
 	}
 
 	protected IEnumerator TravelPath()
@@ -252,7 +247,112 @@ public abstract class Unit : MonoBehaviour
 		pathToTravel = null;
 	}
 
-	IEnumerator LookAt(Vector3 point)
+	protected IEnumerator TravelPath_v2()
+	{
+		GameUI.Locked = true;
+		bool movementAborted = false;
+
+		for (int i = 0; i < pathToTravel.Count - 1; i++)
+		{
+			// Подготовка к перемещению между текущей и следующей ячейкой
+			HexCell fromCell = pathToTravel[i];
+			HexCell toCell = pathToTravel[i + 1];
+
+			if (toCell.HasUnit && toCell.Unit is Squad squad && squad.squadType == SquadType.Enemy)
+			{
+				// Показываем окно подтверждения боя
+				BattleConfirmationUI.Instance.Show(squad, confirmed =>
+				{
+					if (confirmed)
+					{
+						// Загрузка боевой сцены
+						SceneManager.LoadScene("BattleScene");
+					}
+					else
+					{
+						movementAborted = true;
+					}
+				});
+
+				// Ждем ответа от UI
+				while (BattleConfirmationUI.IsCombatDialogActive)
+					yield return null;
+
+				if (movementAborted) break;
+			}
+
+			Grid.DecreaseVisibility(fromCell, VisionRange);
+
+			Vector3 startPos = fromCell.Position;
+			Vector3 endPos = toCell.Position;
+
+			// Корректировка позиций для вращения
+			yield return LookAt(endPos);
+
+			int nextColumn = toCell.ColumnIndex;
+			int nextLine = toCell.LineIndex;
+			if (fromCell.ColumnIndex != nextColumn)
+			{
+				if (nextColumn < fromCell.ColumnIndex - 1)
+				{
+					startPos.x -= HexMetrics.innerDiameter * HexMetrics.wrapSizeX;
+					endPos.x -= HexMetrics.innerDiameter * HexMetrics.wrapSizeX;
+				}
+				else if (nextColumn > fromCell.ColumnIndex + 1)
+				{
+					startPos.x += HexMetrics.innerDiameter * HexMetrics.wrapSizeX;
+					endPos.x += HexMetrics.innerDiameter * HexMetrics.wrapSizeX;
+				}
+			}
+			if (fromCell.LineIndex != nextLine)
+			{
+				if (nextLine < fromCell.LineIndex - 1)
+				{
+					startPos.z -= HexMetrics.outerDiametr * HexMetrics.wrapSizeZ;
+					endPos.z -= HexMetrics.outerDiametr * HexMetrics.wrapSizeZ;
+				}
+				else if (nextLine > fromCell.LineIndex + 1)
+				{
+					startPos.z += HexMetrics.outerDiametr * HexMetrics.wrapSizeZ;
+					endPos.z += HexMetrics.outerDiametr * HexMetrics.wrapSizeZ;
+				}
+			}
+
+			// Анимация перемещения между двумя точками
+			float t = 0f;
+			while (t < 1f)
+			{
+				t += Time.deltaTime * travelSpeed;
+				transform.localPosition = Vector3.Lerp(startPos, endPos, t);
+				yield return null;
+			}
+
+			// Обновляем позицию и родительский чанк
+			transform.localPosition = endPos;
+			Grid.MakeChildOfChunk(transform, toCell.ColumnIndex, toCell.LineIndex);
+
+			// Обновляем текущую ячейку
+			if (fromCell.Unit && fromCell.Unit == this)
+				fromCell.Unit = null;
+
+			location = toCell;
+
+			if (!toCell.HasUnit)
+				toCell.Unit = this;
+
+			Grid.IncreaseVisibility(toCell, VisionRange);
+		}
+
+		stamina -= location.Distance;
+
+		// Финализация
+		pathToTravel = null;
+		currentTravelLocation = null;
+		orientation = transform.localRotation.eulerAngles.y;
+		GameUI.Locked = false;
+	}
+
+	protected IEnumerator LookAt(Vector3 point)
 	{
 		if (HexMetrics.WrappingX)
 		{

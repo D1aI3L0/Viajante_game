@@ -18,20 +18,15 @@ public class RecruitingUI : MonoBehaviour
     public RectTransform skillsContainer;
     public SkillCellVisual skillCellPrefab;
 
-    public List<TraitData> availablePositiveTraits, availableNegativeTraits;
     public RectTransform positiveTraitsContainer, negativeTraitsContainer;
     public TraitCellVisual traitCellPrefab;
 
-
-    public TMP_Text healthLabel, defenceLabel, evasionLabel, attackLabel, accurancyLabel, critLabel, SPAmountLabel, SPRegenLabel, SPMoveCostLabel, initiativeLabel, tountLabel;
+    public TMP_Text healthLabel, defenceLabel, evasionLabel, attackLabel, accurancyLabel, critLabel, SPAmountLabel, SPRegenLabel, SPMoveCostLabel, speedLabel, tountLabel;
 
     private CharacterSlotBase selectedCharacterSlot;
     private WeaponCellVisual selectedWeaponCell;
 
-    private List<PlayerCharacter> recruitingCharacters = new();
-    public List<BasicCharacterTemplates> characterTemplates;
-
-    private const int recruitmentCharactersPerCycleCount = 4;
+    public RecruitingController recruitingController;
 
     private void Awake()
     {
@@ -53,20 +48,29 @@ public class RecruitingUI : MonoBehaviour
     {
         enabled = false;
         recrutingPanel.SetActive(false);
+        OnCharacterUnselect();
+        ClearPanel(recruitingCharactersContainer);
     }
 
     private void ShowCharacters()
     {
-        for (int i = 0; i < recruitingCharacters.Count; i++)
+        List<PlayerCharacter> availableCharacters = recruitingController.GetCharacters();
+        for (int i = 0; i < availableCharacters.Count; i++)
         {
             ClearPanel(recruitingCharactersContainer);
 
-            foreach (PlayerCharacter character in recruitingCharacters)
+            foreach (PlayerCharacter character in availableCharacters)
             {
                 CharacterSlotBase slot = Instantiate(characterSlotPrefab, recruitingCharactersContainer);
                 slot.Initialize(character, this);
             }
         }
+    }
+
+    public void UpdateCharactersPanel()
+    {
+        OnCharacterUnselect();
+        ShowCharacters();
     }
 
     public void OnCharacterSelection(CharacterSlotBase characterSlotBase)
@@ -82,6 +86,7 @@ public class RecruitingUI : MonoBehaviour
         recruitButton.interactable = true;
         ShowCharacterStats();
         ShowCharacterEquipment();
+        ShowCharacterTraits();
     }
 
     public void OnCharacterUnselect()
@@ -91,6 +96,7 @@ public class RecruitingUI : MonoBehaviour
         HideCharacterStats();
         HideCharacterEquipment();
         HideSkillset();
+        HideCharacterStats();
     }
 
     private void ShowCharacterStats()
@@ -103,7 +109,7 @@ public class RecruitingUI : MonoBehaviour
         healthLabel.text = $"{selectedCharacter.baseCharacterStats.maxHealth}";
         defenceLabel.text = $"{selectedCharacter.baseCharacterStats.defence}";
         evasionLabel.text = $"{selectedCharacter.baseCharacterStats.evasion}";
-        initiativeLabel.text = $"{selectedCharacter.baseCharacterStats.speed}";
+        speedLabel.text = $"{selectedCharacter.baseCharacterStats.speed}";
         tountLabel.text = $"{selectedCharacter.baseCharacterStats.tount}";
         SPAmountLabel.text = $"{selectedCharacter.baseCharacterStats.SPamount}";
         SPRegenLabel.text = $"{selectedCharacter.baseCharacterStats.SPregen}";
@@ -122,7 +128,7 @@ public class RecruitingUI : MonoBehaviour
         healthLabel.text = defenceLabel.text = evasionLabel.text =
         attackLabel.text = accurancyLabel.text = critLabel.text =
         SPAmountLabel.text = SPRegenLabel.text = SPMoveCostLabel.text =
-        initiativeLabel.text = tountLabel.text = "---";
+        speedLabel.text = tountLabel.text = "---";
     }
 
     private void ShowCharacterEquipment()
@@ -130,7 +136,7 @@ public class RecruitingUI : MonoBehaviour
         if (selectedCharacterSlot.linkedCharacter == null)
             return;
 
-        ClearPanel(weaponsContainer);
+        HideCharacterEquipment();
 
         var weapons = selectedCharacterSlot.linkedCharacter.GetAvailableWeapons();
         foreach (Weapon weapon in weapons)
@@ -157,6 +163,8 @@ public class RecruitingUI : MonoBehaviour
         if (weapon == null)
             return;
 
+        HideSkillset();
+
         foreach (Skill skill in weapon.skills)
         {
             SkillCellVisual slot = Instantiate(skillCellPrefab, skillsContainer);
@@ -169,20 +177,29 @@ public class RecruitingUI : MonoBehaviour
         ClearPanel(skillsContainer);
     }
 
-    public void UpdateRecruitingCharacters()
+    private void ShowCharacterTraits()
     {
-        recruitingCharacters.Clear();
-        ClearPanel(recruitingCharactersContainer);
+        HideTraits();
 
-        if (characterTemplates.Count > 0)
+        List<Trait> positive = selectedCharacterSlot.linkedCharacter.GetTraits(TraitType.Positive);
+        foreach(Trait trait in positive)
         {
-            for (int i = 0; i < recruitmentCharactersPerCycleCount; i++)
-            {
-                PlayerCharacter newCharacter = new();
-                newCharacter.Initialize(characterTemplates[UnityEngine.Random.Range(0, characterTemplates.Count)]);
-                recruitingCharacters.Add(newCharacter);
-            }
+            TraitCellVisual traitCell = Instantiate(traitCellPrefab, positiveTraitsContainer);
+            traitCell.Setup(trait);
         }
+
+        List<Trait> negative = selectedCharacterSlot.linkedCharacter.GetTraits(TraitType.Negatine);
+        foreach(Trait trait in negative)
+        {
+            TraitCellVisual traitCell = Instantiate(traitCellPrefab, negativeTraitsContainer);
+            traitCell.Setup(trait);
+        }
+    }
+
+    private void HideTraits()
+    {
+        ClearPanel(positiveTraitsContainer);
+        ClearPanel(negativeTraitsContainer);
     }
 
     public void OnRecruitButtonClick()
@@ -190,12 +207,14 @@ public class RecruitingUI : MonoBehaviour
         if (selectedCharacterSlot.linkedCharacter != null)
         {
             Base.Instance.AddCharacter(selectedCharacterSlot.linkedCharacter);
-            recruitingCharacters.Remove(selectedCharacterSlot.linkedCharacter);
+            recruitingController.Remove(selectedCharacterSlot.linkedCharacter);
             Show();
         }
     }
 
-    void ClearPanel(Transform panel)
+
+
+    private void ClearPanel(Transform panel)
     {
         foreach (Transform child in panel)
         {

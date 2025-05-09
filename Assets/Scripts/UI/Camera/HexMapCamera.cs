@@ -2,39 +2,39 @@ using UnityEngine;
 
 public class HexMapCamera : MonoBehaviour
 {
-    Transform swivel, stick;
-    float zoom = 1f;
+    private Transform swivel, stick;
+    private float zoom = 1f;
     public float stickMinZoom, stickMaxZoom;
     public float swivelMinZoom, swivelMaxZoom;
     public float moveSpeedMinZoom, moveSpeedMaxZoom;
     public float rotationSpeed;
-    float rotationAngle;
+    private float rotationAngle;
 
     public HexGrid grid;
-    static HexMapCamera instance;
+    public static HexMapCamera Instance;
 
     public static bool Locked
     {
         set
         {
-            instance.enabled = !value;
+            Instance.enabled = !value;
         }
     }
 
-    void Awake()
+    private void Awake()
     {
-        instance = this;
+        Instance = this;
         swivel = transform.GetChild(0);
         stick = swivel.GetChild(0);
     }
 
-    void OnEnable()
+    private void OnEnable()
     {
-        instance = this;
+        Instance = this;
         ValidatePosition();
     }
 
-    void Update()
+    private void Update()
     {
         float zoomDelta = Input.GetAxis("Mouse ScrollWheel");
         if (zoomDelta != 0f)
@@ -56,7 +56,7 @@ public class HexMapCamera : MonoBehaviour
         }
     }
 
-    void AdjustZoom(float delta)
+    private void AdjustZoom(float delta)
     {
         zoom = Mathf.Clamp01(zoom + delta);
 
@@ -67,7 +67,7 @@ public class HexMapCamera : MonoBehaviour
         swivel.localRotation = Quaternion.Euler(angle, 0f, 0f);
     }
 
-    void AdjustPosition(float xDelta, float zDelta)
+    private void AdjustPosition(float xDelta, float zDelta)
     {
         Vector3 direction = transform.localRotation * new Vector3(xDelta, 0f, zDelta).normalized;
         float damping = Mathf.Max(Mathf.Abs(xDelta), Mathf.Abs(zDelta));
@@ -78,7 +78,7 @@ public class HexMapCamera : MonoBehaviour
         transform.localPosition = (grid.xWrapping || grid.zWrapping) ? WrapPosition(position) : ClampPosition(position);
     }
 
-    void AdjustRotation(float delta)
+    private void AdjustRotation(float delta)
     {
         rotationAngle += delta * rotationSpeed * Time.deltaTime;
         if (rotationAngle < 0f)
@@ -92,7 +92,7 @@ public class HexMapCamera : MonoBehaviour
         transform.localRotation = Quaternion.Euler(0f, rotationAngle, 0f);
     }
 
-    Vector3 ClampPosition(Vector3 position)
+    private Vector3 ClampPosition(Vector3 position)
     {
         float xMax = (grid.cellCountX - 0.5f) * HexMetrics.innerDiameter;
         position.x = Mathf.Clamp(position.x, 0f, xMax);
@@ -103,7 +103,7 @@ public class HexMapCamera : MonoBehaviour
         return position;
     }
 
-    Vector3 WrapPosition(Vector3 position)
+    private Vector3 WrapPosition(Vector3 position)
     {
         if (grid.xWrapping)
         {
@@ -149,6 +149,11 @@ public class HexMapCamera : MonoBehaviour
 
     public static void ValidatePosition()
     {
-        instance.AdjustPosition(0f, 0f);
+        Instance.AdjustPosition(0f, 0f);
+    }
+
+    public static void MoveToBase()
+    {
+        Instance.AdjustPosition(Base.Instance.transform.position.x, Base.Instance.transform.position.z);
     }
 }

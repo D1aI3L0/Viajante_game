@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ab367d46086d9724383e8bde71caffa9, type: 3}
-  m_Name: "\u0416\u0438\u0432\u0443\u0447\u0435\u0441\u0442\u044C"
+  m_Name: "\u0416\u0438\u0432\u0443\u0447\u0438\u0439"
   m_EditorClassIdentifier: 
-  traitName: "\u0416\u0438\u0432\u0443\u0447\u0435\u0441\u0442\u044C"
+  traitName: "\u0416\u0438\u0432\u0443\u0447\u0438\u0439"
   icon: {fileID: 0}
   description: 
   traitType: 0

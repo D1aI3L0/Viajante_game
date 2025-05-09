@@ -27,6 +27,6 @@ public class CharacterSlotSquad : MonoBehaviour
     public void ShowCharacterStats()
     {
         if(character is PlayerCharacter playerCharacter)
-            UIReferences.playerCharacterUI.ShowForCharacter(playerCharacter);
+            PlayerCharacterUI.Instance.ShowForCharacter(playerCharacter);
     }
 }

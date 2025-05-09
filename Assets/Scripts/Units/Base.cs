@@ -15,11 +15,6 @@ public class Base : Unit
 
     public void Initialise()
     {
-        // availableCharacters.AddRange(characters);
-        // for (int i = 0; i < characters.Count; i++)
-        // {
-        //     characters[i].Initialize();
-        // }
         Instance = this;
     }
 
@@ -37,7 +32,7 @@ public class Base : Unit
     {
         for (int i = 0; i < characters.Count; i++)
             availableCharacters.Remove(characters[i]);
-        Grid.AddPlayerSquad(Instantiate(Squad.squadPrefab), cell, UnityEngine.Random.Range(0f, 360f), characters, this);
+        Grid.AddPlayerSquad(cell, UnityEngine.Random.Range(0f, 360f), characters, this);
     }
 
     public void AddCharacter(PlayerCharacter character)

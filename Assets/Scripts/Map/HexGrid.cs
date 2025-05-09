@@ -2,6 +2,7 @@ using TMPro;
 using UnityEngine;
 using System.IO;
 using System.Collections.Generic;
+using System.Linq;
 
 public class HexGrid : MonoBehaviour
 {
@@ -35,7 +36,8 @@ public class HexGrid : MonoBehaviour
 	{
 		HexMetrics.noiseSource = noiseSource;
 		HexMetrics.InitializeHashGrid(seed);
-		Squad.squadPrefab = squadPrefab;
+		Squad.playerSquadPrefab = playerSquadPrefab;
+		Squad.enemySquadPrefab = enemySquadPrefab;
 		Base.basePrefab = basePrefab;
 		CreateMap(cellCountX, cellCountZ, xWrapping, zWrapping);
 	}
@@ -46,7 +48,8 @@ public class HexGrid : MonoBehaviour
 		{
 			HexMetrics.noiseSource = noiseSource;
 			HexMetrics.InitializeHashGrid(seed);
-			Squad.squadPrefab = squadPrefab;
+			Squad.playerSquadPrefab = playerSquadPrefab;
+			Squad.enemySquadPrefab = enemySquadPrefab;
 			Base.basePrefab = basePrefab;
 			HexMetrics.wrapSizeX = xWrapping ? cellCountX : 0;
 			HexMetrics.wrapSizeZ = zWrapping ? cellCountZ : 0;
@@ -551,6 +554,8 @@ public class HexGrid : MonoBehaviour
 	private bool PathSearch(HexCell fromCell, HexCell toCell, Unit unit)
 	{
 		searchFrontierPhase += 2;
+		if (searchFrontierPhase > 100000)
+			ResetSearchPhase();
 
 		searchFrontier.Clear();
 
@@ -653,10 +658,22 @@ public class HexGrid : MonoBehaviour
 		path.Reverse();
 		return path;
 	}
+
+	public void ResetSearchPhase()
+	{
+		for (int i = 0; i < cellsCount; i++)
+		{
+			cells[i].SearchPhase = 0;
+			cells[i].Distance = 0;
+			cells[i].SearchHeuristic = 0;
+		}
+
+		searchFrontierPhase = 0;
+	}
 	//============================================================================================================
 	//                                               Юниты 
 	//============================================================================================================
-	public Squad squadPrefab;
+	public Squad playerSquadPrefab, enemySquadPrefab;
 	public Base basePrefab;
 	private List<Unit> units = new List<Unit>();
 	private Base @base;
@@ -678,48 +695,70 @@ public class HexGrid : MonoBehaviour
 		units.Clear();
 	}
 
-	public void AddPlayerSquad(Squad squad, HexCell location, float orientation, List<PlayerCharacter> characters, Base @base)
+	public void AddPlayerSquad(HexCell location, float orientation, List<PlayerCharacter> characters, Base @base)
 	{
+		Squad squad = Instantiate(Squad.playerSquadPrefab);
 		units.Add(squad);
-		squad.squadType = SquadType.Player;
+		squad.Initialize(@base, characters);
 		squad.ResetStamina();
 		squad.Grid = this;
 		squad.Location = location;
 		squad.Orientation = orientation;
-		squad.Initialize(@base, characters);
 	}
 
-	public void AddEnemySquad(Squad squad, HexCell location, float orientation, List<EnemyCharacter> characters)
+	public Squad AddEnemySquad(HexCell location, float orientation, List<EnemyCharacter> characters)
 	{
+		Squad squad = Instantiate(Squad.enemySquadPrefab);
 		units.Add(squad);
-		squad.squadType = SquadType.Enemy;
+		squad.Initialize(characters);
 		squad.Grid = this;
 		squad.Location = location;
 		squad.Orientation = orientation;
-		squad.Initialize(characters);
+		return squad;
 	}
 
-	public void AddBase(Base _base, HexCell location, float orientation)
+	public void AddBase(HexCell location, float orientation)
 	{
-		RemoveBase();
-		@base = _base;
-		@base.ResetStamina();
-		@base.Grid = this;
-		@base.Location = location;
-		@base.Orientation = orientation;
-		@base.Initialise();
+		if (@base)
+		{
+			@base.Location = location;
+			@base.Orientation = orientation;
+		}
+		else
+		{
+			Base _base = Instantiate(Base.basePrefab);
+			_base.Initialise();
+			@base = _base;
+			@base.ResetStamina();
+			@base.Grid = this;
+			@base.Location = location;
+			@base.Orientation = orientation;
+		}
+	}
+
+	public List<Squad> GetSquads(SquadType squadType)
+	{
+		List<Squad> squads = new();
+		foreach (Unit unit in units)
+		{
+			if (unit is Squad squad && squad.squadType == squadType)
+				squads.Add(squad);
+		}
+		return squads;
 	}
 
 	public void RemoveSquad(Squad squad)
 	{
 		units.Remove(squad);
-		squad.Die();
 	}
 
 	public void RemoveBase()
 	{
 		if (@base)
+		{
 			@base.Die();
+			@base = null;
+		}
 	}
 
 	public void MakeChildOfChunk(Transform child, int columnIndex, int lineIndex)
@@ -733,8 +772,84 @@ public class HexGrid : MonoBehaviour
 		{
 			units[i].ResetStamina();
 		}
-		if (@base) @base.ResetStamina();
+
+		if (@base)
+			@base.ResetStamina();
 	}
+
+	public HexCell GetAvailableEnemyCell(int minRadius, int maxRadius)
+	{
+		searchFrontier.Clear();
+
+		List<HexCell> possiblePositions = ListPool<HexCell>.Get();
+		List<Unit> checkUnits = new();
+		checkUnits.AddRange(GetSquads(SquadType.Player));
+		if (@base) checkUnits.Add(@base);
+
+		foreach (Unit unit in checkUnits)
+		{
+			searchFrontierPhase += 1;
+			if (searchFrontierPhase > 100000)
+				ResetSearchPhase();
+
+			unit.Location.SearchPhase = searchFrontierPhase;
+
+			searchFrontier.Enqueue(unit.Location);
+
+			while (searchFrontier.Count > 0)
+			{
+				HexCell current = searchFrontier.Dequeue();
+				current.SearchPhase += 1;
+
+				for (HexDirection d = HexDirection.NE; d <= HexDirection.NW; d++)
+				{
+					HexCell neighbor = current.GetNeighbor(d);
+					if (neighbor == null || neighbor.SearchPhase >= searchFrontierPhase)
+						continue;
+
+					if (neighbor.coordinates.DistanceTo(unit.Location.coordinates) > maxRadius)
+						continue;
+
+					if (neighbor.isSettlement || neighbor.HasRiver || neighbor.HasRoads || neighbor.HasUnit || neighbor.UrbanLevel > 0 || neighbor.FarmLevel > 0 || neighbor.Walled || neighbor.IsUnderwater || !neighbor.Explorable)
+						continue;
+
+					neighbor.SearchPhase = searchFrontierPhase;
+					if (neighbor.coordinates.DistanceTo(unit.Location.coordinates) >= minRadius)
+						possiblePositions.Add(neighbor);
+					searchFrontier.Enqueue(neighbor);
+				}
+			}
+		}
+
+		HexCell selectedCell = null;
+		if (possiblePositions.Count > 0)
+			selectedCell = possiblePositions[UnityEngine.Random.Range(0, possiblePositions.Count)];
+		ListPool<HexCell>.Add(possiblePositions);
+
+		return selectedCell;
+	}
+
+	public HexCell GetAvailableBaseLocation()
+	{
+		List<HexCell> possiblePositions = ListPool<HexCell>.Get();
+
+		foreach (HexCell cell in cells)
+		{
+			if (cell.isSettlement || cell.HasRiver || cell.HasUnit || cell.UrbanLevel > 0 || cell.FarmLevel > 0 || cell.Walled || cell.IsUnderwater || !cell.Explorable)
+				continue;
+
+			possiblePositions.Add(cell);
+		}
+
+		HexCell selectedCell = null;
+		if (possiblePositions.Count > 0)
+			selectedCell = possiblePositions[UnityEngine.Random.Range(0, possiblePositions.Count)];
+		ListPool<HexCell>.Add(possiblePositions);
+
+		return selectedCell;
+	}
+
+
 	//============================================================================================================
 	//                                          Область видимости 
 	//============================================================================================================

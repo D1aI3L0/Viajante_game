@@ -38,4 +38,14 @@ public class Inventory
                 armorCores.Add(armorCore);
         }
     }
+
+    public void GetItems(out List<Artifact> artifacts)
+    {
+        artifacts = new();
+        for(int i = 0; i < items.Count; i++)
+        {
+            if(items[i] is Artifact artifact)
+                artifacts.Add(artifact);
+        }
+    }
 }

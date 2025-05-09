@@ -8,36 +8,64 @@ public enum SquadType
 
 public class Squad : Unit
 {
-    public static Squad squadPrefab;
-    public List<Character> characters = new List<Character>();
+    public static Squad playerSquadPrefab, enemySquadPrefab;
+    public List<Character> characters = new();
     public SquadType squadType;
     private Base @base;
     public Inventory inventory;
 
+    public override HexCell Location
+    {
+        get => base.Location;
+        set
+        {
+            if (location && squadType == SquadType.Player)
+            {
+                Grid.DecreaseVisibility(location, VisionRange);
+                Grid.IncreaseVisibility(value, VisionRange);
+            }
+
+            base.Location = value;
+        }
+    }
+
+    protected override void OnEnable()
+    {
+        if (location)
+        {
+            if (currentTravelLocation)
+            {
+                Grid.IncreaseVisibility(location, VisionRange);
+                Grid.DecreaseVisibility(currentTravelLocation, VisionRange);
+            }
+            base.OnEnable();
+        }
+    }
+
     public void Initialize(Base @base, List<PlayerCharacter> characters)
     {
+        squadType = SquadType.Player;
         this.@base = @base;
-        if (characters != null)
-        {
-            for (int i = 0; i < characters.Count; i++)
-            {
-                this.characters.Add(characters[i]);
-            }
-        }
+        this.characters.AddRange(characters);
         inventory = new();
     }
 
     public void Initialize(List<EnemyCharacter> characters)
     {
-        if (characters != null)
-        {
-            this.characters.AddRange(characters);
-        }
+        squadType = SquadType.Enemy;
+        @base = null;
+        this.characters.AddRange(characters);
         inventory = null;
     }
 
     public override void Die()
     {
+        if (squadType != SquadType.Enemy && location)
+        {
+            Grid.DecreaseVisibility(location, VisionRange);
+        }
+
+        Grid.RemoveSquad(this);
         base.Die();
     }
 
@@ -56,23 +84,13 @@ public class Squad : Unit
         return UnitValidDestination(cell);
     }
 
-    override public void ResetStamina()
-    {
-        base.ResetStamina();
-    }
-
-    override public void Travel(List<HexCell> path)
-    {
-        base.Travel(path);
-    }
-
     public void ReturnToBase()
     {
         if (@base && squadType == SquadType.Player)
         {
             for (int i = 0; i < characters.Count; i++)
             {
-                if(characters[i] is PlayerCharacter playerCharacter)
+                if (characters[i] is PlayerCharacter playerCharacter)
                     @base.availableCharacters.Add(playerCharacter);
             }
             @base.inventory.AddRange(inventory);

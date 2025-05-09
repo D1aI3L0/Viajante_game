@@ -1,3 +1,4 @@
+using System;
 using System.Reflection;
 using TMPro;
 using Unity.VisualScripting;
@@ -8,7 +9,7 @@ public class GameUI : MonoBehaviour
 {
 	public static GameUI Instance;
 	public HexGrid grid;
-	HexCell currentCell;
+	private HexCell currentCell;
 	public Unit selectedUnit;
 	public GameObject UIContainer;
 
@@ -23,13 +24,21 @@ public class GameUI : MonoBehaviour
 		}
 	}
 
-    void Awake()
-    {
-		Instance = this;
-        Toggle(true);
-    }
+	public static bool Locked
+	{
+		set
+		{
+			Instance.enabled = !value;
+		}
+	}
 
-    void Update()
+	private void Awake()
+	{
+		Instance = this;
+		Toggle(true);
+	}
+
+	private void Update()
 	{
 		if (!EventSystem.current.IsPointerOverGameObject())
 		{
@@ -88,7 +97,7 @@ public class GameUI : MonoBehaviour
 		}
 	}
 
-	bool UpdateCurrentCell()
+	private bool UpdateCurrentCell()
 	{
 		HexCell cell = grid.GetCell(Camera.main.ScreenPointToRay(Input.mousePosition));
 		if (cell != currentCell)
@@ -99,7 +108,7 @@ public class GameUI : MonoBehaviour
 		return false;
 	}
 
-	void DoSelection()
+	private void DoSelection()
 	{
 		grid.ClearPath();
 		UpdateCurrentCell();
@@ -113,12 +122,12 @@ public class GameUI : MonoBehaviour
 			}
 			else if (selectedUnit is Squad squad && squad.squadType == SquadType.Player)
 			{
-				UIReferences.playerSquadUI.ShowForSquad(squad);
+				PlayerSquadUI.Instance.ShowForSquad(squad);
 			}
 		}
 	}
 
-	void DoPathfinding()
+	private void DoPathfinding()
 	{
 		if (UpdateCurrentCell())
 		{
@@ -136,7 +145,7 @@ public class GameUI : MonoBehaviour
 		}
 	}
 
-	void DoMove()
+	private void DoMove()
 	{
 		if (grid.HasPath)
 		{

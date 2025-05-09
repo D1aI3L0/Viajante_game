@@ -24,7 +24,7 @@ public class MainBaseUI : MonoBehaviour
 
     private Base currentBase;
 
-    void Start()
+    private void Start()
     {
         Instance = this;
         squadCreationMenu.Hide();
@@ -34,7 +34,7 @@ public class MainBaseUI : MonoBehaviour
         enabled = false;
     }
 
-    void Update()
+    private void Update()
     {
         createSquadBtn.interactable = currentBase.availableCharacters.Count > 0;
     }
@@ -68,30 +68,42 @@ public class MainBaseUI : MonoBehaviour
 
     public void OpenSquadCreation()
     {
-        CloseAllSubmenus();
-        GameUI.Instance.enabled = false;
-        squadCreationMenu.Show();
+        if (enabled)
+        {
+            CloseAllSubmenus();
+            GameUI.Instance.enabled = false;
+            squadCreationMenu.Show();
+        }
     }
 
     public void OpenWorkshopMenu()
     {
-        CloseAllSubmenus();
-        GameUI.Instance.enabled = false;
-        workshopMenu.Show();
+        if (enabled)
+        {
+            CloseAllSubmenus();
+            GameUI.Instance.enabled = false;
+            workshopMenu.Show();
+        }
     }
 
     public void OpenRecruitmentMenu()
     {
-        CloseAllSubmenus();
-        GameUI.Instance.enabled = false;
-        recruitmentMenu.Show();
+        if (enabled)
+        {
+            CloseAllSubmenus();
+            GameUI.Instance.enabled = false;
+            recruitmentMenu.Show();
+        }
     }
 
     public void OpenUpgradeMenu()
     {
-        CloseAllSubmenus();
-        GameUI.Instance.enabled = false;
-        upgradeMenu.SetActive(true);
+        if (enabled)
+        {
+            CloseAllSubmenus();
+            GameUI.Instance.enabled = false;
+            upgradeMenu.SetActive(true);
+        }
     }
 
     void CloseAllSubmenus()

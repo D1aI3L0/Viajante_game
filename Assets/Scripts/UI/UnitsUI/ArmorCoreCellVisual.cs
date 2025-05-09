@@ -4,14 +4,23 @@ using UnityEngine.EventSystems;
 
 public class ArmorCoreCellVisual : CellVisual, IPointerClickHandler
 {
-    private ArmorCore linkedArmor;
+    public ArmorCore linkedArmor;
     private delegate void OnButtonClick();
     private OnButtonClick onButtonClick;
 
-    public void Setup(ArmorCore armorCore, RecruitingUI recruitingUI)
+    public void Setup(ArmorCore armorCore)
     {
         linkedArmor = armorCore;
-        //onButtonClick = () => { recruitingUI.OnArmorCoreSelection(linkedArmor); };
+    }
+
+    public void Setup(ArmorCore armorCore, PlayerCharacterUI playerCharacterUI, bool isSlot = false)
+    {
+        linkedArmor = armorCore;
+        onButtonClick = () => 
+        { 
+            if(isSlot) playerCharacterUI.OnArmorCoreSwitch(this);
+            else playerCharacterUI.OnArmorCoreSlotSelection(this);
+        };
     }
 
     public void OnPointerClick(PointerEventData eventData)

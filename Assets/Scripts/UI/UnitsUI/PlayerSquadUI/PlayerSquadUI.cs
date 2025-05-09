@@ -5,6 +5,7 @@ using System.Collections.Generic;
 
 public class PlayerSquadUI : MonoBehaviour
 {
+    public static PlayerSquadUI Instance;
     [Header("Основные элементы")]
     public GameObject UIContainer;
     public Transform charactersContainer;
@@ -18,7 +19,7 @@ public class PlayerSquadUI : MonoBehaviour
 
     void Awake()
     {
-        UIReferences.playerSquadUI = this;
+        Instance = this;
         UIContainer.SetActive(false);
         enabled = false;
     }

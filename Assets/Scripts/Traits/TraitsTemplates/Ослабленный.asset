@@ -15,7 +15,7 @@ MonoBehaviour:
   traitName: 
   icon: {fileID: 0}
   description: 
-  traitType: 0
+  traitType: 1
   effects: []
   isPermanent: 0
   durationTurns: 0

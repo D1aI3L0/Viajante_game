@@ -1,6 +1,4 @@
 using UnityEngine;
-using System.Collections;
-using System;
 
 public class GlobalMapGameManager : MonoBehaviour
 {
@@ -14,12 +12,16 @@ public class GlobalMapGameManager : MonoBehaviour
 
     public HexGrid grid;
     
-    private int recruitCycle = 7;
+    private const int recruitCycle = 7;
 
     private void Start()
     {
+        NewMapMenu.Instance.CreateLargeMap();
         GameUI.Instance.CurrentTurn = CurrentTurn;
-        RecruitingUI.Instance.UpdateRecruitingCharacters();
+        RecruitingController.Instance.UpdateRecruitingCharacters();
+        grid.AddBase(grid.GetAvailableBaseLocation(), UnityEngine.Random.Range(0f, 360f));
+        HexMapCamera.MoveToBase();
+        EnemiesController.Instance.OnTurnEnd(0);
     }
 
     private void Update()
@@ -40,6 +42,8 @@ public class GlobalMapGameManager : MonoBehaviour
         HexUI.Instance.DisableAllUnitsUI();
         GameUI.Instance.enabled = false;
 
+        EnemiesController.Instance.OnTurnEnd(CurrentTurn);
+
         StartNewTurn();
     }
 
@@ -47,7 +51,7 @@ public class GlobalMapGameManager : MonoBehaviour
     {
         CurrentTurn++;
         if(CurrentTurn%recruitCycle == 0)
-            RecruitingUI.Instance.UpdateRecruitingCharacters();
+            RecruitingController.Instance.UpdateRecruitingCharacters();
         CurrentState = GameState.PlayerTurn;
         GameUI.Instance.enabled = true;
         GameUI.Instance.CurrentTurn = CurrentTurn;

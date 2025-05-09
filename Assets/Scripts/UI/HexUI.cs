@@ -13,12 +13,12 @@ public class HexUI : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.F1))
         {
-            UIReferences.hexMapEditor.Toggle(!UIReferences.hexMapEditor.enabled);
-            GameUI.Instance.Toggle(!UIReferences.hexMapEditor.enabled);
+            HexMapEditor.Instance.Toggle(!HexMapEditor.Instance.enabled);
+            GameUI.Instance.Toggle(!HexMapEditor.Instance.enabled);
         }
         if (Input.GetKeyDown(KeyCode.F2))
         {
-            UIReferences.hexMapEditor.ShowGrid(!UIReferences.hexMapEditor.gridIsVisible);
+            HexMapEditor.Instance.ShowGrid(!HexMapEditor.Instance.gridIsVisible);
         }
     }
 
@@ -26,7 +26,7 @@ public class HexUI : MonoBehaviour
     public void DisableAllUnitsUI()
     {
         MainBaseUI.Instance.Hide();
-        UIReferences.playerSquadUI.Hide();
-        UIReferences.playerCharacterUI.Hide();
+        PlayerCharacterUI.Instance.Hide();
+        PlayerSquadUI.Instance.Hide();
     }
 }

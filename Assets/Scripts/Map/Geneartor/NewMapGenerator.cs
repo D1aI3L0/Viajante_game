@@ -18,6 +18,7 @@ public struct MinMaxInt
 
 public class NewMapGenerator : MonoBehaviour
 {
+    public static NewMapGenerator Instance;
     public HexGrid grid;
     private int cellCount;
 
@@ -43,6 +44,10 @@ public class NewMapGenerator : MonoBehaviour
 
     public bool fill = true;
 
+    private void Awake()
+    {
+        Instance = this;
+    }
 
     public void GenerateMap(int x, int z, bool xWrapping, bool zWrapping)
     {

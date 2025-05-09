@@ -2,42 +2,37 @@ using UnityEngine;
 
 public class NewMapMenu : MonoBehaviour
 {
-	enum Generator
-	{
-		None,
-		NewGen
-	}
-
+	public static NewMapMenu Instance;
+	public GameObject UIContainer;
 	public HexGrid hexGrid;
+	private bool xWrapping = true, zWrapping = false;
 
-	Generator generator = Generator.None;
-	public NewMapGenerator newGenerator;
-	bool xWrapping = true, zWrapping = false;
+    private void Awake()
+    {
+        Instance = this;
+		enabled = false;
+		UIContainer.SetActive(false);
+    }
 
-	public void Open()
+    public void Show()
 	{
-		gameObject.SetActive(true);
+		enabled = true;
+		UIContainer.SetActive(true);
 		HexMapCamera.Locked = true;
 	}
 
-	public void Close()
+	public void Hide()
 	{
-		gameObject.SetActive(false);
+		enabled = false;
+		UIContainer.SetActive(false);
 		HexMapCamera.Locked = false;
 	}
 
-	void CreateMap(int x, int z)
+	private void CreateMap(int x, int z)
 	{
-		if (generator == Generator.NewGen)
-		{
-			newGenerator.GenerateMap(x, z, xWrapping, zWrapping);
-		}
-		else
-		{
-			hexGrid.CreateMap(x, z, xWrapping, zWrapping);
-		}
+		NewMapGenerator.Instance.GenerateMap(x, z, xWrapping, zWrapping);
 		HexMapCamera.ValidatePosition();
-		Close();
+		Hide();
 	}
 
 
@@ -54,11 +49,6 @@ public class NewMapMenu : MonoBehaviour
 	public void CreateLargeMap()
 	{
 		CreateMap(HexMetrics.chunkSizeX * 20, HexMetrics.chunkSizeZ * 16);
-	}
-
-	public void ToggleMapGeneration(int toggle)
-	{
-		generator = (Generator)toggle;
 	}
 
 	public void ToggleXWrapping(bool toggle)

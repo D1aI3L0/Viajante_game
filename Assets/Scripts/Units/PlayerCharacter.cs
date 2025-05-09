@@ -106,7 +106,6 @@ public class PlayerCharacter : Character
 
     public void RecalculateStats()
     {
-        // Сохраняем отношение здоровья перед изменениями
         float healthRatio = currentHealth / (float)currentCharacterStats.maxHealth;
 
         currentCharacterStats.maxHealth = baseCharacterStats.maxHealth;
@@ -126,10 +125,7 @@ public class PlayerCharacter : Character
             }
         }
 
-        // Обновляем текущее здоровье с сохранением пропорций
         currentHealth = Mathf.RoundToInt(currentCharacterStats.maxHealth * healthRatio);
-
-        // Ограничиваем здоровье в допустимых пределах
         currentHealth = Mathf.Clamp(currentHealth, 1, currentCharacterStats.maxHealth);
     }
 
@@ -173,7 +169,7 @@ public class PlayerCharacter : Character
                 return Mathf.RoundToInt(effect.value);
 
             case TraitEffectType.Multiplicative:
-                return Mathf.RoundToInt(baseStat * effect.value);
+                return Mathf.RoundToInt(baseStat * (float)effect.value / 100);
 
             default:
                 return 0;
@@ -190,5 +186,15 @@ public class PlayerCharacter : Character
                 result.Add(trait);
         }
         return result;
+    }
+
+    internal bool HasTrait(TraitData randomTraitData)
+    {
+        foreach(Trait trait in activeTraits)
+        {
+            if(trait.Data == randomTraitData)
+                return true;
+        }
+        return false;
     }
 }

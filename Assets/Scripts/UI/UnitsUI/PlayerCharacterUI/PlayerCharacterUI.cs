@@ -6,107 +6,109 @@ using UnityEngine.UI;
 
 public class PlayerCharacterUI : MonoBehaviour
 {
-    public GameObject UIContainer;
+    public static PlayerCharacterUI Instance;
 
-    public GameObject armorCoreSlot, artifactSlot;
-    public WeaponCellVisual weapon1Cell, weapon2Cell;
+    public GameObject UIContainer;
+    public TMP_Text title;
+
+    public ArmorCoreCellVisual armorCoreSlot;
+    public ArtifactCellVisual artifactSlot;
+    public WeaponCellVisual weapon1Slot, weapon2Slot;
+    private WeaponCellVisual selectedWeaponCell;
 
     public TraitCellVisual traitCellPrefab;
     public SkillCellVisual skillCellPrefab;
     public Transform skills1Container, skills2Container, positiveTraitsContainer, negativeTraitsContainer;
 
-    private List<SkillCellVisual> skills1 = new(), skills2 = new();
-    private List<TraitCellVisual> positiveTraits = new(), negativeTraits = new();
-
     public TMP_Text healthLabel, defenceLabel, evasionLabel, attackLabel, accurancyLabel, critLabel, SPAmountLabel, SPRegenLabel, SPMoveCostLabel, speedLabel, tountLabel;
 
-    public Image specialEnergy1, specialEnergy2, specialEnergyCombined;
-    public TMP_Text specialEnergy1Amount, specialEnergy2Amount, specialEnergyCombinedAmount;
+    public Image specialEnergy1, specialEnergy2;
+    public TMP_Text specialEnergy1Amount, specialEnergy2Amount;
+    
+    public GameObject selectionPanel;
+    public Transform selectionZoneContainer;
+    public WeaponCellVisual weaponCellPrefab;
+    public ArmorCoreCellVisual armorCoreCellPrefab;
+    public ArtifactCellVisual artifactCellPrefab;
 
-    private PlayerCharacter playerCharacter; 
+    private PlayerCharacter playerCharacter;
+    private bool IsEditMode;
 
     void Awake()
     {
-        UIReferences.playerCharacterUI = this;
+        Instance = this;
         enabled = false;
         UIContainer.SetActive(false);
         playerCharacter = null;
     }
 
-    public void ShowForCharacter(PlayerCharacter character)
+    public void ShowForCharacter(PlayerCharacter character, bool isEditMode = false)
     {
+        IsEditMode = isEditMode;
         playerCharacter = character;
         UpdateUI();
         enabled = true;
         UIContainer.SetActive(true);
+        title.text = isEditMode ? " Character managment" : " Character info";
     }
 
     public void Hide()
     {
-        HideSpecialEnergies();
+        selectionPanel.SetActive(false);
         enabled = false;
         UIContainer.SetActive(false);
-    }
-
-    private void HideSpecialEnergies()
-    {
-        specialEnergy1.gameObject.SetActive(false);
-        specialEnergy2.gameObject.SetActive(false);
-        specialEnergyCombined.gameObject.SetActive(false);
+        if(IsEditMode)
+            MainBaseUI.Instance.enabled = true;
     }
 
     public void UpdateUI()
     {
-        ClearPanel(skills1Container);
-        ClearPanel(skills2Container);
-        ClearPanel(positiveTraitsContainer);
-        ClearPanel(negativeTraitsContainer);
-
+        if(IsEditMode)
+            MainBaseUI.Instance.enabled = false;
+            
+        selectionPanel.SetActive(false);
+        selectedWeaponCell = null;
+        HideSkillsInfo();
+        HideTraits();
         HideSpecialEnergies();
 
-        skills1.Clear();
-        skills2.Clear();
-        positiveTraits.Clear();
-        negativeTraits.Clear();
-
+        SetupSlots();
         UpdateInfo();
     }
 
-    void ClearPanel(Transform panel)
+    private void SetupSlots()
     {
-        foreach (Transform child in panel)
+        if (IsEditMode)
         {
-            Destroy(child.gameObject);
+            weapon1Slot.Setup(playerCharacter.equipment.weapon1, this, true);
+            weapon2Slot.Setup(playerCharacter.equipment.weapon2, this, true);
+            artifactSlot.Setup(playerCharacter.equipment.artifact, this);
+            armorCoreSlot.Setup(playerCharacter.equipment.armorCore, this);
+        }
+        else
+        {
+            weapon1Slot.Setup(playerCharacter.equipment.weapon1, this, true);
+            weapon2Slot.Setup(playerCharacter.equipment.weapon2, this, true);
+            artifactSlot.Setup(playerCharacter.equipment.artifact);
+            armorCoreSlot.Setup(playerCharacter.equipment.armorCore);
         }
     }
 
     private void UpdateInfo()
     {
-        weapon1Cell.Setup(playerCharacter.equipment.weapon1);
-        weapon2Cell.Setup(playerCharacter.equipment.weapon2);
-        UpdateSurvivalInfo();
-        UpdateAttackInfo();
-        UpdateOtherInfo();
-        UpdateSkillsInfo();
+        UpdateStats();
+        ShowSkillsInfo();
         UpdateTraitsInfo();
     }
 
-    private void UpdateSurvivalInfo()
+    private void UpdateStats()
     {
         healthLabel.text = $"{playerCharacter.currentCharacterStats.maxHealth}/{playerCharacter.currentCharacterStats.maxHealth}";
         defenceLabel.text = $"{playerCharacter.currentCharacterStats.defence}";
         evasionLabel.text = $"{playerCharacter.currentCharacterStats.evasion}";
-    }
-
-    private void UpdateAttackInfo()
-    {
         attackLabel.text = $"{playerCharacter.currentAttack1Stats.attack}/{playerCharacter.currentAttack2Stats.attack}";
         accurancyLabel.text = $"{playerCharacter.currentAttack1Stats.accuracy}/{playerCharacter.currentAttack2Stats.accuracy}";
         critLabel.text = $"{playerCharacter.currentAttack1Stats.critRate}/{playerCharacter.currentAttack2Stats.critRate}";
-    }
-
-    private void UpdateOtherInfo()
-    {
         SPAmountLabel.text = $"{playerCharacter.baseCharacterStats.SPamount}";
         SPRegenLabel.text = $"{playerCharacter.baseCharacterStats.SPregen}";
         SPMoveCostLabel.text = $"{playerCharacter.baseCharacterStats.SPmoveCost}";
@@ -114,15 +116,14 @@ public class PlayerCharacterUI : MonoBehaviour
         tountLabel.text = $"{playerCharacter.baseCharacterStats.tount}";
     }
 
-    private void UpdateSkillsInfo()
+    private void ShowSkillsInfo()
     {
-        ClearPanel(skills1Container);
+        HideSkillsInfo();
 
         for (int i = 0; i < playerCharacter.equipment.weapon1.skills.Count; i++)
         {
             SkillCellVisual skillCell = Instantiate(skillCellPrefab, skills1Container);
             skillCell.Setup(playerCharacter.equipment.weapon1.skills[i]);
-            skills1.Add(skillCell);
         }
         specialEnergy1.gameObject.SetActive(true);
         specialEnergy1.color = SpecialEnergy.SpecialEnergyColors[0];
@@ -134,7 +135,6 @@ public class PlayerCharacterUI : MonoBehaviour
         {
             SkillCellVisual skillCell = Instantiate(skillCellPrefab, skills2Container);
             skillCell.Setup(playerCharacter.equipment.weapon2.skills[i]);
-            skills2.Add(skillCell);
         }
 
         specialEnergy2.gameObject.SetActive(true);
@@ -142,8 +142,120 @@ public class PlayerCharacterUI : MonoBehaviour
         specialEnergy2Amount.text = $"{playerCharacter.equipment.weapon2.specialEnergy.amount}";
     }
 
+    private void HideSpecialEnergies()
+    {
+        specialEnergy1.gameObject.SetActive(false);
+        specialEnergy2.gameObject.SetActive(false);
+    }
+
+    private void HideSkillsInfo()
+    {
+        ClearPanel(skills1Container);
+        ClearPanel(skills2Container);
+    }
+
     private void UpdateTraitsInfo()
     {
+        HideTraits();
 
+        List<Trait> positive = playerCharacter.GetTraits(TraitType.Positive);
+        foreach (Trait trait in positive)
+        {
+            TraitCellVisual traitCell = Instantiate(traitCellPrefab, positiveTraitsContainer);
+            traitCell.Setup(trait);
+        }
+
+        List<Trait> negative = playerCharacter.GetTraits(TraitType.Negatine);
+        foreach (Trait trait in negative)
+        {
+            TraitCellVisual traitCell = Instantiate(traitCellPrefab, negativeTraitsContainer);
+            traitCell.Setup(trait);
+        }
+    }
+
+    private void HideTraits()
+    {
+        ClearPanel(positiveTraitsContainer);
+        ClearPanel(negativeTraitsContainer);
+    }
+
+    private void ShowSelectionPanel()
+    {
+        selectionPanel.SetActive(true);
+        ClearPanel(selectionZoneContainer);
+    }
+
+    public void OnArmorCoreSlotSelection(ArmorCoreCellVisual armorCoreCell)
+    {
+        ShowSelectionPanel();
+    }
+
+    public void OnArmorCoreSwitch(ArmorCoreCellVisual armorCoreCell)
+    {
+        if (playerCharacter.equipment.armorCore != null)
+            Base.Instance.inventory.Add(playerCharacter.equipment.armorCore);
+
+        playerCharacter.equipment.armorCore = armorCoreCell.linkedArmor;
+        Base.Instance.inventory.Remove(armorCoreCell.linkedArmor);
+        UpdateUI();
+    }
+
+    public void OnWeaponSlotSelection(WeaponCellVisual weaponCell)
+    {
+        selectedWeaponCell = weaponCell;
+        ShowSelectionPanel();
+
+        foreach(Weapon weapon in playerCharacter.GetAvailableWeapons())
+        {
+            WeaponCellVisual newWeaponCell = Instantiate(weaponCellPrefab, selectionZoneContainer);
+            newWeaponCell.Setup(weapon);
+        }
+    }
+
+    public void OnWeaponSwitch(WeaponCellVisual weaponCell)
+    {
+        if (selectedWeaponCell == null)
+            return;
+
+        if (selectedWeaponCell == weapon1Slot)
+        {
+            playerCharacter.equipment.weapon1 = weaponCell.linkedWeapon;
+        }
+        else if (selectedWeaponCell == weapon2Slot)
+        {
+            playerCharacter.equipment.weapon2 = weaponCell.linkedWeapon;
+        }
+        UpdateUI();
+    }
+
+    public void OnArtifactSlotSelection(ArtifactCellVisual artifactSlot)
+    {
+        ShowSelectionPanel();
+
+        Base.Instance.inventory.GetItems(out List<Artifact> artifacts);
+
+        foreach(Artifact artifact in artifacts)
+        {
+            ArtifactCellVisual newArtifactCell = Instantiate(artifactCellPrefab, selectionZoneContainer);
+            newArtifactCell.Setup(artifact, this);
+        }
+    }
+
+    public void OnArtifactSwitch(ArtifactCellVisual artifactCell)
+    {
+        if (playerCharacter.equipment.artifact != null)
+            Base.Instance.inventory.Add(playerCharacter.equipment.artifact);
+
+        playerCharacter.equipment.artifact = artifactCell.linkedArtifact;
+        Base.Instance.inventory.Remove(artifactCell.linkedArtifact);
+        UpdateUI();
+    }
+
+    void ClearPanel(Transform panel)
+    {
+        foreach (Transform child in panel)
+        {
+            Destroy(child.gameObject);
+        }
     }
 }

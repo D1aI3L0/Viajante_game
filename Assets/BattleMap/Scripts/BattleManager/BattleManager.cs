@@ -109,15 +109,21 @@ public class BattleManager : MonoBehaviour
     public void OnTurnComplete()
     {
         Debug.Log("Ход завершён.");
+
+        if (activeUnit != null)
+        {
+            UnitStatManager.Instance.ProcessEndOfTurn(activeUnit);
+        }
+
         activeUnit = null;
 
-        // Здесь можно добавить проверки на окончание боя (например, если Allies.Count == 0 или Enemies.Count == 0)
-        // Далее сообщаем TurnManager о завершении хода для перехода к следующему.
         if (turnManager != null)
         {
             turnManager.EndCurrentTurn();
         }
     }
+
+
 
     /// <summary>
     /// Вызывается при старте боя.

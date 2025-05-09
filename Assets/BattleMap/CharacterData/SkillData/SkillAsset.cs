@@ -5,8 +5,7 @@ public enum SkillType
     Attack,
     Movement,
     Buff,
-    Debuff,
-    Mixed
+    Debuff
 }
 
 [CreateAssetMenu(fileName = "NewSkill", menuName = "Skills/Skill Asset")]
@@ -29,7 +28,8 @@ public class SkillAsset : ScriptableObject
     public int baseSECost;
     
     [Tooltip("Cooldown навыка (если используется)")]
-    public float cooldown;
+    public int cooldown;
+    public int currentCooldown; // показатель текущего восстановления навыка
     
     [Tooltip("Тип навыка")]
     public SkillType skillType;

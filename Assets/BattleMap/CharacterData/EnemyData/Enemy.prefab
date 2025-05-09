@@ -99,15 +99,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f49df08b18d95f4da994d3dc5d74436, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isEnemyTurn: 0
+  isActiveTurn: 0
+  turnGauge: 0
+  unitIcon: {fileID: 21300000, guid: 4cc1ab808b2e89b40b64e85894b769cd, type: 3}
   maxHP: 200
-  currentHP: 0
   baseDEF: 35
   currentDEF: 0
   baseEVA: 15
   currentEVA: 0
   baseSPD: 130
-  currentSPD: 0
+  currentSPD: 100
+  maxSP: 100
+  SPreg: 20
+  SPmovecost: 2
   baseATK: 35
   currentATK: 0
   baseACC: 100

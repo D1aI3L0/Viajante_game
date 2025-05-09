@@ -45,6 +45,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2af6dd2c61f0a8f419ebc95d13ed1a24, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isActiveTurn: 0
+  turnGauge: 0
+  unitIcon: {fileID: 21300000, guid: c8ffd9f72da8c7d44925d0f502ad5403, type: 3}
+  maxHP: 0
+  baseDEF: 0
+  currentDEF: 0
+  baseEVA: 0
+  currentEVA: 0
+  baseSPD: 0
+  currentSPD: 0
+  maxSP: 0
+  SPreg: 0
+  SPmovecost: 0
+  characterClass: 0
+  currentWeaponIndex: 0
+  weaponParameters: []
+  selectedSubclassIndices: 
+  weaponSkills: []
+  weaponSkillSelections: []
 --- !u!1001 &3332557115999553643
 PrefabInstance:
   m_ObjectHideFlags: 0

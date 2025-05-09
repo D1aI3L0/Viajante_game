@@ -19,12 +19,12 @@ public class SkillHandler : MonoBehaviour
         // Если пользователь является AllyBattleCharacter, списываем базовые затраты SP
         if (user is AllyBattleCharacter ally)
         {
-            if (ally.currentSP < skill.baseSPCost)
+            if (ally.CurrentSP < skill.baseSPCost)
             {
                 Debug.LogFormat("{0} недостаточно SP для применения навыка {1}.", ally.name, skill.skillName);
                 return;
             }
-            ally.currentSP -= skill.baseSPCost;
+            ally.CurrentSP -= skill.baseSPCost;
         }
         else
         {
@@ -36,19 +36,6 @@ public class SkillHandler : MonoBehaviour
         {
             if (effect != null)
             {
-                // Если у эффекта есть дополнительная стоимость, списываем её
-                if (user is AllyBattleCharacter a)
-                {
-                    if (a.currentSP >= effect.additionalSPCost)
-                    {
-                        a.currentSP -= effect.additionalSPCost;
-                    }
-                    else
-                    {
-                        Debug.LogFormat("{0} недостаточно SP для выполнения эффекта {1}.", a.name, effect.name);
-                        continue;
-                    }
-                }
                 effect.ApplyEffect(user, target);
             }
         }

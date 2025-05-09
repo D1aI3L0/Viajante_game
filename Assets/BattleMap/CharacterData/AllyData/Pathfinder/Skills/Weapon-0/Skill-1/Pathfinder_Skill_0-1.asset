@@ -10,14 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f9c69719383ea494f8bb6f4222ed3271, type: 3}
-  m_Name: NewSkill 1
+  m_Name: Pathfinder_Skill_0-1
   m_EditorClassIdentifier: 
-  skillName: dfgdg
-  skillIcon: {fileID: 21300000, guid: 6b045e0e6273d6a478950e45a71a3cd0, type: 3}
-  description: dfgdgdfgfdgdfgdfgdfgdfgdgd
-  baseSPCost: 12
-  baseSECost: 10
-  cooldown: 1
+  skillName: dfgdfg
+  skillIcon: {fileID: 21300000, guid: 87271d5dc97bcb54b9651ad192f59a1e, type: 3}
+  description: 
+  baseSPCost: 0
+  baseSECost: 0
+  cooldown: 0
+  currentCooldown: 0
   skillType: 0
   effects:
-  - {fileID: 11400000, guid: ab86bae60d5480e41b282630b277ecc0, type: 2}
+  - {fileID: 11400000, guid: 264ef7647390647439d46eeddbaa49e4, type: 2}

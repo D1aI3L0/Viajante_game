@@ -30,7 +30,7 @@ public class PlayerTurnController : MonoBehaviour
 
     // --------------------- Методы начала/окончания хода ---------------------
 
-    public void StartTurn(BattleEntity playerUnit)
+    public virtual void StartTurn(BattleEntity playerUnit)
     {
         currentPlayerUnit = playerUnit as AllyBattleCharacter;
         if (currentPlayerUnit == null)

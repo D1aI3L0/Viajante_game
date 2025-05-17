@@ -47,7 +47,7 @@ public class HexCell : MonoBehaviour
 		return HexMetrics.GetEdgeType(elevation, otherCell.elevation);
 	}
 
-	void Refresh()
+	private void Refresh()
 	{
 		if (chunk)
 		{
@@ -67,7 +67,7 @@ public class HexCell : MonoBehaviour
 		}
 	}
 
-	void RefreshSelfOnly()
+	private void RefreshSelfOnly()
 	{
 		chunk.Refresh();
 		if (Unit)
@@ -76,7 +76,7 @@ public class HexCell : MonoBehaviour
 		}
 	}
 
-	void RefreshPosition()
+	private void RefreshPosition()
 	{
 		Vector3 position = transform.localPosition;
 		position.y = elevation * HexMetrics.elevationStep;
@@ -97,7 +97,7 @@ public class HexCell : MonoBehaviour
 	//                                              Соседи 
 	//============================================================================================================
 	[SerializeField]
-	HexCell[] neighbors;
+	private HexCell[] neighbors;
 
 	public HexCell GetNeighbor(HexDirection direction)
 	{
@@ -167,7 +167,7 @@ public class HexCell : MonoBehaviour
 	//============================================================================================================
 	//                                            Тип рельефа 
 	//============================================================================================================
-	long terrainType;
+	private long terrainType;
 
 	public long TerrainTypeIndex
 	{
@@ -230,8 +230,8 @@ public class HexCell : MonoBehaviour
 	//============================================================================================================
 	//                                               Реки 
 	//============================================================================================================
-	bool hasIncomingRiver, hasOutgoingRiver;
-	HexDirection incomingRiver, outgoingRiver;
+	private bool hasIncomingRiver, hasOutgoingRiver;
+	private HexDirection incomingRiver, outgoingRiver;
 
 	public bool HasIncomingRiver
 	{
@@ -377,7 +377,7 @@ public class HexCell : MonoBehaviour
 		SetRoad((int)direction, false);
 	}
 
-	void ValidateRivers()
+	private void ValidateRivers()
 	{
 		if (hasOutgoingRiver && !IsValidRiverDestination(GetNeighbor(outgoingRiver)))
 		{
@@ -389,7 +389,7 @@ public class HexCell : MonoBehaviour
 		}
 	}
 
-	bool IsValidRiverDestination(HexCell neighbor)
+	private bool IsValidRiverDestination(HexCell neighbor)
 	{
 		return neighbor && (elevation >= neighbor.elevation || waterLevel == neighbor.elevation);
 	}
@@ -397,7 +397,7 @@ public class HexCell : MonoBehaviour
 	//                                              Дороги 
 	//============================================================================================================
 	[SerializeField]
-	bool[] roads;
+	private bool[] roads;
 
 	public bool HasRoads
 	{
@@ -438,7 +438,7 @@ public class HexCell : MonoBehaviour
 		}
 	}
 
-	void SetRoad(int index, bool state)
+	private void SetRoad(int index, bool state)
 	{
 		roads[index] = state;
 		neighbors[index].roads[(int)((HexDirection)index).Opposite()] = state;
@@ -449,7 +449,7 @@ public class HexCell : MonoBehaviour
 	//                                            Объекты рельефа 
 	//============================================================================================================
 	private int urbanLevel, farmLevel, plantLevel;
-	bool walled;
+	private bool walled;
 	public int specialIndex;
 
 	public int UrbanLevel
@@ -545,7 +545,7 @@ public class HexCell : MonoBehaviour
 	//============================================================================================================
 	public void Save(BinaryWriter writer)
 	{
-		writer.Write((long)terrainType);
+		writer.Write(terrainType);
 		writer.Write((byte)(elevation + 127));
 		writer.Write((byte)(waterLevel + 127));
 		writer.Write((byte)urbanLevel);
@@ -638,7 +638,7 @@ public class HexCell : MonoBehaviour
 	//============================================================================================================
 	//                                           Поиск пути 
 	//============================================================================================================
-	int distance;
+	private int distance;
 	public int Distance
 	{
 		get
@@ -690,9 +690,8 @@ public class HexCell : MonoBehaviour
 	//============================================================================================================
 	//                                        Область видимости 
 	//============================================================================================================
-	int visibility = 1;
-	bool explored = true;
-
+	private int visibility = 1;
+	private bool explored = true;
 
 	public bool IsVisible
 	{

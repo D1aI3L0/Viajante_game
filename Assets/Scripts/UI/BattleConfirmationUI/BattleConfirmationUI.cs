@@ -11,21 +11,21 @@ public class BattleConfirmationUI : MonoBehaviour
 
     private Action<bool> combatCallback;
 
-    private void Awake()
+    protected virtual void Awake()
     {
         Instance = this;
         Hide();
     }
 
-    public void Show(Squad enemy, Action<bool> action)
+    public virtual void Show(Squad enemy, Action<bool> action)
     {
         enabled = true;
         UIContainer.SetActive(true);
         combatCallback = action;
-        info.text = $"Обнаружен {enemy.name}!\nВступить в бой?";
+        info.text = $"Founded {enemy.name}!\nEnter battle?";
     }
 
-    public void Hide()
+    public virtual void Hide()
     {
         enabled = false;
         UIContainer.SetActive(false);

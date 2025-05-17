@@ -1,6 +1,16 @@
+#if MIRROR
+using Mirror;
+#endif
 using UnityEngine;
+using System;
 
-public class BattleEntity : MonoBehaviour
+[Serializable]
+public class BattleEntity :
+#if MIRROR
+    NetworkBehaviour // Наследуем от NetworkBehaviour в мультиплеере
+#else
+    MonoBehaviour    // В одиночном режиме
+#endif
 {
     // Поле для хранения ссылки на клетку, в которой сейчас находится юнит
     public BattleCell currentCell { get; set; }
@@ -93,5 +103,26 @@ public class BattleEntity : MonoBehaviour
             // Здесь можно добавить дополнительную логику, например, уничтожение объекта или запуск анимации.
             // Destroy(gameObject); // если нужно удалить объект из сцены.
         }
+    }
+
+
+    public virtual int[] GetSkillIDs()
+    {
+        return new int[0];
+    }
+    [SyncVar(hook = nameof(OnCooldownChanged))]
+    public int currentCooldown;
+
+    private void OnCooldownChanged(int oldValue, int newValue)
+    {
+        // Обновление UI или других систем при изменении кулдауна
+        Debug.Log($"Cooldown changed to: {newValue}");
+    }
+
+    [Command]
+    public void CmdResetCooldown(SkillAsset skill)
+    {
+        skill.ResetCooldown();
+        currentCooldown = skill.currentCooldown;
     }
 }

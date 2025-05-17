@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using UnityEngine;
 
 
@@ -58,5 +59,18 @@ public class Upgrade
             return gridPosition + oddPositionsMove[(int)direction];
 
         return gridPosition + evenPositionsMove[(int)direction];
+    }
+    //=================================================================================================
+    //                                      Сохранение и загрузка
+    //=================================================================================================
+    public virtual void Save(BinaryWriter writer)
+    {
+        writer.Write(gridPosition.x);
+        writer.Write(gridPosition.y);
+    }
+
+    public virtual void Load(BinaryReader reader)
+    {
+        gridPosition = new(reader.ReadInt32(), reader.ReadInt32());
     }
 }

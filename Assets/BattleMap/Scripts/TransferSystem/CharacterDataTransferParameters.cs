@@ -9,7 +9,6 @@ public enum CharacterClass
     WarriorZastupnik,
     Pathfinder,
     Mage
-    // Добавьте другие классы по необходимости.
 }
 
 [CreateAssetMenu(fileName = "CharacterDataTransferParameters",
@@ -26,66 +25,69 @@ public class CharacterDataTransferParameters : ScriptableObject
 
     [Header("Базовые данные персонажей (шаблоны)")]
     [Tooltip("Ссылки на базовые ассеты для сопоставления (например, CharacterData_VoinZastupnik, CharacterData_Pathfinder и т.д.).")]
-    public BasicCharacterTemplates[] baseCharacterData = new BasicCharacterTemplates[3];
+    public PlayerCharacter[] playerCharacterData = new PlayerCharacter[0];
 
 #if UNITY_EDITOR
     private void OnValidate()
     {
         // Если массив runtime-параметров не создан или его длина меньше требуемой, пересоздаем его.
-        if (characters == null || characters.Length < numberOfCharacters)
-        {
-            characters = new CharacterRuntimeParameters[3];
-        }
+        characters = new CharacterRuntimeParameters[numberOfCharacters];
 
-        // Проходим по количеству персонажей, заданному в numberOfCharacters.
-        for (int i = 0; i < numberOfCharacters; i++)
+        if (playerCharacterData.Length > 0)
         {
-            if (baseCharacterData[i] != null)
+            // Проходим по количеству персонажей, заданному в numberOfCharacters.
+            for (int i = 0; i < numberOfCharacters; i++)
             {
-                if (characters[i] == null)
-                    characters[i] = new CharacterRuntimeParameters();
-
-                // Копирование общих данных из базового ассета.
-                characters[i].characterClass = baseCharacterData[i].characterClass;
-                characters[i].maxHP = baseCharacterData[i].parameters.maxHP;
-                characters[i].currentHP = baseCharacterData[i].parameters.currentHP;
-                characters[i].DEF = baseCharacterData[i].parameters.DEF;
-                characters[i].EVA = baseCharacterData[i].parameters.EVA;
-                characters[i].PROV = baseCharacterData[i].parameters.PROV;
-                characters[i].SPD = baseCharacterData[i].parameters.SPD;
-                characters[i].SP = baseCharacterData[i].parameters.SP;
-                characters[i].SPreg = baseCharacterData[i].parameters.SPreg;
-                characters[i].SPmovecost = baseCharacterData[i].parameters.SPmovecost;
-
-                // Обеспечиваем, что для каждого персонажа выбрано ровно 2 подкласса (индексы выбора).
-                if (characters[i].selectedSubclassIndices == null || characters[i].selectedSubclassIndices.Length != 2)
+                if (playerCharacterData[i] != null)
                 {
-                    characters[i].selectedSubclassIndices = new int[2] { 0, 0 };
-                }
+                    if (characters[i] == null)
+                        characters[i] = new CharacterRuntimeParameters();
 
-                // Обеспечиваем, что для каждого персонажа задан набор выбранных навыков для оружия
-                if (characters[i].weaponSkillSelections == null || characters[i].weaponSkillSelections.Length != 2)
-                {
-                    characters[i].weaponSkillSelections = new WeaponSkillSelection[2];
+                    // Копирование общих данных из базового ассета.
+                    characters[i].characterClass = playerCharacterData[i].characterClass;
+                    characters[i].maxHP = playerCharacterData[i].currentCharacterStats.maxHealth;
+                    characters[i].currentHP = playerCharacterData[i].currentHealth;
+                    characters[i].DEF = playerCharacterData[i].currentCharacterStats.defence;
+                    characters[i].EVA = playerCharacterData[i].currentCharacterStats.evasion;
+                    characters[i].PROV = playerCharacterData[i].currentCharacterStats.tount;
+                    characters[i].SPD = playerCharacterData[i].currentCharacterStats.speed;
+                    characters[i].SP = playerCharacterData[i].currentCharacterStats.SPamount;
+                    characters[i].SPreg = playerCharacterData[i].currentCharacterStats.SPregen;
+                    characters[i].SPmovecost = playerCharacterData[i].currentCharacterStats.SPmoveCost;
+
+                    // Обеспечиваем, что для каждого персонажа выбрано ровно 2 подкласса (индексы выбора).
+                    if (characters[i].selectedSubclassIndices == null || characters[i].selectedSubclassIndices.Length != 2)
+                    {
+                        characters[i].selectedSubclassIndices = new int[2] { 0, 1 };
+                    }
+
+                    // Обеспечиваем, что для каждого персонажа задан набор выбранных навыков для оружия
+                    if (characters[i].weaponSkillSelections == null || characters[i].weaponSkillSelections.Length != 2)
+                    {
+                        characters[i].weaponSkillSelections = new WeaponSkillSelection[2];
+                        for (int j = 0; j < 2; j++)
+                        {
+                            if (characters[i].weaponSkillSelections[j] == null)
+                                characters[i].weaponSkillSelections[j] = new WeaponSkillSelection();
+                        }
+                    }
+
+
+                    // Обработка параметров оружия и наборов навыков.
+                    // Предполагаем, что для персонажа используется два оружия.
+                    characters[i].weaponParameters = new WeaponParameters[2];
+                    characters[i].weaponSkills = new WeaponSkillSet[2];
+
                     for (int j = 0; j < 2; j++)
                     {
-                        if (characters[i].weaponSkillSelections[j] == null)
-                            characters[i].weaponSkillSelections[j] = new WeaponSkillSelection();
+                        // Используем универсальные методы базового класса для извлечения параметров.
+                        Weapon weapon = playerCharacterData[i].GetWeaponInEquipnentByID(j);
+                        if (weapon != null)
+                        {
+                            characters[i].weaponParameters[j] = weapon.weaponParameters;
+                            characters[i].weaponSkills[j] = weapon.skillSet;
+                        }
                     }
-                }
-
-
-                // Обработка параметров оружия и наборов навыков.
-                // Предполагаем, что для персонажа используется два оружия.
-                characters[i].weaponParameters = new WeaponParameters[2];
-                characters[i].weaponSkills = new WeaponSkillSet[2];
-
-                for (int j = 0; j < 2; j++)
-                {
-                    int chosenSubclass = characters[i].selectedSubclassIndices[j];
-                    // Используем универсальные методы базового класса для извлечения параметров.
-                    characters[i].weaponParameters[j] = baseCharacterData[i].GetWeaponParameters(chosenSubclass);
-                    characters[i].weaponSkills[j] = baseCharacterData[i].GetWeaponSkillSet(chosenSubclass);
                 }
             }
         }

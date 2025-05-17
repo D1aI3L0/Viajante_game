@@ -21,7 +21,6 @@ public static class PathFinder
     {
         if (start == null || target == null)
         {
-            Debug.LogWarning("PathFinder: start или target равны null");
             return null;
         }
         

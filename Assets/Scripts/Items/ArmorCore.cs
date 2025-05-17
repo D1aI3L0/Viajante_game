@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 [Serializable]
@@ -31,9 +32,9 @@ public class ArmorCore : Item, IUpgradable
     public const int xUpgradeMax = 15;
     public const int yUpgradeMax = 15;
 
-    public float HealthBonus { get; private set; }
-    public float DefenceBonus { get; private set; }
-    public float EvasionBonus { get; private set; }
+    public int HealthBonus { get; set; }
+    public int DefenceBonus { get; set; }
+    public int EvasionBonus { get; set; }
 
     private static readonly Dictionary<Rarity, int> BurnThresholds = new Dictionary<Rarity, int>()
     {
@@ -53,7 +54,7 @@ public class ArmorCore : Item, IUpgradable
         { Rarity.Legendary, 0.05f }
     };
 
-    private const float burnChance = 0.5f;
+    private const float burnChance = 0.33f;
 
     private static readonly Dictionary<HiddenType, Dictionary<SurvivalStatType, float>> StatProbabilities =
         new Dictionary<HiddenType, Dictionary<SurvivalStatType, float>>()
@@ -211,7 +212,7 @@ public class ArmorCore : Item, IUpgradable
         return UnityEngine.Random.value <= (burnChance * (CurrentLevel / BurnThresholds[rarity]));
     }
 
-    private void CalculateBonuses()
+    public void CalculateBonuses()
     {
         HealthBonus = 0;
         DefenceBonus = 0;
@@ -286,12 +287,46 @@ public class ArmorCore : Item, IUpgradable
 
     public string GetUpgradeDescription()
     {
-        return $"Уровень: {CurrentLevel}\n" +
-               $"Редкость: {rarity}\n" +
-               $"Тип: {hiddenType}\n" +
-               $"Бонусы:\n" +
-               $"Здоровье: +{HealthBonus}%\n" +
-               $"Защита: +{DefenceBonus}%\n" +
-               $"Уклонение: +{EvasionBonus}%";
+        return $"Level: {CurrentLevel}\n" +
+               $"Rarity: {rarity}\n" +
+               $"Type: {hiddenType}\n" +
+               $"Bonuses:\n" +
+               $"Health: +{HealthBonus}%\n" +
+               $"Defence: +{DefenceBonus}%\n" +
+               $"Evasion: +{EvasionBonus}%";
+    }
+    //=================================================================================================
+    //                                      Сохранение и загрузка
+    //=================================================================================================
+    public override void Save(BinaryWriter writer)
+    {
+        base.Save(writer);
+
+        writer.Write((int)rarity);
+        writer.Write((int)hiddenType);
+        writer.Write(CurrentLevel);
+
+        writer.Write(upgrades.Count);
+        foreach(ArmorCoreUpgrade armorCoreUpgrade in upgrades)
+        {
+            armorCoreUpgrade.Save(writer);
+        }
+    }
+
+    public override void Load(BinaryReader reader)
+    {
+        base.Load(reader);
+
+        rarity = (Rarity)reader.ReadInt32();
+        hiddenType = (HiddenType)reader.ReadInt32();
+        CurrentLevel = reader.ReadInt32();
+
+        int upgradesCount = reader.ReadInt32();
+        for(int i = 0; i < upgradesCount; i++)
+        {
+            ArmorCoreUpgrade newUpgrade = new();
+            newUpgrade.Load(reader);
+            upgrades.Add(newUpgrade);
+        }
     }
 }

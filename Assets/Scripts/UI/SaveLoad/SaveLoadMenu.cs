@@ -6,15 +6,24 @@ using System;
 
 public class SaveLoadMenu : MonoBehaviour
 {
-	const int mapFileVersion = 8;
+	public static SaveLoadMenu Instance;
+	private const int mapFileVersion = 9;
+
+	public GameObject UIContainer;
 	public HexGrid hexGrid;
 	public TMP_InputField nameInput;
-	bool saveMode;
+	private bool saveMode;
 	public TMP_Text menuLabel, actionButtonLabel;
 
 	public RectTransform listContent;
 
 	public SaveLoadItem itemPrefab;
+
+	private void Awake()
+	{
+		Instance = this;
+		Close();
+	}
 
 	public void Open(bool saveMode)
 	{
@@ -32,17 +41,19 @@ public class SaveLoadMenu : MonoBehaviour
 		}
 
 		FillList();
-		gameObject.SetActive(true);
+		enabled = true;
+		UIContainer.SetActive(true);
 		HexMapCamera.Locked = true;
 	}
 
 	public void Close()
 	{
-		gameObject.SetActive(false);
+		enabled = false;
+		UIContainer.SetActive(false);
 		HexMapCamera.Locked = false;
 	}
 
-	string GetSelectedPath()
+	private string GetSelectedPath()
 	{
 		string mapName = nameInput.text;
 		if (mapName.Length == 0)
@@ -52,16 +63,29 @@ public class SaveLoadMenu : MonoBehaviour
 		return System.IO.Path.Combine(Application.persistentDataPath, mapName + ".map");
 	}
 
-	void Save(string path)
+	public void SaveGame(string name)
+	{
+		Save(System.IO.Path.Combine(Application.persistentDataPath, name + ".map"));
+	}
+
+	private void Save(string path)
 	{
 		using (BinaryWriter writer = new BinaryWriter(File.Open(path, FileMode.Create)))
 		{
 			writer.Write(mapFileVersion);
 			hexGrid.Save(writer);
+			GlobalMapGameManager.Instance.Save(writer);
+			RecruitingController.Instance.Save(writer);
+			EnemiesController.Instance.Save(writer);
 		}
 	}
 
-	void Load(string path)
+	public void LoadGame(string name)
+	{
+		Load(System.IO.Path.Combine(Application.persistentDataPath, name + ".map"));
+	}
+
+	private void Load(string path)
 	{
 		if (!File.Exists(path))
 		{
@@ -74,6 +98,9 @@ public class SaveLoadMenu : MonoBehaviour
 			if (header <= mapFileVersion)
 			{
 				hexGrid.Load(reader, header);
+				GlobalMapGameManager.Instance.Load(reader);
+				RecruitingController.Instance.Load(reader);
+				EnemiesController.Instance.Load(reader);
 				HexMapCamera.ValidatePosition();
 			}
 			else
@@ -106,7 +133,7 @@ public class SaveLoadMenu : MonoBehaviour
 		nameInput.text = name;
 	}
 
-	void FillList()
+	private void FillList()
 	{
 		for (int i = 0; i < listContent.childCount; i++)
 		{
@@ -118,7 +145,7 @@ public class SaveLoadMenu : MonoBehaviour
 		for (int i = 0; i < paths.Length; i++)
 		{
 			SaveLoadItem item = Instantiate(itemPrefab);
-			item.menu = this;
+			item.Initialize(this);
 			item.MapName = System.IO.Path.GetFileNameWithoutExtension(paths[i]);
 			item.transform.SetParent(listContent, false);
 		}
@@ -138,6 +165,4 @@ public class SaveLoadMenu : MonoBehaviour
 		nameInput.text = "";
 		FillList();
 	}
-
-
 }

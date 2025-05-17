@@ -21,12 +21,12 @@ public class RuneCellVisual : CellVisual, IPointerEnterHandler, IPointerExitHand
         EquipmentUpgradeUI.Instance.OnRuneSelection(linkedRune);
     }
 
-    virtual public void OnPointerEnter(PointerEventData eventData)
+    public void OnPointerEnter(PointerEventData eventData)
     {
 
     }
 
-    virtual public void OnPointerExit(PointerEventData eventData)
+    public void OnPointerExit(PointerEventData eventData)
     {
 
     }

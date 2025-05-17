@@ -12,6 +12,8 @@ GameObject:
   - component: {fileID: 4892625685053208184}
   - component: {fileID: 3204710416242071065}
   - component: {fileID: 5711750920957842976}
+  - component: {fileID: -6268735249093021364}
+  - component: {fileID: 640984513664788584}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Untagged
@@ -99,6 +101,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f49df08b18d95f4da994d3dc5d74436, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
   isActiveTurn: 0
   turnGauge: 0
   unitIcon: {fileID: 21300000, guid: 4cc1ab808b2e89b40b64e85894b769cd, type: 3}
@@ -118,3 +123,65 @@ MonoBehaviour:
   currentACC: 0
   baseCRIT: 10
   currentCRIT: 0
+  currentSE: 0
+  maxSE: 0
+  currentSEreg: 0
+  currentSEdec: 0
+  skillSet:
+    skills:
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+--- !u!114 &-6268735249093021364
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1208052373259365889}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneId: 0
+  _assetId: 523541190
+  serverOnly: 0
+  visibility: 0
+  hasSpawned: 0
+--- !u!114 &640984513664788584
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1208052373259365889}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8ff3ba0becae47b8b9381191598957c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 1
+  syncMode: 0
+  syncInterval: 0
+  target: {fileID: 1601664550900481957}
+  syncPosition: 1
+  syncRotation: 1
+  syncScale: 1
+  onlySyncOnChange: 1
+  compressRotation: 1
+  interpolatePosition: 1
+  interpolateRotation: 1
+  interpolateScale: 1
+  coordinateSpace: 0
+  timelineOffset: 1
+  showGizmos: 0
+  showOverlay: 0
+  overlayColor: {r: 0, g: 0, b: 0, a: 0.5}
+  onlySyncOnChangeCorrectionMultiplier: 2
+  useFixedUpdate: 0
+  rotationSensitivity: 0.01
+  positionPrecision: 0.01
+  scalePrecision: 0.01

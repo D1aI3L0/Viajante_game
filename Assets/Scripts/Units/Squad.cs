@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 
 public enum SquadType
 {
@@ -13,34 +14,6 @@ public class Squad : Unit
     public SquadType squadType;
     private Base @base;
     public Inventory inventory;
-
-    public override HexCell Location
-    {
-        get => base.Location;
-        set
-        {
-            if (location && squadType == SquadType.Player)
-            {
-                Grid.DecreaseVisibility(location, VisionRange);
-                Grid.IncreaseVisibility(value, VisionRange);
-            }
-
-            base.Location = value;
-        }
-    }
-
-    protected override void OnEnable()
-    {
-        if (location)
-        {
-            if (currentTravelLocation)
-            {
-                Grid.IncreaseVisibility(location, VisionRange);
-                Grid.DecreaseVisibility(currentTravelLocation, VisionRange);
-            }
-            base.OnEnable();
-        }
-    }
 
     public void Initialize(Base @base, List<PlayerCharacter> characters)
     {
@@ -97,5 +70,106 @@ public class Squad : Unit
         }
         characters.Clear();
         Die();
+    }
+
+    public PlayerCharacter[] ToPlayerCharactersArray()
+    {
+        PlayerCharacter[] playerCharacters = new PlayerCharacter[characters.Count];
+        for(int i = 0; i < characters.Count; i++)
+        {
+            playerCharacters[i] = (PlayerCharacter)characters[i];
+        }
+        return playerCharacters;
+    }
+
+    public EnemyCharacter[] ToEnemyCharactersArray()
+    {
+        EnemyCharacter[] enemyCharacters = new EnemyCharacter[characters.Count];
+        for(int i = 0; i < characters.Count; i++)
+        {
+            enemyCharacters[i] = (EnemyCharacter)characters[i];
+        }
+        return enemyCharacters;
+    }
+    //============================================================================================================
+    //                                       Сохранение и загрузка 
+    //============================================================================================================
+    public override void Save(BinaryWriter writer)
+    {
+        base.Save(writer);
+
+        if (squadType == SquadType.Player)
+        {
+            SavePlayerSquad(writer);
+        }
+        else
+        {
+            SaveEnemySquad(writer);
+        }
+    }
+
+    private void SavePlayerSquad(BinaryWriter writer)
+    {
+        writer.Write(characters.Count);
+        foreach (Character character in characters)
+        {
+            writer.Write(Base.Instance.GetCharacterID((PlayerCharacter)character));
+        }
+        inventory.Save(writer);
+    }
+
+    private void SaveEnemySquad(BinaryWriter writer)
+    {
+        writer.Write(characters.Count);
+        foreach (Character character in characters)
+        {
+            ((EnemyCharacter)character).Save(writer);
+        }
+    }
+
+    public override void Load(BinaryReader reader, HexGrid grid)
+    {
+        base.Load(reader, grid);
+
+        if (squadType == SquadType.Player)
+        {
+            LoadPlayerSquad(reader);
+        }
+        else
+        {
+            LoadEnemySquad(reader);
+        }
+    }
+
+    private void LoadPlayerSquad(BinaryReader reader)
+    {
+        @base = Base.Instance;
+
+        int charactersCount = reader.ReadInt32();
+        for(int i = 0; i < charactersCount; i++)
+        {
+            characters.Add(@base.GetCharacterByID(reader.ReadInt32()));
+        }
+
+        foreach(Character character in characters)
+        {
+            Base.Instance.availableCharacters.Remove((PlayerCharacter)character);
+        }
+
+        inventory = new();
+        inventory.Load(reader);
+    }
+
+    private void LoadEnemySquad(BinaryReader reader)
+    {
+        @base = null;
+        inventory = null;
+        int enemiesCount = reader.ReadInt32();
+        for (int i = 0; i < enemiesCount; i++)
+        {
+            EnemyCharacter enemy = new();
+            enemy.Load(reader);
+            characters.Add(enemy);
+        }
     }
 }

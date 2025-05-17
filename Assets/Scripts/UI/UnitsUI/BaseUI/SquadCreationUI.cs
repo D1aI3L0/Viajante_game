@@ -41,7 +41,7 @@ public class SquadCreationUI : MonoBehaviour
         squadCreationPanel.SetActive(false);
     }
 
-    void RefreshAvailableCharacters()
+    private void RefreshAvailableCharacters()
     {
         ClearPanel(availableCharactersPanel);
 
@@ -55,7 +55,7 @@ public class SquadCreationUI : MonoBehaviour
         }
     }
 
-    void RefreshSquadMembers()
+    private void RefreshSquadMembers()
     {
         ClearPanel(squadMembersPanel);
 
@@ -68,7 +68,7 @@ public class SquadCreationUI : MonoBehaviour
         UpdateUI();
     }
 
-    void ClearPanel(Transform panel)
+    private void ClearPanel(Transform panel)
     {
         foreach (Transform child in panel)
         {
@@ -92,7 +92,7 @@ public class SquadCreationUI : MonoBehaviour
         RefreshSquadMembers();
     }
 
-    void UpdateUI()
+    private void UpdateUI()
     {
         squadSizeText.text = $"{selectedCharacters.Count}/3";
         createSquadButton.interactable = selectedCharacters.Count > 0;

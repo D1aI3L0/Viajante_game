@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class AllyBattleCharacter : BattleEntity
@@ -146,4 +147,19 @@ public class AllyBattleCharacter : BattleEntity
         Debug.LogFormat("BattleCharacter initialized: Class = {0}", characterClass);
     }
 
+    public override int[] GetSkillIDs()
+    {
+        List<int> skillIDs = new List<int>();
+
+        for (int i = 0; i < weaponSkills.Length; i++)
+        {
+            for (int j = 0; j < weaponSkillSelections[i].selectedSkillIndices.Length; i++)
+            {
+                if (weaponSkills[i].skills[weaponSkillSelections[i].selectedSkillIndices[j]] != null)
+                    skillIDs.Add(weaponSkills[i].skills[weaponSkillSelections[i].selectedSkillIndices[j]].GetInstanceID());
+            }
+        }
+
+        return skillIDs.ToArray();
+    }
 }

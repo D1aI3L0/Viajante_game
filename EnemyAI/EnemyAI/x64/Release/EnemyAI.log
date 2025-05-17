@@ -1,0 +1,15 @@
+﻿  pch.cpp
+  dllmain.cpp
+  EnemyAI.cpp
+D:\UnityProjects\Viajante_game\EnemyAI\EnemyAI\EnemyAI.cpp(34,22): warning C4244: инициализация: преобразование "int" в "float", возможна потеря данных
+  (компиляция исходного файла "/EnemyAI.cpp")
+  
+D:\UnityProjects\Viajante_game\EnemyAI\EnemyAI\EnemyAI.cpp(35,22): warning C4244: инициализация: преобразование "int" в "float", возможна потеря данных
+  (компиляция исходного файла "/EnemyAI.cpp")
+  
+     Создается библиотека D:\UnityProjects\Viajante_game\EnemyAI\x64\Release\EnemyAI.lib и объект D:\UnityProjects\Viajante_game\EnemyAI\x64\Release\EnemyAI.exp
+  Создание кода
+  Previous IPDB not found, fall back to full compilation.
+  All 4 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Создание кода завершено
+  EnemyAI.vcxproj -> D:\UnityProjects\Viajante_game\EnemyAI\x64\Release\EnemyAI.dll

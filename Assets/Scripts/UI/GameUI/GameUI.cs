@@ -9,7 +9,7 @@ public class GameUI : MonoBehaviour
 {
 	public static GameUI Instance;
 	public HexGrid grid;
-	private HexCell currentCell;
+	internal HexCell currentCell;
 	public Unit selectedUnit;
 	public GameObject UIContainer;
 
@@ -114,7 +114,23 @@ public class GameUI : MonoBehaviour
 		UpdateCurrentCell();
 		if (currentCell)
 		{
-			HexUI.Instance.DisableAllUnitsUI();
+			HexUI.Instance.HideAllUIs();
+			selectedUnit = currentCell.Unit;
+			if (selectedUnit is Base @base)
+			{
+				MainBaseUI.Instance.ShowForBase(@base);
+			}
+			else if (selectedUnit is Squad squad && squad.squadType == SquadType.Player)
+			{
+				PlayerSquadUI.Instance.ShowForSquad(squad);
+			}
+		}
+	}
+
+	public void DoTestSelection()
+	{
+		if (currentCell)
+		{
 			selectedUnit = currentCell.Unit;
 			if (selectedUnit is Base @base)
 			{

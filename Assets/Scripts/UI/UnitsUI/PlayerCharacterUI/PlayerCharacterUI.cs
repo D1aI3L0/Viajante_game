@@ -106,9 +106,9 @@ public class PlayerCharacterUI : MonoBehaviour
         healthLabel.text = $"{playerCharacter.currentCharacterStats.maxHealth}/{playerCharacter.currentCharacterStats.maxHealth}";
         defenceLabel.text = $"{playerCharacter.currentCharacterStats.defence}";
         evasionLabel.text = $"{playerCharacter.currentCharacterStats.evasion}";
-        attackLabel.text = $"{playerCharacter.currentAttack1Stats.attack}/{playerCharacter.currentAttack2Stats.attack}";
-        accurancyLabel.text = $"{playerCharacter.currentAttack1Stats.accuracy}/{playerCharacter.currentAttack2Stats.accuracy}";
-        critLabel.text = $"{playerCharacter.currentAttack1Stats.critRate}/{playerCharacter.currentAttack2Stats.critRate}";
+        attackLabel.text = $"{playerCharacter.equipment.weapon1.weaponParameters.ATK}/{playerCharacter.equipment.weapon2.weaponParameters.ATK}";
+        accurancyLabel.text = $"{playerCharacter.equipment.weapon1.weaponParameters.ACC}/{playerCharacter.equipment.weapon2.weaponParameters.ACC}";
+        critLabel.text = $"{playerCharacter.equipment.weapon1.weaponParameters.CRIT}/{playerCharacter.equipment.weapon2.weaponParameters.CRIT}";
         SPAmountLabel.text = $"{playerCharacter.baseCharacterStats.SPamount}";
         SPRegenLabel.text = $"{playerCharacter.baseCharacterStats.SPregen}";
         SPMoveCostLabel.text = $"{playerCharacter.baseCharacterStats.SPmoveCost}";
@@ -120,26 +120,24 @@ public class PlayerCharacterUI : MonoBehaviour
     {
         HideSkillsInfo();
 
-        for (int i = 0; i < playerCharacter.equipment.weapon1.skills.Count; i++)
+        for (int i = 0; i < playerCharacter.equipment.weapon1.skillSet.skills.Length; i++)
         {
             SkillCellVisual skillCell = Instantiate(skillCellPrefab, skills1Container);
-            skillCell.Setup(playerCharacter.equipment.weapon1.skills[i]);
+            skillCell.Setup(playerCharacter.equipment.weapon1.skillSet.skills[i]);
         }
         specialEnergy1.gameObject.SetActive(true);
-        specialEnergy1.color = SpecialEnergy.SpecialEnergyColors[0];
-        specialEnergy1Amount.text = $"{playerCharacter.equipment.weapon1.specialEnergy.amount}";
+        specialEnergy1Amount.text = $"{playerCharacter.equipment.weapon1.weaponParameters.SE}";
 
         ClearPanel(skills2Container);
 
-        for (int i = 0; i < playerCharacter.equipment.weapon2.skills.Count; i++)
+        for (int i = 0; i < playerCharacter.equipment.weapon2.skillSet.skills.Length; i++)
         {
             SkillCellVisual skillCell = Instantiate(skillCellPrefab, skills2Container);
-            skillCell.Setup(playerCharacter.equipment.weapon2.skills[i]);
+            skillCell.Setup(playerCharacter.equipment.weapon2.skillSet.skills[i]);
         }
 
         specialEnergy2.gameObject.SetActive(true);
-        specialEnergy2.color = SpecialEnergy.SpecialEnergyColors[0];
-        specialEnergy2Amount.text = $"{playerCharacter.equipment.weapon2.specialEnergy.amount}";
+        specialEnergy2Amount.text = $"{playerCharacter.equipment.weapon2.weaponParameters.SE}";
     }
 
     private void HideSpecialEnergies()

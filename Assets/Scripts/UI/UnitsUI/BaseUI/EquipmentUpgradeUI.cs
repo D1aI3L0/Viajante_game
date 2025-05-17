@@ -243,7 +243,7 @@ public class EquipmentUpgradeUI : MonoBehaviour
         selectionPanel.SetActive(false);
     }
 
-    public void OnSkillSelection(Skill skill)
+    public void OnSkillSelection(SkillAsset skill)
     {
         if (!selectedUpgradeCell)
             return;

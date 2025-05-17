@@ -18,4 +18,9 @@ public class MovementEffect : SkillEffect
         user.transform.position += user.transform.forward * moveDistance;
         Debug.LogFormat("{0} переместился с {1} на {2}.", user.name, originalPosition, user.transform.position);
     }
+
+    public override void Copy(SkillEffect other)
+    {
+        moveDistance = ((MovementEffect)other).moveDistance;
+    }
 }

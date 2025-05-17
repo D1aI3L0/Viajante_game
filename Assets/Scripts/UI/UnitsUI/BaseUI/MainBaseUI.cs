@@ -24,7 +24,7 @@ public class MainBaseUI : MonoBehaviour
 
     private Base currentBase;
 
-    private void Start()
+    protected virtual void Start()
     {
         Instance = this;
         squadCreationMenu.Hide();
@@ -34,12 +34,12 @@ public class MainBaseUI : MonoBehaviour
         enabled = false;
     }
 
-    private void Update()
+    protected virtual void Update()
     {
         createSquadBtn.interactable = currentBase.availableCharacters.Count > 0;
     }
 
-    public void ShowForBase(Base playerBase)
+    public virtual void ShowForBase(Base playerBase)
     {
         enabled = true;
         currentBase = playerBase;

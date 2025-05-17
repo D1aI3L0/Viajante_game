@@ -1,65 +1,18 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 
 
 [Serializable]
-public class AttackStats
-{
-    public int attack;
-    public int accuracy;
-    public int critRate;
-}
-
-public enum SpecialEnergyType
-{
-    Rage,
-    Endurance,
-
-}
-
-[Serializable]
-public struct SpecialEnergy
-{
-    public static Color[] SpecialEnergyColors = 
-    {
-        Color.blue,
-        Color.cyan,
-        Color.green,
-        Color.yellow
-    };
-    private const int combinedCoefficient = 85;
-
-    public SpecialEnergyType energyType;
-    public int amount;
-    public int regen;
-    public int decrease;
-
-    public static SpecialEnergy? GetCombinedEnergy(SpecialEnergy specialEnergy1, SpecialEnergy specialEnergy2)
-    {
-        if(specialEnergy1.energyType != specialEnergy2.energyType)
-            return null;
-
-        return new SpecialEnergy()
-        { 
-            energyType = specialEnergy1.energyType,
-            amount = (specialEnergy1.amount + specialEnergy2.amount) * combinedCoefficient / 100,
-            regen = (specialEnergy1.amount + specialEnergy2.amount) * combinedCoefficient / 100,
-            decrease = (specialEnergy1.amount + specialEnergy2.amount) * combinedCoefficient / 100
-        };
-    }
-}
-
-
-[Serializable]
 public class Weapon : Item, IUpgradable
 {
-    public AttackStats attackStats = new();
-    public SpecialEnergy specialEnergy = new();
+    public WeaponParameters weaponParameters = new();
 
-    public List<Skill> skills = new();
+    public WeaponSkillSet skillSet;
     public List<WeaponUpgrade> upgrades = new();
     private Dictionary<WeaponUpgradeSkill, List<WeaponUpgradeRune>> upgradesDictionary = new();
 
@@ -74,19 +27,19 @@ public class Weapon : Item, IUpgradable
         InitializeSkillUpgrades();
     }
 
-    private void InitializeStats(WeaponParameters weaponParameters)
+    private void InitializeStats(WeaponParameters otherWeaponParameters)
     {
-        attackStats.attack = weaponParameters.ATK;
-        attackStats.accuracy = weaponParameters.ACC;
-        attackStats.critRate = weaponParameters.CRIT;
-        specialEnergy.amount = weaponParameters.SE;
-        specialEnergy.regen = weaponParameters.SEreg;
-        specialEnergy.decrease = weaponParameters.SEdec;
+        weaponParameters.ATK = otherWeaponParameters.ATK;
+        weaponParameters.ACC = otherWeaponParameters.ACC;
+        weaponParameters.CRIT = otherWeaponParameters.CRIT;
+        weaponParameters.SE = otherWeaponParameters.SE;
+        weaponParameters.SEreg = otherWeaponParameters.SEreg;
+        weaponParameters.SEdec = otherWeaponParameters.SEdec;
     }
 
     private void InitializeSkillSet(WeaponSkillSet weaponSkillSet)
     {
-
+        skillSet = new(weaponSkillSet);
     }
 
     private void InitializeSkillUpgrades()
@@ -103,8 +56,8 @@ public class Weapon : Item, IUpgradable
         {
             isFixed = true,
             gridPosition = Vector2Int.zero,
-            linkedSkill = null
         };
+        _ = skillSet.skills.Length > 1 ? baseAttackUpgrade.linkedSkill = skillSet.skills[0] : baseAttackUpgrade.linkedSkill = null;
         upgradesDictionary.Add(baseAttackUpgrade, new());
         upgrades.Add(baseAttackUpgrade);
     }
@@ -125,7 +78,7 @@ public class Weapon : Item, IUpgradable
         upgrades.Add(weaponUpgradeSkill);
     }
 
-    private bool TryUpgrade(out WeaponUpgradeRune newWeaponUpgrade)
+    public bool TryUpgrade(out WeaponUpgradeRune newWeaponUpgrade)
     {
         int index = UnityEngine.Random.Range(0, upgradesDictionary.Keys.Count);
         WeaponUpgradeSkill selectedSkillUpgrade = upgradesDictionary.Keys.ToList()[index];
@@ -241,25 +194,25 @@ public class Weapon : Item, IUpgradable
         return -1;
     }
 
-    public List<Skill> GetAvailableSkills()
+    public List<SkillAsset> GetAvailableSkills()
     {
-        List<Skill> availableSkills = new();
+        List<SkillAsset> availableSkills = new();
         var linkedSkills = GetLinkedSkills();
 
-        for (int i = 0; i < skills.Count; i++)
+        for (int i = 0; i < skillSet.skills.Length; i++)
         {
-            if (!linkedSkills.Contains(skills[i]))
+            if (!linkedSkills.Contains(skillSet.skills[i]))
             {
-                availableSkills.Add(skills[i]);
+                availableSkills.Add(skillSet.skills[i]);
             }
         }
 
         return availableSkills;
     }
 
-    public List<Skill> GetLinkedSkills()
+    public List<SkillAsset> GetLinkedSkills()
     {
-        List<Skill> linkedSkills = new();
+        List<SkillAsset> linkedSkills = new();
         var skillUpgrades = upgradesDictionary.Keys.ToList();
         for (int i = 0; i < skillUpgrades.Count; i++)
         {
@@ -271,9 +224,9 @@ public class Weapon : Item, IUpgradable
         return linkedSkills;
     }
 
-    public Dictionary<Skill, List<Rune>> GetLinkedSkillRunes()
+    public Dictionary<SkillAsset, List<Rune>> GetLinkedSkillRunes()
     {
-        Dictionary<Skill, List<Rune>> result = new();
+        Dictionary<SkillAsset, List<Rune>> result = new();
 
         foreach (var skillUpgrade in upgradesDictionary.Keys.ToList())
         {
@@ -363,18 +316,25 @@ public class Weapon : Item, IUpgradable
         return false;
     }
 
-    private bool TyrGetUpgrade(Vector2Int position, out WeaponUpgrade weaponUpgrade)
+    public int GetSkillID(SkillAsset skill)
     {
-        weaponUpgrade = null;
-        foreach (WeaponUpgrade upgrade in upgrades)
+        if (skill == null)
+            return -1;
+
+        for (int i = 0; i < skillSet.skills.Length; i++)
         {
-            if (upgrade.gridPosition.Equals(position))
-            {
-                weaponUpgrade = upgrade;
-                return true;
-            }
+            if (skillSet.skills[i] == skill)
+                return i;
         }
-        return false;
+        return -1;
+    }
+
+    public SkillAsset GetSkillByID(int id)
+    {
+        if (id < 0 || id > skillSet.skills.Length)
+            return null;
+
+        return skillSet.skills[id];
     }
     //=================================================================================================
     //                                      IUpgradable
@@ -395,6 +355,54 @@ public class Weapon : Item, IUpgradable
 
     public string GetUpgradeDescription()
     {
-        return $"Уровень: {CurrentLevel}\n";
+        return $"Level: {CurrentLevel}\n";
+    }
+    //=================================================================================================
+    //                                      Сохранение и загрузка
+    //=================================================================================================
+    public override void Save(BinaryWriter writer)
+    {
+        base.Save(writer);
+        writer.Write(CurrentLevel);
+
+        var upgradeSkills = upgradesDictionary.Keys.ToList();
+        for (int i = 0; i < 4; i++)  
+        {
+            upgradeSkills[i].Save(writer, this);
+
+            upgradesDictionary.TryGetValue(upgradeSkills[i], out var upgradeRunes);
+            writer.Write(upgradeRunes.Count);
+            foreach (WeaponUpgradeRune upgradeRune in upgradeRunes)
+            {
+                upgradeRune.Save(writer);
+            }
+        }
+    }
+
+    public override void Load(BinaryReader reader)
+    {
+        base.Load(reader);
+        upgrades.Clear();
+        upgradesDictionary.Clear();
+
+        CurrentLevel = reader.ReadInt32();
+
+        for (int i = 0; i < 4; i++)
+        {
+            WeaponUpgradeSkill newSkillUpgrade = new();
+            newSkillUpgrade.Load(reader, this);
+
+            int runeUpgradeCount = reader.ReadInt32();
+            List<WeaponUpgradeRune> newRuneUpgrades = new();
+            for (int j = 0; j < runeUpgradeCount; j++)
+            {
+                WeaponUpgradeRune newRuneUpgrade = new();
+                newRuneUpgrade.Load(reader);
+                newRuneUpgrades.Add(newRuneUpgrade);
+            }
+            upgradesDictionary.Add(newSkillUpgrade, newRuneUpgrades);
+            upgrades.Add(newSkillUpgrade);
+            upgrades.AddRange(newRuneUpgrades);
+        }
     }
 }

@@ -41,11 +41,13 @@ public class RecruitingUI : MonoBehaviour
         HideCharacterEquipment();
         HideCharacterStats();
         HideSkillset();
+        HideTraits();
         ShowCharacters();
     }
 
     public void Hide()
     {
+        GameUI.Instance.enabled = true;
         enabled = false;
         recrutingPanel.SetActive(false);
         OnCharacterUnselect();
@@ -54,16 +56,13 @@ public class RecruitingUI : MonoBehaviour
 
     private void ShowCharacters()
     {
+        ClearPanel(recruitingCharactersContainer);
         List<PlayerCharacter> availableCharacters = recruitingController.GetCharacters();
-        for (int i = 0; i < availableCharacters.Count; i++)
-        {
-            ClearPanel(recruitingCharactersContainer);
 
-            foreach (PlayerCharacter character in availableCharacters)
-            {
-                CharacterSlotBase slot = Instantiate(characterSlotPrefab, recruitingCharactersContainer);
-                slot.Initialize(character, this);
-            }
+        foreach (PlayerCharacter character in availableCharacters)
+        {
+            CharacterSlotBase slot = Instantiate(characterSlotPrefab, recruitingCharactersContainer);
+            slot.Initialize(character, this);
         }
     }
 
@@ -118,9 +117,9 @@ public class RecruitingUI : MonoBehaviour
 
     private void ShowWeaponStats(Weapon weapon)
     {
-        attackLabel.text = $"{weapon.attackStats.attack}";
-        accurancyLabel.text = $"{weapon.attackStats.accuracy}";
-        critLabel.text = $"{weapon.attackStats.critRate}";
+        attackLabel.text = $"{weapon.weaponParameters.ATK}";
+        accurancyLabel.text = $"{weapon.weaponParameters.ACC}";
+        critLabel.text = $"{weapon.weaponParameters.CRIT}";
     }
 
     private void HideCharacterStats()
@@ -165,7 +164,7 @@ public class RecruitingUI : MonoBehaviour
 
         HideSkillset();
 
-        foreach (Skill skill in weapon.skills)
+        foreach (SkillAsset skill in weapon.skillSet.skills)
         {
             SkillCellVisual slot = Instantiate(skillCellPrefab, skillsContainer);
             slot.Setup(skill);
@@ -182,14 +181,14 @@ public class RecruitingUI : MonoBehaviour
         HideTraits();
 
         List<Trait> positive = selectedCharacterSlot.linkedCharacter.GetTraits(TraitType.Positive);
-        foreach(Trait trait in positive)
+        foreach (Trait trait in positive)
         {
             TraitCellVisual traitCell = Instantiate(traitCellPrefab, positiveTraitsContainer);
             traitCell.Setup(trait);
         }
 
         List<Trait> negative = selectedCharacterSlot.linkedCharacter.GetTraits(TraitType.Negatine);
-        foreach(Trait trait in negative)
+        foreach (Trait trait in negative)
         {
             TraitCellVisual traitCell = Instantiate(traitCellPrefab, negativeTraitsContainer);
             traitCell.Setup(trait);
@@ -211,8 +210,6 @@ public class RecruitingUI : MonoBehaviour
             Show();
         }
     }
-
-
 
     private void ClearPanel(Transform panel)
     {

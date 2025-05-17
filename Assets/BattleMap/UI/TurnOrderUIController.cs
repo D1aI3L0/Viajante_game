@@ -26,7 +26,16 @@ public class TurnOrderUIController : MonoBehaviour
     /// </summary>
     public void UpdateTurnOrderDisplay()
     {
-        List<BattleEntity> sortedUnits = TurnManager.Instance.participants
+#if MIRROR
+        List<BattleEntity> participants = new();
+        foreach (uint id in TurnManager.Instance.SyncParticipants)
+        {
+            participants.Add(TurnManager.Instance.GetParticipantById(id));
+        }
+#else
+        List<BattleEntity> participants = TurnManager.Instance.GetParticipants();
+#endif
+        List<BattleEntity> sortedUnits = participants
             .OrderBy(entity => entity.turnGauge)
             .ToList();
 

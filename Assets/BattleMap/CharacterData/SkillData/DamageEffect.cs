@@ -50,4 +50,12 @@ public class DamageEffect : SkillEffect
         
         //target.TakeDamage(calculatedDamage);
     }
+
+    public override void Copy(SkillEffect other)
+    {
+        damageMultiplierMin = ((DamageEffect)other).damageMultiplierMin;
+        damageMultiplierMax = ((DamageEffect)other).damageMultiplierMax;
+        skillAccuracyBonus = ((DamageEffect)other).skillAccuracyBonus;
+        critBonus = ((DamageEffect)other).critBonus;
+    }
 }

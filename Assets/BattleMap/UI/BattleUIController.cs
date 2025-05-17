@@ -163,9 +163,6 @@ public class BattleUIController : MonoBehaviour
 
 
 
-
-
-
     // Обработчики для кнопок навыков
     // Можно задать каждому навыковому индексу
     public void OnSkillButtonClicked(int skillIndex)

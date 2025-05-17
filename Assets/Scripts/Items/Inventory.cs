@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 
 public class Inventory
 {
@@ -47,5 +48,15 @@ public class Inventory
             if(items[i] is Artifact artifact)
                 artifacts.Add(artifact);
         }
+    }
+
+    public void Save(BinaryWriter writer)
+    {
+
+    }
+
+    public void Load(BinaryReader reader)
+    {
+
     }
 }

@@ -32,8 +32,12 @@ public class HexGrid : MonoBehaviour
 	public HexSettlement settlementPrefab;
 	private List<HexSettlement> settlements;
 
+	public bool skipAutoinitialization = false;
+
 	void Awake()
 	{
+		if (skipAutoinitialization)
+			return;
 		HexMetrics.noiseSource = noiseSource;
 		HexMetrics.InitializeHashGrid(seed);
 		Squad.playerSquadPrefab = playerSquadPrefab;
@@ -44,6 +48,8 @@ public class HexGrid : MonoBehaviour
 
 	void OnEnable()
 	{
+		if (skipAutoinitialization)
+			return;
 		if (!HexMetrics.noiseSource)
 		{
 			HexMetrics.noiseSource = noiseSource;
@@ -93,16 +99,35 @@ public class HexGrid : MonoBehaviour
 		biomesEmpty = new GameObject("Biomes").transform;
 		biomesEmpty.SetParent(transform);
 		if (biomes == null)
+		{
 			biomes = ListPool<HexBiome>.Get();
+		}
 		else
+		{
 			biomes.Clear();
+		}
 
 		settlementsEmpty = new GameObject("Settlements").transform;
 		settlementsEmpty.SetParent(transform);
 		if (settlements == null)
+		{
 			settlements = ListPool<HexSettlement>.Get();
+		}
 		else
+		{
 			settlements.Clear();
+		}
+
+		if (squads.Count > 0)
+		{
+			foreach (Squad squad in squads)
+			{
+				squad.Die();
+			}
+		}
+		squads.Clear();
+
+		RemoveBase();
 
 		return true;
 	}
@@ -424,12 +449,6 @@ public class HexGrid : MonoBehaviour
 			cells[i].Save(writer);
 		}
 
-		writer.Write(units.Count);
-		for (int i = 0; i < units.Count; i++)
-		{
-			units[i].Save(writer);
-		}
-
 		writer.Write(biomes.Count);
 		for (int i = 0; i < biomes.Count; i++)
 		{
@@ -441,6 +460,15 @@ public class HexGrid : MonoBehaviour
 		{
 			settlements[i].Save(writer);
 		}
+
+		@base.Save(writer);
+
+		writer.Write(squads.Count);
+		for (int i = 0; i < squads.Count; i++)
+		{
+			writer.Write((int)squads[i].squadType);
+			squads[i].Save(writer);
+		}
 	}
 
 	public void Load(BinaryReader reader, int header)
@@ -449,14 +477,11 @@ public class HexGrid : MonoBehaviour
 		ClearSquads();
 
 		int x = 40, z = 24;
-		if (header >= 1)
-		{
-			x = reader.ReadInt32();
-			z = reader.ReadInt32();
-		}
+		x = reader.ReadInt32();
+		z = reader.ReadInt32();
 
-		bool xWrapping = header >= 5 ? reader.ReadBoolean() : false;
-		bool zWrapping = header >= 6 ? reader.ReadBoolean() : false;
+		bool xWrapping = reader.ReadBoolean();
+		bool zWrapping = reader.ReadBoolean();
 
 		if (!CreateMap(x, z, xWrapping, zWrapping))
 		{
@@ -472,61 +497,63 @@ public class HexGrid : MonoBehaviour
 			chunks[i].Refresh();
 		}
 
-		if (header >= 2)
+		int biomesCount = reader.ReadInt32();
+		for (int i = 0; i < biomesCount; i++)
 		{
-			int unitCount = reader.ReadInt32();
-			for (int i = 0; i < unitCount; i++)
+			HexCell center = GetCell(reader.ReadInt32());
+			int borderSize = reader.ReadInt32();
+			List<HexCell> border = ListPool<HexCell>.Get();
+			for (int j = 0; j < borderSize; j++)
 			{
-				Unit.Load(reader, this);
+				border.Add(GetCell(reader.ReadInt32()));
+			}
+			AddBiome(center, border);
+		}
+
+
+		int settlementsCount = reader.ReadInt32();
+		List<List<int>> connections = new();
+		for (int i = 0; i < settlementsCount; i++)
+		{
+			int index = reader.ReadInt32();
+			HexCell center = GetCell(reader.ReadInt32());
+			int borderSize = reader.ReadInt32();
+			List<HexCell> border = ListPool<HexCell>.Get();
+			for (int j = 0; j < borderSize; j++)
+			{
+				border.Add(GetCell(reader.ReadInt32()));
+			}
+			AddSettlement(center, border, (SettlementType)reader.ReadByte(), (SettlementNation)reader.ReadByte(), reader.ReadBoolean(), index);
+			int connectedWithCount = reader.ReadInt32();
+			connections.Add(new List<int>());
+			for (int j = 0; j < connectedWithCount; j++)
+			{
+				connections[i].Add(reader.ReadInt32());
 			}
 		}
 
-		if (header >= 7)
+		for (int i = 0; i < settlementsCount; i++)
 		{
-			int biomesCount = reader.ReadInt32();
-			for (int i = 0; i < biomesCount; i++)
+			for (int j = 0; j < connections[i].Count; j++)
 			{
-				HexCell center = GetCell(reader.ReadInt32());
-				int borderSize = reader.ReadInt32();
-				List<HexCell> border = ListPool<HexCell>.Get();
-				for (int j = 0; j < borderSize; j++)
-				{
-					border.Add(GetCell(reader.ReadInt32()));
-				}
-				AddBiome(center, border);
+				settlements[i].connectedWith.Add(settlements[connections[i][j]]);
 			}
 		}
 
-		if (header >= 8)
-		{
-			int settlementsCount = reader.ReadInt32();
-			List<List<int>> connections = new();
-			for (int i = 0; i < settlementsCount; i++)
-			{
-				int index = reader.ReadInt32();
-				HexCell center = GetCell(reader.ReadInt32());
-				int borderSize = reader.ReadInt32();
-				List<HexCell> border = ListPool<HexCell>.Get();
-				for (int j = 0; j < borderSize; j++)
-				{
-					border.Add(GetCell(reader.ReadInt32()));
-				}
-				AddSettlement(center, border, (SettlementType)reader.ReadByte(), (SettlementNation)reader.ReadByte(), reader.ReadBoolean(), index);
-				int connectedWithCount = reader.ReadInt32();
-				connections.Add(new List<int>());
-				for (int j = 0; j < connectedWithCount; j++)
-				{
-					connections[i].Add(reader.ReadInt32());
-				}
-			}
 
-			for (int i = 0; i < settlementsCount; i++)
-			{
-				for (int j = 0; j < connections[i].Count; j++)
-				{
-					settlements[i].connectedWith.Add(settlements[connections[i][j]]);
-				}
-			}
+		@base = Instantiate(Base.basePrefab);
+		@base.Load(reader, this);
+		
+        Base.Instance = @base;
+
+		int squadsCount = reader.ReadInt32();
+		for (int i = 0; i < squadsCount; i++)
+		{
+			SquadType squadType = (SquadType)reader.ReadInt32();
+			Squad newSquad = Instantiate(squadType == SquadType.Player ? Squad.playerSquadPrefab : Squad.enemySquadPrefab);
+			newSquad.squadType = squadType;
+			newSquad.Load(reader, this);
+			squads.Add(newSquad);
 		}
 	}
 	//============================================================================================================
@@ -675,7 +702,7 @@ public class HexGrid : MonoBehaviour
 	//============================================================================================================
 	public Squad playerSquadPrefab, enemySquadPrefab;
 	public Base basePrefab;
-	private List<Unit> units = new List<Unit>();
+	private List<Squad> squads = new();
 	private Base @base;
 
 	public bool HasPath
@@ -688,17 +715,22 @@ public class HexGrid : MonoBehaviour
 
 	private void ClearSquads()
 	{
-		for (int i = 0; i < units.Count; i++)
+		for (int i = 0; i < squads.Count; i++)
 		{
-			units[i].Die();
+			squads[i].Die();
 		}
-		units.Clear();
+		squads.Clear();
+	}
+
+	public Base GetBase()
+	{
+		return @base;
 	}
 
 	public void AddPlayerSquad(HexCell location, float orientation, List<PlayerCharacter> characters, Base @base)
 	{
 		Squad squad = Instantiate(Squad.playerSquadPrefab);
-		units.Add(squad);
+		squads.Add(squad);
 		squad.Initialize(@base, characters);
 		squad.ResetStamina();
 		squad.Grid = this;
@@ -709,7 +741,7 @@ public class HexGrid : MonoBehaviour
 	public Squad AddEnemySquad(HexCell location, float orientation, List<EnemyCharacter> characters)
 	{
 		Squad squad = Instantiate(Squad.enemySquadPrefab);
-		units.Add(squad);
+		squads.Add(squad);
 		squad.Initialize(characters);
 		squad.Grid = this;
 		squad.Location = location;
@@ -739,7 +771,7 @@ public class HexGrid : MonoBehaviour
 	public List<Squad> GetSquads(SquadType squadType)
 	{
 		List<Squad> squads = new();
-		foreach (Unit unit in units)
+		foreach (Unit unit in this.squads)
 		{
 			if (unit is Squad squad && squad.squadType == squadType)
 				squads.Add(squad);
@@ -749,7 +781,7 @@ public class HexGrid : MonoBehaviour
 
 	public void RemoveSquad(Squad squad)
 	{
-		units.Remove(squad);
+		squads.Remove(squad);
 	}
 
 	public void RemoveBase()
@@ -768,9 +800,9 @@ public class HexGrid : MonoBehaviour
 
 	public void ResetUnitsStamina()
 	{
-		for (int i = 0; i < units.Count; i++)
+		for (int i = 0; i < squads.Count; i++)
 		{
-			units[i].ResetStamina();
+			squads[i].ResetStamina();
 		}
 
 		if (@base)
@@ -849,7 +881,23 @@ public class HexGrid : MonoBehaviour
 		return selectedCell;
 	}
 
+	public int GetSquadID(Squad squad)
+	{
+		for (int i = 0; i < squads.Count; i++)
+		{
+			if (squads[i] == squad)
+				return i;
+		}
+		return -1;
+	}
 
+	public Squad GetSquadByID(int id)
+	{
+		if (id < 0 || id > squads.Count)
+			return null;
+
+		return squads[id];
+	}
 	//============================================================================================================
 	//                                          Область видимости 
 	//============================================================================================================
@@ -935,9 +983,9 @@ public class HexGrid : MonoBehaviour
 		{
 			cells[i].ResetVisibility();
 		}
-		for (int i = 0; i < units.Count; i++)
+		for (int i = 0; i < squads.Count; i++)
 		{
-			Unit unit = units[i];
+			Unit unit = squads[i];
 			IncreaseVisibility(unit.Location, unit.VisionRange);
 		}
 	}

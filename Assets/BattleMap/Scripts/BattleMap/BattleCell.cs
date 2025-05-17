@@ -1,3 +1,4 @@
+using Mirror;
 using UnityEngine;
 
 public enum CellState
@@ -27,7 +28,7 @@ public class BattleCell : MonoBehaviour
     [SerializeField] private BattleEntity _occupant;
 
     // Соседи клетки (индексируется согласно направлению, например, через HexDirection)
-    [SerializeField] private BattleCell[] neighbors;
+    [SerializeField] public BattleCell[] neighbors;
 
     // ------------------------- Properties -------------------------
 
@@ -87,6 +88,24 @@ public class BattleCell : MonoBehaviour
         private set => state = value;
     }
 
+    public void SetState(CellState newState)
+    {
+        State = newState;
+    }
+
+
+    public void SetObstacle(GameObject obstaclePrefab)
+    {
+        if (State != CellState.Obstacle)
+        {
+            State = CellState.Obstacle;
+            if (obstaclePrefab != null && _obstacleObject == null)
+            {
+                _obstacleObject = Instantiate(obstaclePrefab, transform);
+                _obstacleObject.transform.localPosition = Vector3.zero;
+            }
+        }
+    }
     // ------------------------- Methods -------------------------
 
     #region Occupant Management
@@ -188,11 +207,4 @@ public class BattleCell : MonoBehaviour
     }
 
     #endregion
-
-    // public void OnCellClicked()
-    // {
-    //     Debug.Log("Клетка " + name + " была нажата.");
-    //     // Вы можете напрямую вызвать нужный метод, например:
-    //     // PlayerTurnController.Instance.OnCellClicked(this);
-    // }
 }

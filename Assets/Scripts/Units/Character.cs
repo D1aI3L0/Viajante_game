@@ -1,15 +1,6 @@
 using System;
+using System.IO;
 
-[Serializable]
-public class CharacterStats
-{
-    public int maxHealth;
-    public int defence;
-    public int evasion;
-    public int SPamount, SPregen, SPmoveCost;
-    public int speed;
-    public int tount;
-}
 
 
 [Serializable]
@@ -18,5 +9,16 @@ public class Character
     public string characterName;
     public int level = 1;
     public CharacterStats currentCharacterStats = new(), baseCharacterStats = new();
-    public int currentHealth;
+    //=================================================================================================
+    //                                      Сохранение и загрузка
+    //=================================================================================================
+    public virtual void Save(BinaryWriter writer)
+    {
+        writer.Write(level);
+    }
+    
+    public virtual void Load(BinaryReader reader)
+    {
+        level = reader.ReadInt32();
+    }
 }

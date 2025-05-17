@@ -17,14 +17,14 @@ public class PlayerSquadUI : MonoBehaviour
     private Squad currentSquad;
     private List<CharacterSlotSquad> characterSlots = new List<CharacterSlotSquad>();
 
-    void Awake()
+    protected virtual void Awake()
     {
         Instance = this;
         UIContainer.SetActive(false);
         enabled = false;
     }
 
-    public void ShowForSquad(Squad squad)
+    public virtual void ShowForSquad(Squad squad)
     {
         currentSquad = squad;
         UpdateUI();

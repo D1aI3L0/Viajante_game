@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 public class RecruitingController : MonoBehaviour
@@ -69,5 +70,75 @@ public class RecruitingController : MonoBehaviour
     public void Remove(PlayerCharacter playerCharacter)
     {
         recruitingCharacters.Remove(playerCharacter);
+    }
+
+    public static BasicCharacterTemplates GetCharacterTemplate(CharacterClass characterClass)
+    {
+        foreach(BasicCharacterTemplates characterTemplate in Instance.characterTemplates)
+        {
+            if(characterTemplate.characterClass == characterClass)
+            {
+                return characterTemplate;
+            }
+        }
+        return null;
+    }
+
+    public int GetTraitID(TraitData traitData)
+    {
+        if(traitData.traitType == TraitType.Positive)
+        {
+            for(int i = 0; i < availablePositiveTraits.Count; i++)
+            {
+                if(availablePositiveTraits[i] == traitData)
+                    return i;
+            }
+        }
+        else
+        {
+            for(int i = 0; i < availableNegativeTraits.Count; i++)
+            {
+                if(availableNegativeTraits[i] == traitData)
+                    return i;
+            }
+        }
+        return -1;
+    }
+
+    public TraitData GetPositiveTraitByID(int id)
+    {
+        if(id < 0 || id > availablePositiveTraits.Count)
+            return null;
+
+        return availablePositiveTraits[id];
+    }
+
+    public TraitData GetNegativeTraitByID(int id)
+    {
+        if(id < 0 || id > availableNegativeTraits.Count)
+            return null;
+
+        return availableNegativeTraits[id];
+    }
+
+
+    public void Save(BinaryWriter writer)
+    {
+        writer.Write(recruitingCharacters.Count);
+        foreach(PlayerCharacter character in recruitingCharacters)
+        {
+            character.Save(writer);
+        }
+    }
+
+    public void Load(BinaryReader reader)
+    {
+        int charactersCount = reader.ReadInt32();
+        for(int i = 0; i < charactersCount; i++)
+        {
+            PlayerCharacter newCharacter = new();
+            newCharacter.Load(reader);
+            recruitingCharacters.Add(newCharacter);
+        }
     }
 }

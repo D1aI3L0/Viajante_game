@@ -4,8 +4,7 @@ using UnityEngine.UI;
 
 public class SaveLoadItem : MonoBehaviour
 {
-
-	public SaveLoadMenu menu;
+    [SerializeField] private Button button;
 
 	public string MapName
 	{
@@ -20,10 +19,15 @@ public class SaveLoadItem : MonoBehaviour
 		}
 	}
 
-	string mapName;
-
-	public void Select()
+	public void Initialize(SaveLoadMenu saveLoadMenu)
 	{
-		menu.SelectItem(mapName);
+		button.onClick.AddListener(() => saveLoadMenu.SelectItem(mapName)); 
 	}
+
+	public void Initialize(MainMenuUIController mainMenuUI)
+	{
+		button.onClick.AddListener(() => mainMenuUI.SelectGame(mapName));
+	}
+
+	private string mapName;
 }

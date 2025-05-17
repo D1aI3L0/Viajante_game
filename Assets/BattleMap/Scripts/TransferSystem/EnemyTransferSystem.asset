@@ -1,0 +1,135 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5bdc9c35647699248881f85c7e807628, type: 3}
+  m_Name: EnemyTransferSystem
+  m_EditorClassIdentifier: 
+  enemiesCount: 2
+  enemyStats:
+  - characterParameters:
+      maxHP: 34624
+      currentHP: 34624
+      DEF: 27
+      EVA: 62
+      PROV: 7
+      SPD: 547
+      SP: 47
+      SPreg: 25
+      SPmovecost: 257
+    weaponParameters:
+      ATK: 2547
+      ACC: 2457
+      CRIT: 257
+      SE: 457
+      SEreg: 257
+      SEdec: 0
+    skillSet:
+      skills:
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+  - characterParameters:
+      maxHP: 174
+      currentHP: 174
+      DEF: 235
+      EVA: 5
+      PROV: 1534
+      SPD: 1741
+      SP: 4
+      SPreg: 461
+      SPmovecost: 616
+    weaponParameters:
+      ATK: 61346
+      ACC: 2457
+      CRIT: 717
+      SE: 257
+      SEreg: 5672
+      SEdec: 0
+    skillSet:
+      skills:
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+  enemyCharacters:
+  - characterName: Warrior
+    level: 1
+    currentCharacterStats:
+      maxHealth: 34624
+      defence: 27
+      evasion: 62
+      SPamount: 47
+      SPregen: 25
+      SPmoveCost: 257
+      speed: 547
+      tount: 7
+    baseCharacterStats:
+      maxHealth: 34624
+      defence: 27
+      evasion: 62
+      SPamount: 47
+      SPregen: 25
+      SPmoveCost: 257
+      speed: 547
+      tount: 7
+    isElite: 0
+    weaponParameters:
+      ATK: 2547
+      ACC: 2457
+      CRIT: 257
+      SE: 457
+      SEreg: 257
+      SEdec: 0
+    skillSet:
+      skills:
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+  - characterName: Snake
+    level: 1
+    currentCharacterStats:
+      maxHealth: 174
+      defence: 235
+      evasion: 5
+      SPamount: 4
+      SPregen: 461
+      SPmoveCost: 616
+      speed: 1741
+      tount: 1534
+    baseCharacterStats:
+      maxHealth: 174
+      defence: 235
+      evasion: 5
+      SPamount: 4
+      SPregen: 461
+      SPmoveCost: 616
+      speed: 1741
+      tount: 1534
+    isElite: 0
+    weaponParameters:
+      ATK: 61346
+      ACC: 2457
+      CRIT: 717
+      SE: 257
+      SEreg: 5672
+      SEdec: 0
+    skillSet:
+      skills:
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}

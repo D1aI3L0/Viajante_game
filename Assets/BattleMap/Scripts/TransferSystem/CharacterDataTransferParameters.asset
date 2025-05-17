@@ -14,50 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   numberOfCharacters: 2
   characters:
-  - characterClass: 1
-    selectedSubclassIndices: 0000000001000000
-    maxHP: 140
-    currentHP: 140
-    DEF: 35
-    EVA: 20
-    PROV: 10
-    SPD: 140
-    SP: 100
-    SPreg: 15
-    SPmovecost: 5
-    weaponParameters:
-    - ATK: 35
-      ACC: 88
-      CRIT: 15
-      SE: 100
-      SEreg: 20
-      SEdec: 0
-    - ATK: 30
-      ACC: 92
-      CRIT: 10
-      SE: 4
-      SEreg: 0
-      SEdec: 0
-    weaponSkills:
-    - skills:
-      - {fileID: 11400000, guid: 491aebf19dc6af2418ebc4524de7eb36, type: 2}
-      - {fileID: 11400000, guid: 491aebf19dc6af2418ebc4524de7eb36, type: 2}
-      - {fileID: 11400000, guid: 491aebf19dc6af2418ebc4524de7eb36, type: 2}
-      - {fileID: 11400000, guid: 491aebf19dc6af2418ebc4524de7eb36, type: 2}
-      - {fileID: 11400000, guid: 491aebf19dc6af2418ebc4524de7eb36, type: 2}
-    - skills:
-      - {fileID: 11400000, guid: 491aebf19dc6af2418ebc4524de7eb36, type: 2}
-      - {fileID: 11400000, guid: 491aebf19dc6af2418ebc4524de7eb36, type: 2}
-      - {fileID: 11400000, guid: 491aebf19dc6af2418ebc4524de7eb36, type: 2}
-      - {fileID: 11400000, guid: 491aebf19dc6af2418ebc4524de7eb36, type: 2}
-      - {fileID: 11400000, guid: 491aebf19dc6af2418ebc4524de7eb36, type: 2}
-    weaponSkillSelections:
-    - selectedSkillIndices: 010000000200000003000000
-    - selectedSkillIndices: 010000000300000004000000
   - characterClass: 0
-    selectedSubclassIndices: 0000000001000000
+    selectedSubclassIndices: 0000000000000000
     maxHP: 180
-    currentHP: 180
+    currentHP: 1
     DEF: 45
     EVA: 12
     PROV: 15
@@ -80,24 +40,24 @@ MonoBehaviour:
       SEdec: 0
     weaponSkills:
     - skills:
-      - {fileID: 0}
-      - {fileID: 0}
-      - {fileID: 0}
-      - {fileID: 0}
-      - {fileID: 0}
+      - {fileID: 11400000, guid: 4a7c15f167d5969429f11a1dc18415b6, type: 2}
+      - {fileID: 11400000, guid: eb8422cb429d1774f9e0671fb94c56f5, type: 2}
+      - {fileID: 11400000, guid: c4f1e560f5e341e438df3ed8a7c4baac, type: 2}
+      - {fileID: 11400000, guid: fe81a3afa2a870844af2941fce1bc258, type: 2}
+      - {fileID: 11400000, guid: 73970e06eaebbc14f8d666ed9d24e03a, type: 2}
     - skills:
-      - {fileID: 0}
-      - {fileID: 0}
-      - {fileID: 0}
-      - {fileID: 0}
-      - {fileID: 0}
+      - {fileID: 11400000, guid: 29541a6d99d6f924cad8cec009c050c7, type: 2}
+      - {fileID: 11400000, guid: b6af95ff4482cf6449a0999d8931ee94, type: 2}
+      - {fileID: 11400000, guid: 45c67e0cc4e5a7b4fa2579d4c7bce25a, type: 2}
+      - {fileID: 11400000, guid: 7fd84e2a32c52404fbfccb94de19e516, type: 2}
+      - {fileID: 11400000, guid: 2c36243e53be89342b61b02ccd552199, type: 2}
     weaponSkillSelections:
-    - selectedSkillIndices: 010000000100000001000000
-    - selectedSkillIndices: 010000000100000001000000
+    - selectedSkillIndices: 010000000200000003000000
+    - selectedSkillIndices: 010000000200000003000000
   - characterClass: 0
-    selectedSubclassIndices: 0000000001000000
-    maxHP: 180
-    currentHP: 180
+    selectedSubclassIndices: 0000000000000000
+    maxHP: 198
+    currentHP: 1
     DEF: 45
     EVA: 12
     PROV: 15
@@ -106,35 +66,184 @@ MonoBehaviour:
     SPreg: 15
     SPmovecost: 5
     weaponParameters:
-    - ATK: 2
-      ACC: 321
-      CRIT: 23
-      SE: 123
-      SEreg: 123
+    - ATK: 40
+      ACC: 95
+      CRIT: 10
+      SE: 100
+      SEreg: 15
       SEdec: 0
-    - ATK: 123
-      ACC: 213
-      CRIT: 213
-      SE: 123
-      SEreg: 123
+    - ATK: 45
+      ACC: 90
+      CRIT: 12
+      SE: 100
+      SEreg: 15
       SEdec: 0
     weaponSkills:
     - skills:
-      - {fileID: 0}
-      - {fileID: 0}
-      - {fileID: 0}
-      - {fileID: 0}
-      - {fileID: 0}
+      - {fileID: 11400000, guid: 4a7c15f167d5969429f11a1dc18415b6, type: 2}
+      - {fileID: 11400000, guid: eb8422cb429d1774f9e0671fb94c56f5, type: 2}
+      - {fileID: 11400000, guid: c4f1e560f5e341e438df3ed8a7c4baac, type: 2}
+      - {fileID: 11400000, guid: fe81a3afa2a870844af2941fce1bc258, type: 2}
+      - {fileID: 11400000, guid: 73970e06eaebbc14f8d666ed9d24e03a, type: 2}
     - skills:
-      - {fileID: 0}
-      - {fileID: 0}
-      - {fileID: 0}
-      - {fileID: 0}
-      - {fileID: 0}
+      - {fileID: 11400000, guid: 29541a6d99d6f924cad8cec009c050c7, type: 2}
+      - {fileID: 11400000, guid: b6af95ff4482cf6449a0999d8931ee94, type: 2}
+      - {fileID: 11400000, guid: 45c67e0cc4e5a7b4fa2579d4c7bce25a, type: 2}
+      - {fileID: 11400000, guid: 7fd84e2a32c52404fbfccb94de19e516, type: 2}
+      - {fileID: 11400000, guid: 2c36243e53be89342b61b02ccd552199, type: 2}
     weaponSkillSelections:
-    - selectedSkillIndices: 010000000100000001000000
-    - selectedSkillIndices: 010000000100000001000000
-  baseCharacterData:
-  - {fileID: 11400000, guid: 51bed3ec0c6e9854089ab52251558654, type: 2}
-  - {fileID: 11400000, guid: 712d2251579b797488c0eda6201dff33, type: 2}
-  - {fileID: 0}
+    - selectedSkillIndices: 010000000200000003000000
+    - selectedSkillIndices: 010000000200000003000000
+  playerCharacterData:
+  - characterName: WarriorZastupnik
+    level: 1
+    currentCharacterStats:
+      maxHealth: 180
+      defence: 45
+      evasion: 12
+      SPamount: 100
+      SPregen: 15
+      SPmoveCost: 5
+      speed: 120
+      tount: 15
+    baseCharacterStats:
+      maxHealth: 180
+      defence: 45
+      evasion: 12
+      SPamount: 100
+      SPregen: 15
+      SPmoveCost: 5
+      speed: 120
+      tount: 15
+    characterClass: 0
+    equipment:
+      weapon1:
+        icon: {fileID: 0}
+        weaponParameters:
+          ATK: 40
+          ACC: 95
+          CRIT: 10
+          SE: 100
+          SEreg: 15
+          SEdec: 0
+        skillSet:
+          skills:
+          - {fileID: 11400000, guid: 4a7c15f167d5969429f11a1dc18415b6, type: 2}
+          - {fileID: 11400000, guid: eb8422cb429d1774f9e0671fb94c56f5, type: 2}
+          - {fileID: 11400000, guid: c4f1e560f5e341e438df3ed8a7c4baac, type: 2}
+          - {fileID: 11400000, guid: fe81a3afa2a870844af2941fce1bc258, type: 2}
+          - {fileID: 11400000, guid: 73970e06eaebbc14f8d666ed9d24e03a, type: 2}
+        upgrades:
+        - gridPosition: {x: 0, y: 0}
+        - gridPosition: {x: 6, y: -4}
+        - gridPosition: {x: -7, y: 6}
+        - gridPosition: {x: -6, y: -6}
+      weapon2:
+        icon: {fileID: 0}
+        weaponParameters:
+          ATK: 45
+          ACC: 90
+          CRIT: 12
+          SE: 100
+          SEreg: 15
+          SEdec: 0
+        skillSet:
+          skills:
+          - {fileID: 11400000, guid: 29541a6d99d6f924cad8cec009c050c7, type: 2}
+          - {fileID: 11400000, guid: b6af95ff4482cf6449a0999d8931ee94, type: 2}
+          - {fileID: 11400000, guid: 45c67e0cc4e5a7b4fa2579d4c7bce25a, type: 2}
+          - {fileID: 11400000, guid: 7fd84e2a32c52404fbfccb94de19e516, type: 2}
+          - {fileID: 11400000, guid: 2c36243e53be89342b61b02ccd552199, type: 2}
+        upgrades:
+        - gridPosition: {x: 0, y: 0}
+        - gridPosition: {x: 7, y: -2}
+        - gridPosition: {x: -6, y: 5}
+        - gridPosition: {x: -6, y: -4}
+      armorCore:
+        icon: {fileID: 0}
+        rarity: 0
+        hiddenType: 0
+        upgrades:
+        - gridPosition: {x: 0, y: 0}
+          isBurned: 0
+          statType: 0
+          bonusValue: 0
+      artifact:
+        icon: {fileID: 0}
+    currentHealth: 1
+  - characterName: WarriorZastupnik
+    level: 1
+    currentCharacterStats:
+      maxHealth: 198
+      defence: 45
+      evasion: 12
+      SPamount: 100
+      SPregen: 15
+      SPmoveCost: 5
+      speed: 120
+      tount: 15
+    baseCharacterStats:
+      maxHealth: 180
+      defence: 45
+      evasion: 12
+      SPamount: 100
+      SPregen: 15
+      SPmoveCost: 5
+      speed: 120
+      tount: 15
+    characterClass: 0
+    equipment:
+      weapon1:
+        icon: {fileID: 0}
+        weaponParameters:
+          ATK: 40
+          ACC: 95
+          CRIT: 10
+          SE: 100
+          SEreg: 15
+          SEdec: 0
+        skillSet:
+          skills:
+          - {fileID: 11400000, guid: 4a7c15f167d5969429f11a1dc18415b6, type: 2}
+          - {fileID: 11400000, guid: eb8422cb429d1774f9e0671fb94c56f5, type: 2}
+          - {fileID: 11400000, guid: c4f1e560f5e341e438df3ed8a7c4baac, type: 2}
+          - {fileID: 11400000, guid: fe81a3afa2a870844af2941fce1bc258, type: 2}
+          - {fileID: 11400000, guid: 73970e06eaebbc14f8d666ed9d24e03a, type: 2}
+        upgrades:
+        - gridPosition: {x: 0, y: 0}
+        - gridPosition: {x: 5, y: 2}
+        - gridPosition: {x: -8, y: 7}
+        - gridPosition: {x: -5, y: -7}
+      weapon2:
+        icon: {fileID: 0}
+        weaponParameters:
+          ATK: 45
+          ACC: 90
+          CRIT: 12
+          SE: 100
+          SEreg: 15
+          SEdec: 0
+        skillSet:
+          skills:
+          - {fileID: 11400000, guid: 29541a6d99d6f924cad8cec009c050c7, type: 2}
+          - {fileID: 11400000, guid: b6af95ff4482cf6449a0999d8931ee94, type: 2}
+          - {fileID: 11400000, guid: 45c67e0cc4e5a7b4fa2579d4c7bce25a, type: 2}
+          - {fileID: 11400000, guid: 7fd84e2a32c52404fbfccb94de19e516, type: 2}
+          - {fileID: 11400000, guid: 2c36243e53be89342b61b02ccd552199, type: 2}
+        upgrades:
+        - gridPosition: {x: 0, y: 0}
+        - gridPosition: {x: 6, y: 2}
+        - gridPosition: {x: -7, y: 4}
+        - gridPosition: {x: -5, y: -7}
+      armorCore:
+        icon: {fileID: 0}
+        rarity: 0
+        hiddenType: 0
+        upgrades:
+        - gridPosition: {x: 0, y: 0}
+          isBurned: 0
+          statType: 0
+          bonusValue: 0
+      artifact:
+        icon: {fileID: 0}
+    currentHealth: 1

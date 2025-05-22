@@ -18,4 +18,6 @@ public class BattleConfig : ScriptableObject
     [Header("Дополнительные параметры")]
     [Tooltip("Уровень сложности боя (например, от 1 до 10), который может влиять на поведение и характеристики противников.")]
     public int battleDifficulty = 1;
+
+    public static bool IsMultiplayer = false;
 }

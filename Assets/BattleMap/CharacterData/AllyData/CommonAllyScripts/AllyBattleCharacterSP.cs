@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AllyBattleCharacter : BattleEntity
+public class AllyBattleCharacterSP : BattleEntitySP
 {
     // Дополнительное поле для класса персонажа
     public CharacterClass characterClass;
@@ -67,7 +67,7 @@ public class AllyBattleCharacter : BattleEntity
     // Метод для установки текущей клетки
     public void SetCurrentCell(BattleCell cell)
     {
-        currentCell = cell;
+        CurrentCell = cell;
     }
 
     public void SwitchWeapon()
@@ -149,11 +149,11 @@ public class AllyBattleCharacter : BattleEntity
 
     public override int[] GetSkillIDs()
     {
-        List<int> skillIDs = new List<int>();
+        List<int> skillIDs = new ();
 
         for (int i = 0; i < weaponSkills.Length; i++)
         {
-            for (int j = 0; j < weaponSkillSelections[i].selectedSkillIndices.Length; i++)
+            for (int j = 0; j < weaponSkillSelections[i].selectedSkillIndices.Length; j++)
             {
                 if (weaponSkills[i].skills[weaponSkillSelections[i].selectedSkillIndices[j]] != null)
                     skillIDs.Add(weaponSkills[i].skills[weaponSkillSelections[i].selectedSkillIndices[j]].GetInstanceID());

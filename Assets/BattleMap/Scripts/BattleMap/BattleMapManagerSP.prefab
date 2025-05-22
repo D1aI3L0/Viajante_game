@@ -1,0 +1,56 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &250139839800342503
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6275169121719824503}
+  - component: {fileID: 7152928330774432299}
+  m_Layer: 0
+  m_Name: BattleMapManagerSP
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6275169121719824503
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 250139839800342503}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 979.794, y: 513.6081, z: -6.7002172}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7152928330774432299
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 250139839800342503}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4af55945a3ae314cac5093384be8d85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  battleConfig: {fileID: 11400000, guid: 1d60e9bd5babf214cb58f525c9a68b49, type: 2}
+  hexPrefab: {fileID: 7569648107108246269, guid: 2f6cc431aed7c8b469816461ce074f96, type: 3}
+  prefabBattleCells:
+  - {fileID: 919132149155446097, guid: 7d30d81d3ff241f4c85c1b5691d4374e, type: 3}
+  obstaclePrefab: {fileID: 919132149155446097, guid: 521026bbd649340419ea99a98bb23920, type: 3}
+  warriorPrefab: {fileID: 4530143948483365523, guid: 16afd70d6fa719c4c9b3dfe5e0b9bb80, type: 3}
+  pathfinderPrefab: {fileID: 4530143948483365523, guid: 48b4c0722f9d67640852470fb5e7b33a, type: 3}
+  characterTransfer: {fileID: 11400000, guid: 623d9963a74b0fb499486929b3961852, type: 2}
+  enemyTransfer: {fileID: 11400000, guid: b16b98430f6055842acc490820c840cb, type: 2}
+  enemyPrefab: {fileID: 1208052373259365889, guid: 35f6d3c0ee7ece946a82eef41225b810, type: 3}

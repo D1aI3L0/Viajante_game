@@ -23,12 +23,13 @@ public class NetworkPlayerController : NetworkBehaviour
         Debug.Log($"Player ready: {newReady}");
     }
 
+
     // Команда для установки готовности (вызывается клиентом, выполняется на сервере)
     [Command]
     public void CmdSetReady(bool ready)
     {
         isReady = ready;
-        BattleManager.Instance.ServerCheckPlayersReady();
+        BattleManagerMP.Instance.ServerCheckPlayersReady();
     }
 
     // Только для локального игрока (вызывается в UI)
@@ -40,7 +41,6 @@ public class NetworkPlayerController : NetworkBehaviour
         }
     }
 
-#if MIRROR
     [Server]
     public void SpawnPlayerCharacter(BattleCell spawnCell)
     {
@@ -61,9 +61,8 @@ public class NetworkPlayerController : NetworkBehaviour
         NetworkServer.Spawn(playerInstance, connectionToClient);
 
         // Настройка клетки
-        BattleEntity entity = playerInstance.GetComponent<BattleEntity>();
+        BattleEntityMP entity = playerInstance.GetComponent<BattleEntityMP>();
         spawnCell.SetOccupant(entity);
         entity.currentCell = spawnCell;
     }
-#endif
 }

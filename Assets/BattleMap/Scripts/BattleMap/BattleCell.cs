@@ -1,4 +1,4 @@
-using Mirror;
+using System;
 using UnityEngine;
 
 public enum CellState
@@ -9,6 +9,7 @@ public enum CellState
     Obstacle,
 }
 
+[Serializable]
 public class BattleCell : MonoBehaviour
 {
     // ------------------------- Public Fields -------------------------
@@ -25,7 +26,8 @@ public class BattleCell : MonoBehaviour
 
     // Поля, связанные с препятствием и занятым персонажем
     [SerializeField] private GameObject _obstacleObject;
-    [SerializeField] private BattleEntity _occupant;
+    [SerializeField] private BattleEntitySP _occupantSP;
+    [SerializeField] private BattleEntityMP _occupantMP;
 
     // Соседи клетки (индексируется согласно направлению, например, через HexDirection)
     [SerializeField] public BattleCell[] neighbors;
@@ -64,12 +66,22 @@ public class BattleCell : MonoBehaviour
     /// <summary>
     /// Свойство для получения/установки занятого персонажа (occupant) с обновлением состояния.
     /// </summary>
-    public BattleEntity occupant
+    public BattleEntitySP OccupantSP
     {
-        get => _occupant;
+        get => _occupantSP;
         set
         {
-            _occupant = value;
+            _occupantSP = value;
+            UpdateCellState();
+        }
+    }
+
+    public BattleEntityMP OccupantMP
+    {
+        get => _occupantMP;
+        set
+        {
+            _occupantMP = value;
             UpdateCellState();
         }
     }
@@ -113,18 +125,28 @@ public class BattleCell : MonoBehaviour
     /// <summary>
     /// Очищает клетку – удаляет ссылку на занятого персонажа и обновляет состояние.
     /// </summary>
-    public void ClearOccupant()
+    public void ClearOccupantSP()
     {
-        occupant = null;
+        OccupantSP = null;
         UpdateCellState();
     }
 
     /// <summary>
     /// Устанавливает нового Occupant (персонажа) в клетку и обновляет состояние.
     /// </summary>
-    public void SetOccupant(BattleEntity newOccupant)
+    public void SetOccupant(BattleEntitySP newOccupant)
     {
-        occupant = newOccupant;
+        OccupantSP = newOccupant;
+        UpdateCellState();
+        if (newOccupant != null)
+        {
+            newOccupant.CurrentCell = this;
+        }
+    }
+
+    public void SetOccupant(BattleEntityMP newOccupant)
+    {
+        OccupantMP = newOccupant;
         UpdateCellState();
         if (newOccupant != null)
         {
@@ -146,9 +168,13 @@ public class BattleCell : MonoBehaviour
         {
             State = CellState.Obstacle;
         }
-        else if (_occupant != null)
+        else if (_occupantSP != null)
         {
-            State = _occupant.IsEnemy ? CellState.Enemy : CellState.Ally;
+            State = _occupantSP.IsEnemy ? CellState.Enemy : CellState.Ally;
+        }
+        else if (_occupantMP != null)
+        {
+            State = _occupantMP.IsEnemy ? CellState.Enemy : CellState.Ally;
         }
         else
         {

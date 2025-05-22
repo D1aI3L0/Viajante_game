@@ -10,13 +10,14 @@ public class SkillCellVisual : CellVisual, IPointerEnterHandler, IPointerExitHan
 
     public void Setup(SkillAsset skill, EquipmentUpgradeUI equipmentUpgradeUI)
     {
-        linkedSkill = skill;
+        Setup(skill);
         onClick = () => equipmentUpgradeUI.OnSkillSelection(linkedSkill);
     }
 
     public void Setup(SkillAsset skill)
     {
         linkedSkill = skill;
+        icon.sprite = skill.skillIcon;
     }
 
     public void OnPointerClick(PointerEventData eventData)

@@ -17,25 +17,22 @@ public class TurnOrderUIController : MonoBehaviour
     private void Start()
     {
         // Запускаем периодический апдейт очереди
-        InvokeRepeating(nameof(UpdateTurnOrderDisplay), 0f, uiUpdateInterval);
+        if (BattleConfig.IsMultiplayer)
+            InvokeRepeating(nameof(UpdateTurnOrderDisplayMP), 0f, uiUpdateInterval);
+        else
+            InvokeRepeating(nameof(UpdateTurnOrderDisplaySP), 0f, uiUpdateInterval);
     }
 
     /// <summary>
     /// Обновляет и сортирует отображение юнитов по turnGauge.
     /// Чем ниже показатель turnGauge, тем юнит ближе к ходу, соответственно, он должен быть ближе к левой части панели.
     /// </summary>
-    public void UpdateTurnOrderDisplay()
+    public void UpdateTurnOrderDisplaySP()
     {
-#if MIRROR
-        List<BattleEntity> participants = new();
-        foreach (uint id in TurnManager.Instance.SyncParticipants)
-        {
-            participants.Add(TurnManager.Instance.GetParticipantById(id));
-        }
-#else
-        List<BattleEntity> participants = TurnManager.Instance.GetParticipants();
-#endif
-        List<BattleEntity> sortedUnits = participants
+        List<BattleEntitySP> participants = new();
+        participants = TurnManagerSP.Instance.GetParticipants();
+
+        List<BattleEntitySP> sortedUnits = participants
             .OrderBy(entity => entity.turnGauge)
             .ToList();
 
@@ -46,7 +43,47 @@ public class TurnOrderUIController : MonoBehaviour
         }
 
         // Создание элементов очереди для каждого юнита
-        foreach (BattleEntity entity in sortedUnits)
+        foreach (BattleEntitySP entity in sortedUnits)
+        {
+            GameObject element = Instantiate(turnOrderElementPrefab, turnOrderContainer);
+            // Предполагается, что в префабе есть компонент Image (для иконки)
+            Image iconImage = element.GetComponentInChildren<Image>();
+            if (iconImage != null)
+            {
+                iconImage.sprite = entity.unitIcon;
+            }
+
+            // Если нужен текст для отображения turnGauge (например, ввиде числа)
+            TMP_Text gaugeText = element.GetComponentInChildren<TMP_Text>();
+            if (gaugeText != null)
+            {
+                gaugeText.text = entity.turnGauge.ToString("F1");
+            }
+        }
+    }
+
+    public void UpdateTurnOrderDisplayMP()
+    {
+        List<BattleEntityMP> participants = new();
+        if (BattleConfig.IsMultiplayer)
+        {
+            foreach (uint id in TurnManagerMP.Instance.SyncParticipants)
+            {
+                participants.Add(TurnManagerMP.Instance.GetParticipantById(id));
+            }
+        }
+        List<BattleEntityMP> sortedUnits = participants
+            .OrderBy(entity => entity.turnGauge)
+            .ToList();
+
+        // Очистка контейнера
+        foreach (Transform child in turnOrderContainer)
+        {
+            Destroy(child.gameObject);
+        }
+
+        // Создание элементов очереди для каждого юнита
+        foreach (BattleEntityMP entity in sortedUnits)
         {
             GameObject element = Instantiate(turnOrderElementPrefab, turnOrderContainer);
             // Предполагается, что в префабе есть компонент Image (для иконки)

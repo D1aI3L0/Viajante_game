@@ -1082,5 +1082,4 @@ public class HexGrid : MonoBehaviour
 			settlement.transform.localPosition = settlement.center.Position;
 		}
 	}
-	//============================================================================================================
 }

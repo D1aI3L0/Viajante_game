@@ -14,7 +14,6 @@ namespace NetworkTests
             if (networkManager != null)
                 TearDown();
 
-            // Создание NetworkManager
             networkManagerGO = new GameObject("NetworkManager");
             networkManagerGO.SetActive(false);
             networkManagerGO.AddComponent<NetworkManager>();
@@ -25,7 +24,6 @@ namespace NetworkTests
             Transport.active = telepathyTransport;
             networkManager.transport = telepathyTransport;
 
-            // Назначаем PlayerPrefab в NetworkManager
             networkManager.playerPrefab = Resources.Load<GameObject>("NetworkAllyMapPref");
 
             networkManagerGO.SetActive(true);

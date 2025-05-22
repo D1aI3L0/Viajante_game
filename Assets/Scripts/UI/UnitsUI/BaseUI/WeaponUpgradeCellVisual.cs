@@ -31,11 +31,18 @@ public class WeaponUpgradeCellVisual : UpgradeCellVisual, IPointerEnterHandler, 
         cellColor = skillCellColors[colorNumber];
         icon.color = cellColor;
 
-        if (upgrade is WeaponUpgradeSkill)
+        if (upgrade is WeaponUpgradeSkill weaponUpgradeSkill)
+        {
+            if (weaponUpgradeSkill.linkedSkill != null)
+            {
+                icon.sprite = weaponUpgradeSkill.linkedSkill.skillIcon;
+            }
             skillHightight.SetActive(true);
+        }
 
         if (upgrade is WeaponUpgradeRune upgradeRune && upgradeRune.linkedRune != null)
         {
+            icon.sprite = upgradeRune.linkedRune.icon;
             foreach (HexDirection d in upgradeRune.linkedRune.runeConnections)
             {
                 runeConnectionsVisual[(int)d].SetActive(true);

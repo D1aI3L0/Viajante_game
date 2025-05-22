@@ -106,6 +106,7 @@ public class GlobalMapGameManager : MonoBehaviour
         enemyTransfer.enemyCharacters = enemySquad.ToEnemyCharactersArray();
 
         battleConfig.enemyCount = enemySquad.characters.Count;
+        BattleConfig.IsMultiplayer = false;
     }
 
     public void Save(BinaryWriter writer)

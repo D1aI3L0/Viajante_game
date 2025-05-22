@@ -68,7 +68,7 @@ public static class PathFinder
                     continue;
                 
                 // Если клетка занята (occupant != null) и не является target, пропускаем её
-                if (neighbor.occupant != null && neighbor != target)
+                if ((neighbor.OccupantSP != null || neighbor.OccupantMP != null) && neighbor != target)
                     continue;
 
                 if (closedSet.Contains(neighbor))

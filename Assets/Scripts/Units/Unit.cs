@@ -152,7 +152,7 @@ public abstract class Unit : MonoBehaviour
 
 	protected IEnumerator TravelPath_v2()
 	{
-		//GameUI.Locked = true;
+		GameUI.Locked = true;
 		bool movementAborted = false;
 
 		for (int i = 0; i < pathToTravel.Count - 1; i++)
@@ -166,8 +166,8 @@ public abstract class Unit : MonoBehaviour
 				{
 					if (confirmed)
 					{
-						//GlobalMapGameManager.Instance.SetBattleParametres((Squad)this, squad);
-						//SceneManager.LoadScene("BattleScene");
+						GlobalMapGameManager.Instance.SetBattleParametres((Squad)this, squad);
+						SceneManager.LoadScene("BattleScene");
 						return;
 					}
 					else
@@ -182,7 +182,7 @@ public abstract class Unit : MonoBehaviour
 				if (movementAborted) break;
 			}
 
-			//Grid.DecreaseVisibility(fromCell, VisionRange);
+			Grid.DecreaseVisibility(fromCell, VisionRange);
 
 			Vector3 startPos = fromCell.Position;
 			Vector3 endPos = toCell.Position;
@@ -245,7 +245,7 @@ public abstract class Unit : MonoBehaviour
 		pathToTravel = null;
 		currentTravelLocation = null;
 		orientation = transform.localRotation.eulerAngles.y;
-		//GameUI.Locked = false;
+		GameUI.Locked = false;
 	}
 
 	protected IEnumerator LookAt(Vector3 point)

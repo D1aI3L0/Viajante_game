@@ -1,7 +1,7 @@
 using System.Linq;
 using UnityEngine;
 
-public class EnemyBattleCharacter : BattleEntity
+public class EnemyBattleCharacterSP : BattleEntitySP
 {
     public override bool IsEnemy => true;
 

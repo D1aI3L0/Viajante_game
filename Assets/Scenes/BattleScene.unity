@@ -1437,7 +1437,6 @@ MonoBehaviour:
   moveSpeedMaxZoom: 20
   rotationSpeed: 90
   battleConfig: {fileID: 11400000, guid: 1d60e9bd5babf214cb58f525c9a68b49, type: 2}
-  battleMapManager: {fileID: 797964344}
   keyboardZoomSpeed: 1
 --- !u!1 &594131660
 GameObject:
@@ -2072,81 +2071,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 793027998}
   m_CullTransparentMesh: 1
---- !u!1 &797964342
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 797964343}
-  - component: {fileID: 797964344}
-  - component: {fileID: 797964345}
-  m_Layer: 0
-  m_Name: BattleMapManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &797964343
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 797964342}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &797964344
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 797964342}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3a10c9b121419ed46bbe23cefdc1cbf6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  syncDirection: 0
-  syncMode: 0
-  syncInterval: 0
-  battleConfig: {fileID: 11400000, guid: 1d60e9bd5babf214cb58f525c9a68b49, type: 2}
-  hexPrefab: {fileID: 7569648107108246269, guid: 2f6cc431aed7c8b469816461ce074f96, type: 3}
-  prefabBattleCells:
-  - {fileID: 77806373715000298, guid: ff6b9eef01b195d40bf9249acd50d9c5, type: 3}
-  obstaclePrefab: {fileID: 919132149155446097, guid: 521026bbd649340419ea99a98bb23920, type: 3}
-  warriorPrefab: {fileID: 4530143948483365523, guid: 16afd70d6fa719c4c9b3dfe5e0b9bb80, type: 3}
-  pathfinderPrefab: {fileID: 4530143948483365523, guid: 48b4c0722f9d67640852470fb5e7b33a, type: 3}
-  dataTransfer: {fileID: 11400000, guid: 623d9963a74b0fb499486929b3961852, type: 2}
-  enemyTransfer: {fileID: 11400000, guid: b16b98430f6055842acc490820c840cb, type: 2}
-  enemyPrefab: {fileID: 1208052373259365889, guid: 35f6d3c0ee7ece946a82eef41225b810, type: 3}
---- !u!114 &797964345
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 797964342}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  sceneId: 3305670358
-  _assetId: 0
-  serverOnly: 0
-  visibility: 0
-  hasSpawned: 0
 --- !u!1 &819886391
 GameObject:
   m_ObjectHideFlags: 0
@@ -2695,7 +2619,6 @@ GameObject:
   m_Component:
   - component: {fileID: 910027363}
   - component: {fileID: 910027362}
-  - component: {fileID: 910027364}
   m_Layer: 0
   m_Name: BattleManager
   m_TagString: Untagged
@@ -2715,13 +2638,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f94156d21d2220d448043ebe7d8cfd0e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  syncDirection: 0
-  syncMode: 0
-  syncInterval: 0
-  turnManager: {fileID: 1056172042}
-  playerTurnController: {fileID: 478784107}
-  enemyTurnController: {fileID: 379448910}
-  skipAutoInitialization: 0
+  battleConfig: {fileID: 11400000, guid: 1d60e9bd5babf214cb58f525c9a68b49, type: 2}
+  battleMapManagerSPPrefab: {fileID: 250139839800342503, guid: 2196358f86c81fe459b78710ce6c9a6a, type: 3}
+  turnManagerSPPrefab: {fileID: 5387556817951486549, guid: 151ef2b4ee939c84eaea7cae40635499, type: 3}
+  battleManagerSPPrefab: {fileID: 2042166843590429811, guid: e4fdae0e5fe2d854cb1ce73b04571861, type: 3}
+  battleMapManagerMPPrefab: {fileID: 4533867182760685514, guid: 0bb485412c540584c960b402fde24635, type: 3}
+  turnManagerMPPrefab: {fileID: 853684312309061622, guid: 2742da901b019904586aeb32b595387e, type: 3}
+  battleManagerMPPrefab: {fileID: 3019840906802175608, guid: 8c759f7a66f91eb4cb64dc70ab5f6ce1, type: 3}
 --- !u!4 &910027363
 Transform:
   m_ObjectHideFlags: 0
@@ -2735,29 +2658,11 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1056172041}
   - {fileID: 478784108}
   - {fileID: 379448911}
   - {fileID: 629664131}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &910027364
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 910027361}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  sceneId: 3667504057
-  _assetId: 0
-  serverOnly: 0
-  visibility: 0
-  hasSpawned: 0
 --- !u!1 &915912298
 GameObject:
   m_ObjectHideFlags: 0
@@ -2894,58 +2799,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 915912298}
   m_CullTransparentMesh: 1
---- !u!1 &1056172040
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1056172041}
-  - component: {fileID: 1056172042}
-  m_Layer: 0
-  m_Name: TurnManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1056172041
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1056172040}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 910027363}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1056172042
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1056172040}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 613623b5dddbbfc4c943d17c6ecee661, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  syncDirection: 0
-  syncMode: 0
-  syncInterval: 0
-  turnThreshold: 100
-  battleActive: 1
-  updateInterval: 0.1
-  currentActiveUnit: {fileID: 0}
-  skipAutoInitialization: 0
 --- !u!1 &1268497552
 GameObject:
   m_ObjectHideFlags: 0
@@ -3916,108 +3769,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1683129815}
   m_CullTransparentMesh: 1
---- !u!1 &1751811872
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1751811875}
-  - component: {fileID: 1751811874}
-  - component: {fileID: 1751811873}
-  m_Layer: 0
-  m_Name: NetworkManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1751811873
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1751811872}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c7424c1070fad4ba2a7a96b02fbeb4bb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  port: 7777
-  NoDelay: 1
-  SendTimeout: 5000
-  ReceiveTimeout: 30000
-  serverMaxMessageSize: 16384
-  serverMaxReceivesPerTick: 10000
-  serverSendQueueLimitPerConnection: 10000
-  serverReceiveQueueLimitPerConnection: 10000
-  clientMaxMessageSize: 16384
-  clientMaxReceivesPerTick: 1000
-  clientSendQueueLimit: 10000
-  clientReceiveQueueLimit: 10000
---- !u!114 &1751811874
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1751811872}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8aab4c8111b7c411b9b92cf3dbc5bd4e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  dontDestroyOnLoad: 1
-  runInBackground: 1
-  headlessStartMode: 0
-  editorAutoStart: 0
-  sendRate: 60
-  offlineScene: 
-  onlineScene: 
-  offlineSceneLoadDelay: 0
-  transport: {fileID: 0}
-  networkAddress: localhost
-  maxConnections: 100
-  disconnectInactiveConnections: 0
-  disconnectInactiveTimeout: 60
-  authenticator: {fileID: 0}
-  playerPrefab: {fileID: 4530143948483365523, guid: f48a7586c1601b445a43ae9382b4899d, type: 3}
-  autoCreatePlayer: 0
-  playerSpawnMethod: 0
-  spawnPrefabs: []
-  exceptionsDisconnect: 1
-  snapshotSettings:
-    bufferTimeMultiplier: 2
-    bufferLimit: 32
-    catchupNegativeThreshold: -1
-    catchupPositiveThreshold: 1
-    catchupSpeed: 0.019999999552965164
-    slowdownSpeed: 0.03999999910593033
-    driftEmaDuration: 1
-    dynamicAdjustment: 1
-    dynamicAdjustmentTolerance: 1
-    deliveryTimeEmaDuration: 2
-  evaluationMethod: 0
-  evaluationInterval: 3
-  timeInterpolationGui: 0
---- !u!4 &1751811875
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1751811872}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 30.653183, y: -39.02544, z: 71.386086}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1751839695
 GameObject:
   m_ObjectHideFlags: 0
@@ -5035,10 +4786,8 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 1881363259}
-  - {fileID: 797964343}
   - {fileID: 910027363}
   - {fileID: 572901290}
   - {fileID: 186277872}
   - {fileID: 1436452496}
-  - {fileID: 1751811875}
   - {fileID: 531643587}

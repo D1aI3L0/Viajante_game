@@ -1,46 +1,24 @@
-#if MIRROR
-using Mirror;
-#endif
 using UnityEngine;
-using System.Collections.Generic;
-using System;
 
-[Serializable]
-public class BattleManager :
-#if MIRROR
-    NetworkBehaviour // Наследуемся от NetworkBehaviour в мультиплеере
-#else
-    MonoBehaviour    // В одиночном режиме остаётся MonoBehaviour
-#endif
+public class BattleManager : MonoBehaviour
 {
-    public static BattleManager Instance { get; set; }
+    public static BattleManager Instance { get; private set; }
 
-    // Списки участников для контроля глобального состояния боя
-#if MIRROR
-    readonly public SyncList<uint> SyncAllies = new SyncList<uint>();
-    readonly public SyncList<uint> SyncEnemies = new SyncList<uint>();
-    readonly public SyncList<uint> players = new SyncList<uint>();
-#else
-    public List<BattleEntity> Allies = new List<BattleEntity>();
-    public List<BattleEntity> Enemies = new List<BattleEntity>();
-#endif
+    // Конфигурация боя, в которой указан тип игры
+    public BattleConfig battleConfig;
 
-    // Ссылка на TurnManager, который занимается переключением ходов
-    public TurnManager turnManager;
+    [Header("Префабы менеджеров для одиночного режима")]
+    public GameObject battleMapManagerSPPrefab;
+    public GameObject turnManagerSPPrefab;
+    public GameObject battleManagerSPPrefab;
 
-    // Модули управления ходами: для игрока и для врагов (AI)
-    public PlayerTurnController playerTurnController;
-    public EnemyTurnController enemyTurnController;
-
-    // Активный сейчас юнит, чей ход выполняется
-    private BattleEntity activeUnit;
-
-    public bool skipAutoInitialization = false;
+    [Header("Префабы менеджеров для многопользовательского режима")]
+    public GameObject battleMapManagerMPPrefab;
+    public GameObject turnManagerMPPrefab;
+    public GameObject battleManagerMPPrefab;
 
     private void Awake()
     {
-        if (skipAutoInitialization)
-            return;
         // Реализация синглтона
         if (Instance != null && Instance != this)
         {
@@ -48,292 +26,63 @@ public class BattleManager :
             return;
         }
         Instance = this;
+        
+
+        // В зависимости от настроек битвы создаём нужные объекты менеджеров
+        CreateManagers();
     }
 
-    private void Start()
+    /// <summary>
+    /// Метод инициализирует менеджеры в зависимости от типа игры (одиночный или мультиплеер)
+    /// </summary>
+    private void CreateManagers()
     {
-        if (skipAutoInitialization)
+        if (battleConfig == null)
+        {
+            Debug.LogError("BattleConfig не назначен в BattleManager");
             return;
-        if (turnManager == null)
-        {
-            turnManager = GetComponent<TurnManager>();
-        }
-        StartBattle();
-    }
-
-    public void StartTest()
-    {
-        Instance = this;
-    }
-
-    // Добавляем метод для получения всех сущностей
-    public List<BattleEntity> GetAllEntities()
-    {
-#if MIRROR
-        return null;
-#else
-        List<BattleEntity> entities = new List<BattleEntity>();
-
-        // Добавляем союзников
-        foreach (var ally in Allies.Where(a => a != null))
-        {
-            entities.Add(ally);
         }
 
-        // Добавляем врагов
-        foreach (var enemy in Enemies.Where(e => e != null))
+        if (BattleConfig.IsMultiplayer)
         {
-            entities.Add(enemy);
-        }
+            Debug.Log("Запуск в многопользовательском режиме – создаём MP-менеджеры.");
+            // Создаем Multiplayer версию менеджеров как дочерние объекты BattleManager
+            if (battleMapManagerMPPrefab != null)
+                Instantiate(battleMapManagerMPPrefab);
+            else
+                Debug.LogWarning("Префаб BattleMapManagerMP не назначен!");
 
-        return entities;
-#endif
-    }
+            if (turnManagerMPPrefab != null)
+                Instantiate(turnManagerMPPrefab, transform.position, Quaternion.identity, transform);
+            else
+                Debug.LogWarning("Префаб TurnManagerMP не назначен!");
 
-    /// <summary>
-    /// Регистрирует союзного юнита в списке Allies.
-    /// Вызывается при размещении союзников.
-    /// </summary>
-    public void RegisterAlly(BattleEntity ally)
-    {
-#if MIRROR
-        if (isServer)
-        {
-            NetworkServer.Spawn(ally.gameObject);
-            SyncAllies.Add(ally.netId); // Только сервер управляет списком
-        }
-#else
-        if (ally != null && !Allies.Contains(ally))
-        {
-            Allies.Add(ally);
-            Debug.Log("Зарегистрирован союзник: " + ally.name + ". Всего союзников: " + Allies.Count);
-        }
-#endif
-    }
+            if (battleManagerMPPrefab != null)
+                Instantiate(battleManagerMPPrefab, transform.position, Quaternion.identity, transform);
+            else
+                Debug.LogWarning("Префаб BattleManagerMP не назначен!");
 
-    /// <summary>
-    /// Регистрирует вражеского юнита в списке Enemies.
-    /// Вызывается при размещении врагов.
-    /// </summary>
-    public void RegisterEnemy(BattleEntity enemy)
-    {
-#if MIRROR
-        if (isServer)
-        {
-            NetworkServer.Spawn(enemy.gameObject);
-            SyncEnemies.Add(enemy.netId);
-        }
-#else
-        if (enemy != null && !Enemies.Contains(enemy))
-        {
-            Enemies.Add(enemy);
-            Debug.Log("Зарегистрирован враг: " + enemy.name + ". Всего врагов: " + Enemies.Count);
-        }
-#endif
-    }
 
-    public BattleEntity GetEntityByID(uint netId)
-    {
-        NetworkServer.spawned.TryGetValue(netId, out NetworkIdentity identity);
-        return identity?.GetComponent<BattleEntity>();
-    }
-
-    /// <summary>
-    /// Вызывается TurnManager, когда выбран активный юнит.
-    /// Здесь определяется, чей сейчас ход, и делегируется соответствующему модулю управления.
-    /// </summary>
-    public void SetActiveUnit(BattleEntity unit)
-    {
-        activeUnit = unit;
-        Debug.Log("Активный юнит: " + unit.name);
-
-        // Если юнит не враг (то есть, игрок), запускаем управление игроком
-        if (!unit.IsEnemy)
-        {
-            if (playerTurnController != null)
-            {
-                playerTurnController.StartTurn(unit);
-            }
+            // При необходимости здесь можно создать и NetworkManager, если он несоздан из другого места.
         }
-        // Если враг – запускаем AI управления для врагов
         else
         {
-            if (enemyTurnController != null)
-            {
-                enemyTurnController.StartTurn((EnemyBattleCharacter)unit);
-            }
+            Debug.Log("Запуск в одиночном режиме – создаём SP-менеджеры.");
+            // Создаем SinglePlayer версию менеджеров
+            if (battleMapManagerSPPrefab != null)
+                Instantiate(battleMapManagerSPPrefab);
+            else
+                Debug.LogWarning("Префаб BattleMapManagerSP не назначен!");
+
+            if (turnManagerSPPrefab != null)
+                Instantiate(turnManagerSPPrefab, transform.position, Quaternion.identity, transform);
+            else
+                Debug.LogWarning("Префаб TurnManagerSP не назначен!");
+
+            if (battleManagerSPPrefab != null)
+                Instantiate(battleManagerSPPrefab, transform.position, Quaternion.identity, transform);
+            else
+                Debug.LogWarning("Префаб BattleManagerSP не назначен!");
         }
     }
-
-    /// <summary>
-    /// Вызывается по завершении хода активного юнита (из модуля управления).
-    /// Сбрасывает активного юнита и сообщает TurnManager об окончании хода.
-    /// </summary>
-    public void OnTurnComplete()
-    {
-        if (activeUnit != null)
-        {
-            UnitStatManager.Instance.ProcessEndOfTurn(activeUnit);
-        }
-
-        activeUnit = null;
-
-        if (turnManager != null)
-        {
-            turnManager.EndCurrentTurn();
-        }
-    }
-
-
-
-    /// <summary>
-    /// Вызывается при старте боя.
-    /// Здесь можно проводить первичную инициализацию и дополнительные проверки (например, проверить, что списки не пусты).
-    /// </summary>
-    public void StartBattle()
-    {
-#if MIRROR
-        if (isServer)
-        {
-            BattleMapManager.Instance.ServerGenerateMap();
-        }
-#else
-        BattleMapManager.Instance.CreateBattleMap();
-        PlaceCharacters();
-        turnManager.StartGaugeCycle();
-#endif
-    }
-
-    /// <summary>
-    /// Вызывается по завершении боя.
-    /// Здесь можно проводить очистку данных, оповещать UI и т.п.
-    /// </summary>
-    public void EndBattle()
-    {
-        Debug.Log("Бой закончен");
-    }
-
-#if MIRROR
-    [Server]
-    public void ServerStartBattle()
-    {
-        // 1. Генерируем карту на сервере
-        BattleMapManager.Instance.CreateBattleMap();
-
-        // 2. Синхронизируем данные карты
-        RpcSyncMapData(
-            BattleMapManager.Instance.GetObstacleIndices(),
-            BattleMapManager.Instance.GetSpawnZones()
-        );
-
-        // 3. Распределяем игроков по командам
-        DistributePlayers();
-    }
-
-    [ClientRpc]
-    private void RpcSyncMapData(int[] obstacleIndices, Vector2[] spawnZones)
-    {
-        // Клиенты воссоздают карту по данным сервера
-        BattleMapManager.Instance.RecreateMap(obstacleIndices, spawnZones);
-    }
-
-    [Server]
-    private void DistributePlayers()
-    {
-        foreach (NetworkConnection conn in NetworkServer.connections.Values)
-        {
-            if (conn.identity == null) continue;
-
-            NetworkPlayerController player = conn.identity.GetComponent<NetworkPlayerController>();
-            if (player != null)
-            {
-                BattleCell spawnCell = BattleMapManager.Instance.GetFreeSpawnCell(isAlly: true);
-                if (spawnCell != null)
-                {
-                    player.SpawnPlayerCharacter(spawnCell);
-                }
-            }
-        }
-    }
-#endif
-
-#if MIRROR
-    [Server]
-    public void ServerOnEntityDeath(BattleEntity entity)
-    {
-        // Удаляем сущность из списков
-        if (SyncAllies.Contains(entity.netId)) SyncAllies.Remove(entity.netId);
-        if (SyncEnemies.Contains(entity.netId)) SyncEnemies.Remove(entity.netId);
-
-        // Оповещаем клиентов
-        RpcEntityDeath(entity.netId);
-    }
-
-    [ClientRpc]
-    private void RpcEntityDeath(uint entityId)
-    {
-        NetworkServer.spawned.TryGetValue(entityId, out NetworkIdentity identity);
-        BattleEntity entity = identity?.GetComponent<BattleEntity>();
-        if (entity != null)
-        {
-
-        }
-    }
-#endif
-
-#if MIRROR
-    [Server]
-    public bool ServerCheckPlayersReady()
-    {
-        bool allReady = true;
-        foreach (uint playerId in players)
-        {
-            NetworkPlayerController player = GetPlayerByID(playerId);
-            if (player && !player.isReady)
-            {
-                allReady = false;
-                break;
-            }
-        }
-
-        if (allReady)
-        {
-            RpcStartBattle();
-            if (!skipAutoInitialization)
-                ServerStartBattle();
-        }
-        return allReady;
-    }
-
-    public NetworkPlayerController GetPlayerByID(uint netId)
-    {
-        NetworkServer.spawned.TryGetValue(netId, out NetworkIdentity identity);
-        return identity?.GetComponent<NetworkPlayerController>();
-    }
-
-    [ClientRpc]
-    private void RpcStartBattle()
-    {
-        // Клиенты получают оповещение о старте боя
-    }
-#endif
-
-#if MIRROR
-    public List<uint> GetAllAllies()
-    {
-        return new List<uint>(SyncAllies);
-    }
-#else
-    public List<BattleEntity> GetAllAllies()
-    {
-        return Allies;
-    }
-#endif
-
-#if MIRROR
-    public SyncList<uint> GetAllEnemies()
-    {
-        return SyncEnemies;
-    }
-#endif
 }

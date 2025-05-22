@@ -26,7 +26,7 @@ public class BattleUIController : MonoBehaviour
     public Button switchingWeaponsButton;
 
     // Ссылка на активного игрока
-    private AllyBattleCharacter player;
+    private AllyBattleCharacterSP player;
 
     private void Awake()
     {
@@ -48,7 +48,7 @@ public class BattleUIController : MonoBehaviour
     /// Вызывается для установки ссылки на активного персонажа.
     /// Эту функцию можно вызвать из PlayerTurnController при начале хода.
     /// </summary>
-    public void SetPlayer(AllyBattleCharacter newPlayer)
+    public void SetPlayer(AllyBattleCharacterSP newPlayer)
     {
         // Если ранее уже был установлен игрок, отписываемся от его события
         if (player != null)

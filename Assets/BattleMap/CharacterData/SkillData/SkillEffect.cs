@@ -6,7 +6,9 @@ public class SkillEffect : ScriptableObject
     /// Выполняет эффект навыка.
     /// user – персонаж, применяющий навык; target – цель (если применимо)
     /// </summary>
-    public virtual void ApplyEffect(BattleEntity user, BattleEntity target){}
+    public virtual void ApplyEffect(BattleEntitySP user, BattleEntitySP target){}
+    
+    public virtual void ApplyEffect(BattleEntityMP user, BattleEntityMP target){}
 
-    public virtual void Copy(SkillEffect other){}
+    public virtual void Copy(SkillEffect other) { }
 }

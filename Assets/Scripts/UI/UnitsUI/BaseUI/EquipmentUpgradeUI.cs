@@ -40,8 +40,6 @@ public class EquipmentUpgradeUI : MonoBehaviour
 
     private UpgradeCellVisual selectedUpgradeCell;
 
-    private List<CellVisual> selectionCells = new();
-
     public void Awake()
     {
         Instance = this;
@@ -193,7 +191,6 @@ public class EquipmentUpgradeUI : MonoBehaviour
     private void ShowSelectionPanel()
     {
         ClearPanel(selectionContainer);
-        selectionCells.Clear();
 
         if (selectedUpgradeCell is WeaponUpgradeCellVisual weaponUpgradeCell)
         {
@@ -220,7 +217,6 @@ public class EquipmentUpgradeUI : MonoBehaviour
         {
             SkillCellVisual newSkillCell = Instantiate(skillCellPrefab, selectionContainer);
             newSkillCell.Setup(availableSkills[i], this);
-            selectionCells.Add(newSkillCell);
         }
     }
 
@@ -234,7 +230,6 @@ public class EquipmentUpgradeUI : MonoBehaviour
         {
             RuneCellVisual newSkillCell = Instantiate(runeCellPrefab, selectionContainer);
             newSkillCell.Setup(availableRunes[i]);
-            selectionCells.Add(newSkillCell);
         }
     }
 
@@ -253,7 +248,8 @@ public class EquipmentUpgradeUI : MonoBehaviour
             if (weaponUpgradeCell.GetLinkedUpgrade() is WeaponUpgradeSkill weaponUpgradeSkill && !weaponUpgradeSkill.isFixed)
                 weaponUpgradeSkill.linkedSkill = skill;
         }
-        ShowSelectionForSkills();
+        ShowSelectionPanel();
+        ShowItemDetails();
     }
 
     public void OnRuneSelection(Rune rune)
@@ -271,7 +267,8 @@ public class EquipmentUpgradeUI : MonoBehaviour
                 weaponUpgradeRune.linkedRune = rune;
             }
         }
-        ShowSelectionForRunes();
+        ShowSelectionPanel();
+        ShowItemDetails();
     }
 
     public void ResetUpgrades()

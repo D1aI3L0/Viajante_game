@@ -7,7 +7,7 @@ public class PlayerTurnController : MonoBehaviour
     public static PlayerTurnController Instance { get; private set; }
 
     // Текущий контролируемый персонаж (сейчас предполагается, что это AllyBattleCharacter)
-    private AllyBattleCharacter currentPlayerUnit;
+    private AllyBattleCharacterSP currentPlayerUnit;
 
     // Компонент LineRenderer для визуального отображения маршрута
     public LineRenderer lineRenderer;
@@ -30,9 +30,9 @@ public class PlayerTurnController : MonoBehaviour
 
     // --------------------- Методы начала/окончания хода ---------------------
 
-    public virtual void StartTurn(BattleEntity playerUnit)
+    public virtual void StartTurn(BattleEntitySP playerUnit)
     {
-        currentPlayerUnit = playerUnit as AllyBattleCharacter;
+        currentPlayerUnit = playerUnit as AllyBattleCharacterSP;
         if (currentPlayerUnit == null)
         {
             Debug.LogError("Переданный юнит не является AllyBattleCharacter.");
@@ -49,7 +49,7 @@ public class PlayerTurnController : MonoBehaviour
     {
         ClearPathDisplay();
         currentPlayerUnit = null;
-        BattleManager.Instance.OnTurnComplete();
+        BattleManagerSP.Instance.OnTurnComplete();
     }
 
     // --------------------- Обработка построения маршрута ---------------------
@@ -60,8 +60,7 @@ public class PlayerTurnController : MonoBehaviour
     /// <param name="targetCell">Клетка, по которой кликнули.</param>
     public void OnCellClicked(BattleCell targetCell)
     {
-        
-        Debug.Log("Start cell: " + (currentPlayerUnit.currentCell != null ? currentPlayerUnit.currentCell.name : "null") +
+        Debug.Log("Start cell: " + (currentPlayerUnit.CurrentCell != null ? currentPlayerUnit.CurrentCell.name : "null") +
           "; Target cell: " + targetCell.name);
 
 
@@ -72,7 +71,7 @@ public class PlayerTurnController : MonoBehaviour
         }
 
         // Вычисляем маршрут от текущей клетки до выбранной
-        BattleCell startCell = currentPlayerUnit.currentCell;
+        BattleCell startCell = currentPlayerUnit.CurrentCell;
         currentPath = PathFinder.FindPath(startCell, targetCell);
         if (currentPath != null)
         {
@@ -127,10 +126,10 @@ public class PlayerTurnController : MonoBehaviour
         {
             currentPlayerUnit.CurrentSP -= currentPlayerUnit.SPmovecost;
 
-            BattleCell previousCell = currentPlayerUnit.currentCell;
+            BattleCell previousCell = currentPlayerUnit.CurrentCell;
             if (previousCell != null)
             {
-                previousCell.ClearOccupant();
+                previousCell.ClearOccupantSP();
             }
 
             nextCell.SetOccupant(currentPlayerUnit);
@@ -147,7 +146,7 @@ public class PlayerTurnController : MonoBehaviour
             }
             currentPlayerUnit.transform.position = endPos;
 
-            currentPlayerUnit.currentCell = nextCell;
+            currentPlayerUnit.CurrentCell = nextCell;
             yield return new WaitForSeconds(0.1f);
         }
         ClearPathDisplay();
@@ -163,7 +162,7 @@ public class PlayerTurnController : MonoBehaviour
         if (currentPath == null || currentPath.Count == 0)
             return;
 
-        BattleCell start = currentPlayerUnit.currentCell;
+        BattleCell start = currentPlayerUnit.CurrentCell;
         List<BattleCell> firstSegment = PathFinder.FindPath(start, keyCell);
         List<BattleCell> secondSegment = PathFinder.FindPath(keyCell, currentPath[currentPath.Count - 1]);
 

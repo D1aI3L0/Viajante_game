@@ -1,0 +1,77 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &4533867182760685514
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7871476362539112874}
+  - component: {fileID: 2148028580457957072}
+  - component: {fileID: 9006626047263800023}
+  m_Layer: 0
+  m_Name: BattleMapManagerMP
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7871476362539112874
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4533867182760685514}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 979.794, y: 513.6081, z: -6.7002172}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2148028580457957072
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4533867182760685514}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1b9a97cf0e35ad74e8b68499ff9f8176, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  battleConfig: {fileID: 11400000, guid: 1d60e9bd5babf214cb58f525c9a68b49, type: 2}
+  hexPrefab: {fileID: 7569648107108246269, guid: 2f6cc431aed7c8b469816461ce074f96, type: 3}
+  prefabBattleCells:
+  - {fileID: 919132149155446097, guid: 7d30d81d3ff241f4c85c1b5691d4374e, type: 3}
+  obstaclePrefab: {fileID: 919132149155446097, guid: 521026bbd649340419ea99a98bb23920, type: 3}
+  warriorPrefab: {fileID: 4530143948483365523, guid: 6ce64b1ad5f56264fa220c988094b51a, type: 3}
+  pathfinderPrefab: {fileID: 4530143948483365523, guid: 6bf7d8f05b12cd842a0f729c033ca5f3, type: 3}
+  dataTransfer: {fileID: 11400000, guid: 623d9963a74b0fb499486929b3961852, type: 2}
+  enemyTransfer: {fileID: 11400000, guid: b16b98430f6055842acc490820c840cb, type: 2}
+  enemyPrefab: {fileID: 1208052373259365889, guid: 026d75493cbe7674981e691522d47fb6, type: 3}
+--- !u!114 &9006626047263800023
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4533867182760685514}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneId: 0
+  _assetId: 969026337
+  serverOnly: 0
+  visibility: 0
+  hasSpawned: 0
